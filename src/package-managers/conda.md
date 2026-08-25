@@ -30,3 +30,7 @@ When resolving a conda environment, on exotic platforms where login nodes
 and compute nodes has fundamental differences (such as existence of GPU/CUDA, even CPU microarch(? TODO: double check)), it is better to resolve
 the conda environment using the hardware that your job will run on (i.e.
 compute node) because it would resolves differently depending on these factors TODO
+
+However, when login node and compute node doesn't have these differences, it is a better practice to
+load the environment from login node first before submitting jobs (to minimize overhead for massively parallel applications),
+introduce heredoc (TODO) as a pattern to encapsulate this while being performant.
