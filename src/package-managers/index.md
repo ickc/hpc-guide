@@ -90,11 +90,11 @@ esac
 
 Prebuilt:
 
-- [conda/mamba/micromamba/pixi](conda)
+- [conda/mamba/micromamba/pixi](conda.md)
 
 Built from source:
 
-- [spack](spack)
+- [spack](spack.md)
 
 ## Where to put your new environments
 

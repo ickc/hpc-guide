@@ -15,7 +15,7 @@ Limitation: overwhelming the scheduler
 
 TODO
 
-Limitation: license (cite), be careful about [oversubscription](oversubscription)
+Limitation: license (cite), be careful about [oversubscription](oversubscription.md)
 
 ## `mpi4py.futures`
 
