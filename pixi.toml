@@ -1,0 +1,18 @@
+[workspace]
+authors = ["Kolen Cheung <10970208+ickc@users.noreply.github.com>"]
+name = "hpc-guide"
+version = "0.1.0"
+description = "A guide to be effective on utilizing HPC resources"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64"]
+
+[dependencies]
+quarto = "*"
+
+[activation]
+env = { QUARTO_PORT = "8018" }
+
+[tasks]
+build = { cmd = "quarto render", cwd = "src", description = "Render the Quarto site" }
+serve = { cmd = "quarto preview src --port $QUARTO_PORT --host 0.0.0.0", description = "Preview the Quarto site on port QUARTO_PORT" }
+clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove generated files (Quarto output and cache)" }
