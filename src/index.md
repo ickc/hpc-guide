@@ -1,5 +1,4 @@
 - Doc:
-    - arch dependent prefix to avoid collision between i3 and macs 
     - find out more about the storage system and document it. E.g. https://github.com/gw4-isambard/rse-sharing/issues/4#issuecomment-4592097055 mentions about HDDs.
     - consolidate around conda: currently it is scattered around in multiple pages
     - consolidate recommendated approach to bootstrap conda/mamba/micromamba/pixi and the way to load the environment in batch job

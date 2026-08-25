@@ -91,3 +91,14 @@ Prebuilt:
 Built from source:
 
 - [spack](spack)
+
+## Where to put your new environments
+
+HPC systems become increasingly heterogenious. If the HPC system you have access to have a network mounted `$HOME`
+and the same `$HOME` is mounted on nodes with a different architecture say `x86_64` vs. `aarch64` or even different OS (Linux vs. FreeBSD)
+then you are going to run into the following issue:
+
+- put a binary somewhere, say `~/.local/bin/binary_here`, runs fine on one node
+- SSH into another node and then run `binary_here` again: TODO: paste an example error here
+
+The solution is: arch dependent prefix TODO
