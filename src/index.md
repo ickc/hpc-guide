@@ -1,17 +1,4 @@
 - Doc:
-    - consolidate around conda: currently it is scattered around in multiple pages
-    - consolidate recommendated approach to bootstrap conda/mamba/micromamba/pixi and the way to load the environment in batch job
-
-        ```sh
-        # best portability (miniforge3/conda/anaconda)
-        source "$(conda info --base)/etc/profile.d/conda.sh"
-        conda activate ...
-        # tool specific
-        eval "$(conda shell.bash hook)"
-        eval "$(mamba shell hook -s bash)"
-        eval "$(micromamba shell hook -s bash)"
-        eval "$(pixi shell-hook -s bash)"
-        ```
     - How to build MPICH in Spack that can still communicate through the Cray's interconnect:
 
     ```yml
