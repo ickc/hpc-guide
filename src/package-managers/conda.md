@@ -23,3 +23,10 @@ Project centric design (tie to a git repo rather than a central one
 that you need to remember which project you're associating with, encouraging project level reproducibility),
 environment bootstrap, and task runner
 all-in-one.
+
+# Tips
+
+When resolving a conda environment, on exotic platforms where login nodes
+and compute nodes has fundamental differences (such as existence of GPU/CUDA, even CPU microarch(? TODO: double check)), it is better to resolve
+the conda environment using the hardware that your job will run on (i.e.
+compute node) because it would resolves differently depending on these factors TODO
