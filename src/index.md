@@ -1,5 +1,4 @@
 - Doc:
-    -   don't recommend mise: `mise use -g ubi:isambard-sc/clifton`
     -   create and distribute `bootstrap/install/clifton.sh` and recommend `curl|bash` and optionally with signing
     -   documentation and recommendation around VSCode: e.g.
         -   What is allowed?
