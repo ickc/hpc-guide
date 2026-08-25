@@ -24,6 +24,21 @@ that you need to remember which project you're associating with, encouraging pro
 environment bootstrap, and task runner
 all-in-one.
 
+# How to load the environment
+
+TODO: expand and explain
+
+```sh
+# best portability (miniforge3/conda/anaconda)
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate ...
+# tool specific (has other choices of shell as well)
+eval "$(conda shell.bash hook)"
+eval "$(mamba shell hook -s bash)"
+eval "$(micromamba shell hook -s bash)"
+eval "$(pixi shell-hook -s bash)"
+```
+
 # Tips
 
 When resolving a conda environment, on exotic platforms where login nodes
