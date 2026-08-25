@@ -1,7 +1,4 @@
 - Doc:
-    -   documentation and recommendation around VSCode: e.g.
-        -   What is allowed?
-        -   How to launch?
     -   Provide `NUM_THREADS` pattern:
 
         ```bash
