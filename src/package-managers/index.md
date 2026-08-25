@@ -1,4 +1,8 @@
-# Introduction
+---
+title: "Package managers"
+---
+
+## Introduction
 
 Package managers for HPC has unique requirements:
 

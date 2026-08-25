@@ -1,3 +1,7 @@
+---
+title: "Workflow managers"
+---
+
 Workflow managers are useful for reproducible workflow, especially
 when you have complicated pipelines with complicated data dependencies.
 

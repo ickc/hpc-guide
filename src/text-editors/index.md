@@ -1,10 +1,14 @@
+---
+title: "Text editors"
+---
+
 There are many text editors you can run on a remote UNIX system such as an HPC.
 The key problem to solve is how can you edit text files on a remote system in real time,
 without having to manually transferring them back and forth?
 
 There are two classes of text editors you can use:
 
-# Terminal based text editors
+## Terminal based text editors
 
 TODO: add links
 
@@ -15,7 +19,7 @@ TODO: add links
 
 If you don't know where to start, nano is a good option, often time available by defaults on many HPC systems (not Isambard though).
 
-# GUI based text editors with a remote mechanism
+## GUI based text editors with a remote mechanism
 
 - VSCode with Remote SSH
 - Zed editor with "Remote Development"
