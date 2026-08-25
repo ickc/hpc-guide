@@ -1,5 +1,4 @@
 - Doc:
-    - [x]  introduce using `conda-forge/label/mpi-external` to deploy MPI applications (MPICH ABI compatibility)
     -   introduce bootstrapping software project using pixi
     -   introduce more parallelization strategies
         - [ ]  GNU parallel
