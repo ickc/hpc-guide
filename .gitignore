@@ -2,5 +2,4 @@
 .pixi/
 # quarto
 /src/.quarto/
-/src/docs/
 /src/_freeze/

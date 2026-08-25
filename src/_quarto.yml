@@ -1,8 +1,11 @@
 project:
   type: website
-  output-dir: docs
+  output-dir: ../docs
   render:
     - "**/*.md"
+  resources:
+    # Tell GitHub Pages not to run the output through Jekyll
+    - .nojekyll
 
 website:
   title: "HPC Guide"
