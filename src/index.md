@@ -1,5 +1,4 @@
 - Doc:
-    -   introduce bootstrapping software project using pixi
     -   introduce more parallelization strategies
         - [ ]  GNU parallel
         -   Parsl
