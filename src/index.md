@@ -1,8 +1,4 @@
 - Doc:
-    -   introduce more parallelization strategies
-        - [ ]  GNU parallel
-        -   Parsl
-        -   hybrid Slurm job array + X parallelization
     - [ ] investigate and fix/doc why `conda activate ...` from login nodes doesn't propagate @inprogress
         -   recommend loading environment from login node first before submitting jobs (to minimize overhead for massively parallel applications), introduce heredoc. Depends on last bullet point
     - arch dependent prefix to avoid collision between i3 and macs 
