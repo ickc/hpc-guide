@@ -9,6 +9,8 @@ platforms = ["linux-64", "osx-arm64", "osx-64"]
 [dependencies]
 quarto = "*"
 lychee = "*"
+pandoc = "*"
+python = ">=3.11"
 
 [activation]
 env = { QUARTO_PORT = "8018" }
@@ -18,8 +20,7 @@ build = { cmd = "quarto render", cwd = "src", description = "Render the Quarto s
 serve = { cmd = "quarto preview src --port $QUARTO_PORT --host 0.0.0.0", description = "Preview the Quarto site on port QUARTO_PORT" }
 clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove generated files (Quarto output and cache)" }
 
-check-permalinks = { cmd = "bash bin/check-permalinks.sh", description = "Check page naming and permalink front matter" }
-fix-permalinks = { cmd = "bash bin/check-permalinks.sh --fix", description = "Write the correct output-file into each numbered page" }
-check-orphans = { cmd = "bash bin/check-orphans.sh", depends-on = ["build"], description = "Report rendered pages that nothing links to" }
+format = { cmd = "python bin/md_formatter.py src --derive-output-file", description = "Normalise markdown through pandoc and derive output-file from filenames" }
+format-check = { cmd = "python bin/md_formatter.py src --derive-output-file --check", description = "Fail if any markdown file is not formatted" }
 linkcheck = { cmd = "lychee --no-ignore --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links in the rendered site via lychee" }
 linkcheck-except-429 = { cmd = "lychee --no-ignore --accept '100..=299, 429' --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links via lychee, accepting 429 (too many requests). Primarily for CI." }
