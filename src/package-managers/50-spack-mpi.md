@@ -1,9 +1,14 @@
+---
+title: "Spack & MPI"
+output-file: spack-mpi
+---
+
 TODO: introduce how to link libfabrics, etc. properly to compose an
 environment with the vendor provided MPI
 
 - How to build MPICH in Spack that can still communicate through the Cray's interconnect:
 
-```yml
+``` yml
 libfabric:
     buildable: false
     externals:
