@@ -1,7 +1,12 @@
 ---
 title: "MPI"
+listing:
+  contents: "*.md"
+  type: table
+  fields: [title, description]
+  sort: filename
+  sort-ui: false
+  filter-ui: false
 ---
 
-See [conda](../package-managers/conda-mpi.md)
-
-See [Spack](../package-managers/spack-mpi.md)
+Composing an environment against the vendor-provided MPI.

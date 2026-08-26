@@ -1,5 +1,6 @@
 ---
 title: "Workflow managers"
+output-file: workflow.html
 ---
 
 Workflow managers are useful for reproducible workflow, especially
