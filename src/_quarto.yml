@@ -9,6 +9,7 @@ project:
 
 website:
   title: "HPC Guide"
+  site-url: "https://ickc.github.io/hpc-guide/"
   description: "A guide to be effective on utilizing HPC resources"
   search:
     location: sidebar
@@ -48,14 +49,15 @@ website:
         contents:
           - auto: "text-editors/*.md"
   page-footer:
-    left: "© Kolen Cheung"
+    left: "© {{< copyright-year 2026 >}} Kolen Cheung"
 
 format:
   html:
     theme:
-      light: cosmo
-      dark: darkly
+      light: [flatly, custom.scss]
+      dark: [darkly, custom.scss]
     respect-user-color-scheme: true
+    html-math-method: katex
     toc: true
     toc-depth: 3
     code-copy: true
