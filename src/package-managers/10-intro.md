@@ -12,7 +12,7 @@ Package managers for HPC has unique requirements:
 
 There are also two kinds of package managers:
 
-- those for missing system softwares that you depends but the sysadmin from the system might not be willing to install for you, e.g. ffmpeg
+- those for missing system softwares that you depends but the sysadmin from the system might not be willing to install for you, e.g. ffmpeg
 - those that boostrap an environment for your research project to run
 
 Some can do both, some are specialized.
@@ -39,7 +39,7 @@ And in some cases it is just providing a nicer UX.
 
 E.g. if you run `mise use -g ubi:isambard-sc/clifton`, you are trusting multiple layers of maintainers sitting at different levels where compromising either one makes your system compromised. If you know that ultimately you are trusting GitHub Releases from `isambard-sc`, then running the following script directly eliminates unnecessary layers of trust and increase security overall (especially with a binary as sensitive as this one):
 
-```sh
+``` sh
 #!/usr/bin/env bash
 
 set -euo pipefail
@@ -100,7 +100,7 @@ Built from source:
 ## Where to put your new environments
 
 HPC systems become increasingly heterogenious. If the HPC system you have access to have a network mounted `$HOME`
-and the same `$HOME` is mounted on nodes with a different architecture say `x86_64` vs. `aarch64` or even different OS (Linux vs. FreeBSD)
+and the same `$HOME` is mounted on nodes with a different architecture say `x86_64` vs. `aarch64` or even different OS (Linux vs. FreeBSD)
 then you are going to run into the following issue:
 
 - put a binary somewhere, say `~/.local/bin/binary_here`, runs fine on one node

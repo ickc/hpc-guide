@@ -24,5 +24,5 @@ Scale beyond 1 node while still embarassingly parallel in Python.
 
 ## Hybrid
 
-Nothing prevent you from mixing them, e.g. Slurm job array, where each
+Nothing prevent you from mixing them, e.g. Slurm job array, where each
 have an exclusive node and launch independent tasks in it using GNU parallel to reduce the amount of spam to the scheduler.

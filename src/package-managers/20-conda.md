@@ -33,7 +33,7 @@ all-in-one.
 
 TODO: expand and explain
 
-```sh
+``` sh
 # best portability (miniforge3/conda/anaconda)
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate ...

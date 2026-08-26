@@ -8,7 +8,7 @@ environment with the vendor provided MPI
 
 - How to build MPICH in Spack that can still communicate through the Cray's interconnect:
 
-```yml
+``` yml
 libfabric:
     buildable: false
     externals:
