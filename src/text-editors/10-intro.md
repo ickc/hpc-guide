@@ -48,7 +48,7 @@ As a sidenote, using any of these requires extra attension when you want to edit
 (say you're running an interactive notebook on the compute nodes).
 This has nothing to do with the text editors themselves,
 but the fact that you want to perform interactive tasks on the compute
-where you often need extra hopping: local -\> login -\> compute.
+where you often need extra hopping: `local -> login -> compute`.
 We'll talk about this pattern in TODO and some of its pitfalls if setup incorrectly.
 
 TODO: mention how to hop over SSH, security implications, and if setup incorrectly leads to security risks

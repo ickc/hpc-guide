@@ -11,7 +11,7 @@ lfs quota -hp $(lfs project -d $d | awk '{print $1}') $d
 
 to check the quota available in a certain directory.
 
-For example, if you have separate storage quota for these directories, \$HOME \$SCRATCHDIR \$PROJECTDIR, then run
+For example, if you have separate storage quota for these directories, `$HOME` `$SCRATCHDIR` `$PROJECTDIR`, then run
 
 ``` sh
 for d in $HOME $SCRATCHDIR $PROJECTDIR; do
