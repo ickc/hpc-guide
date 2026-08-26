@@ -90,11 +90,25 @@ pandoc, and derives `output-file` from the filename under
 and forwards filters to pandoc with `-F`.
 
 YAML front matter is deliberately kept away from pandoc. Pandoc parses metadata
-values as markdown and re-escapes them on the way out, which corrupts Quarto
-configuration — a listing's `contents: "*.md"` comes back as `contents: \*.md` —
-and it also sorts keys and drops quoting. Only the body goes through pandoc; the
-front matter is copied through untouched apart from `output-file`.
+values as markdown and re-escapes them on the way out, so a listing's
+`contents: "*.md"` comes back as `contents: \*.md`. That is not cosmetic:
+Quarto parses front matter with its own YAML parser rather than through pandoc,
+so it reads the backslash literally. `quarto inspect` reports
+`"contents": "\\*.md"`, the glob matches nothing, and the section listing
+renders empty. Pandoc also sorts metadata keys and drops quoting. So only the
+body round-trips; the front matter is copied through untouched apart from
+`output-file`.
 
-Formatting is expected to change nothing about the rendered site. It escapes
-some characters that pandoc considers ambiguous (`\[TIPS\]`, `\$HOME`, `-\>`)
-and writes fenced code as ``` ``` sh ```. All of these render identically.
+Formatting is expected to change nothing about the rendered site.
+
+It escapes anything pandoc considers ambiguous in prose — a bare `$` becomes
+`\$`, a bare `>` becomes `\>`, bracketed text becomes `\[like this\]`. These
+render identically, but the escapes are a hint that the source is saying
+something it does not mean: mark shell variables and the like as code spans, and
+use a real `::: {.callout-tip}` block rather than a literal `[TIPS]` marker. The
+source currently needs no escapes at all.
+
+Two other things it does, both harmless: fenced code is written as
+``` ``` sh ``` with a space, and a non-breaking space is inserted after an
+abbreviation, so `i.e. x` becomes `i.e.\u00a0x`. The latter is invisible in an
+editor.
