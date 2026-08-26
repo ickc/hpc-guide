@@ -1,6 +1,6 @@
 ---
 title: "Oversubscription"
-output-file: oversubscription.html
+output-file: oversubscription
 ---
 
 On an HPC, it is quite often you'd run into a situation

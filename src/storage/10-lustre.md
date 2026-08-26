@@ -1,6 +1,6 @@
 ---
 title: "Lustre file system"
-output-file: lustre.html
+output-file: lustre
 ---
 
 On LUSTRE file system, use

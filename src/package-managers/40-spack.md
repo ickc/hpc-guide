@@ -1,5 +1,5 @@
 ---
 title: "Spack"
-output-file: spack.html
+output-file: spack
 ---
 
