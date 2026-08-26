@@ -23,7 +23,8 @@ done
 
 to check the quota of them all at once.
 
-\[TIPS\]
+::: callout-tip
 Write this in a script called `myquota` in your PATH or a shell function to reuse it.
+:::
 
 TODO: add more tips from <https://github.com/ickc/isambard-workspace/tree/main/lustre>.
