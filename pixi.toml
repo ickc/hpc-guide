@@ -19,6 +19,7 @@ serve = { cmd = "quarto preview src --port $QUARTO_PORT --host 0.0.0.0", descrip
 clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove generated files (Quarto output and cache)" }
 
 check-permalinks = { cmd = "bash bin/check-permalinks.sh", description = "Check page naming and permalink front matter" }
+fix-permalinks = { cmd = "bash bin/check-permalinks.sh --fix", description = "Write the correct output-file into each numbered page" }
 check-orphans = { cmd = "bash bin/check-orphans.sh", depends-on = ["build"], description = "Report rendered pages that nothing links to" }
 linkcheck = { cmd = "lychee --no-ignore --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links in the rendered site via lychee" }
 linkcheck-except-429 = { cmd = "lychee --no-ignore --accept '100..=299, 429' --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links via lychee, accepting 429 (too many requests). Primarily for CI." }
