@@ -1,6 +1,6 @@
 ---
 title: "Conda, mamba, micromamba & pixi"
-output-file: conda.html
+output-file: conda
 ---
 
 ## Why conda

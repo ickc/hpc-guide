@@ -1,6 +1,6 @@
 ---
 title: "Introduction"
-output-file: intro.html
+output-file: intro
 ---
 
 ## Introduction

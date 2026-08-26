@@ -1,6 +1,6 @@
 ---
 title: "Embarassingly parallel jobs"
-output-file: embarassingly-parallel.html
+output-file: embarassingly-parallel
 ---
 
 There are many ways to launch a bunch of embarassingly-parallel (TODO: def)
