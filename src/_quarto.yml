@@ -30,22 +30,23 @@ website:
       - section: "Package managers"
         href: package-managers/index.md
         contents:
-          - package-managers/conda.md
-          - package-managers/conda-mpi.md
-          - package-managers/spack.md
-          - package-managers/spack-mpi.md
-      - href: mpi/index.md
-        text: MPI
+          - auto: "package-managers/*.md"
+      - section: "MPI"
+        href: mpi/index.md
+        contents:
+          - auto: "mpi/*.md"
       - section: "Running jobs"
+        href: running-jobs/index.md
         contents:
-          - running-jobs/workflow.md
-          - running-jobs/embarassingly-parallel.md
-          - running-jobs/oversubscription.md
+          - auto: "running-jobs/*.md"
       - section: "Storage"
+        href: storage/index.md
         contents:
-          - lustre.md
-      - href: text-editors/index.md
-        text: Text editors
+          - auto: "storage/*.md"
+      - section: "Text editors"
+        href: text-editors/index.md
+        contents:
+          - auto: "text-editors/*.md"
   page-footer:
     left: "© Kolen Cheung"
 

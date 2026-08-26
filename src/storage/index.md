@@ -1,5 +1,5 @@
 ---
-title: "Package managers"
+title: "Storage"
 listing:
   contents: "*.md"
   type: table
@@ -9,4 +9,4 @@ listing:
   filter-ui: false
 ---
 
-Bootstrapping software environments on systems where you cannot use the system package manager.
+Working with the shared file systems on a cluster.
