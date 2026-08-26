@@ -89,26 +89,47 @@ pandoc, and derives `output-file` from the filename under
 `--derive-output-file`. It is generic: it takes files, directories, or globs,
 and forwards filters to pandoc with `-F`.
 
+### Pandoc is not a formatter
+
+Pandoc is a converter, and using it as a markdown formatter is an abuse of it.
+It is a routine and useful abuse, but only if you know the limitations going in:
+
+- **It escapes aggressively on round trip.** A bare `$` comes back as `\$`, a
+  bare `>` as `\>`, bracketed text as `\[like this\]`. This is simply what
+  pandoc does, not a diagnosis of the source.
+- **Formatting detail is barely configurable.** Fenced code is written as
+  ``` ``` sh ``` with a space; a non-breaking space is inserted after an
+  abbreviation, so `i.e. x` becomes `i.e.\u00a0x` and is invisible in an editor.
+  Neither is adjustable.
+
+The lack of knobs is the point, in the same way it is the point in Black: there
+is one canonical form, so nobody argues about style in review. Take the whole
+package or use something else.
+
+### Reading the escapes
+
+An escape is not by itself a sign that anything is wrong — see above, pandoc
+escapes whether or not it needs to. It is worth a case-by-case look, though, and
+the question to ask is whether the plain text is carrying structure that the
+document could carry properly instead. Where it is, create the structure:
+
+- `[TIPS]` was a literal marker standing in for an admonition. It is now a
+  `::: {.callout-tip}` block, which Quarto renders as a real Tip.
+- `$HOME` in prose was a shell variable written as words. It is now a code span.
+
+Where the answer is no, leave the escape alone. It renders identically.
+
+### Front matter
+
 YAML front matter is deliberately kept away from pandoc. Pandoc parses metadata
 values as markdown and re-escapes them on the way out, so a listing's
-`contents: "*.md"` comes back as `contents: \*.md`. That is not cosmetic:
-Quarto parses front matter with its own YAML parser rather than through pandoc,
-so it reads the backslash literally. `quarto inspect` reports
+`contents: "*.md"` comes back as `contents: \*.md`. Here the escape does break
+things, because Quarto parses front matter with its own YAML parser rather than
+through pandoc, and so reads the backslash literally. `quarto inspect` reports
 `"contents": "\\*.md"`, the glob matches nothing, and the section listing
-renders empty. Pandoc also sorts metadata keys and drops quoting. So only the
-body round-trips; the front matter is copied through untouched apart from
-`output-file`.
+renders empty with no error. Pandoc also sorts metadata keys and drops quoting.
+
+So only the body round-trips; the front matter is copied through untouched apart
+from `output-file`.
 
 Formatting is expected to change nothing about the rendered site.
-
-It escapes anything pandoc considers ambiguous in prose — a bare `$` becomes
-`\$`, a bare `>` becomes `\>`, bracketed text becomes `\[like this\]`. These
-render identically, but the escapes are a hint that the source is saying
-something it does not mean: mark shell variables and the like as code spans, and
-use a real `::: {.callout-tip}` block rather than a literal `[TIPS]` marker. The
-source currently needs no escapes at all.
-
-Two other things it does, both harmless: fenced code is written as
-``` ``` sh ``` with a space, and a non-breaking space is inserted after an
-abbreviation, so `i.e. x` becomes `i.e.\u00a0x`. The latter is invisible in an
-editor.
