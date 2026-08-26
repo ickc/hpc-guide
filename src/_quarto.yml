@@ -1,0 +1,66 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "**/*.md"
+  resources:
+    # Tell GitHub Pages not to run the output through Jekyll
+    - .nojekyll
+
+website:
+  title: "HPC Guide"
+  description: "A guide to be effective on utilizing HPC resources"
+  search:
+    location: sidebar
+    type: textbox
+  navbar:
+    left:
+      - href: index.md
+        text: Home
+    right:
+      - icon: github
+        href: https://github.com/ickc/hpc-guide
+        aria-label: GitHub
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - href: index.md
+        text: Overview
+      - section: "Package managers"
+        href: package-managers/index.md
+        contents:
+          - auto: "package-managers/*.md"
+      - section: "MPI"
+        href: mpi/index.md
+        contents:
+          - auto: "mpi/*.md"
+      - section: "Running jobs"
+        href: running-jobs/index.md
+        contents:
+          - auto: "running-jobs/*.md"
+      - section: "Storage"
+        href: storage/index.md
+        contents:
+          - auto: "storage/*.md"
+      - section: "Text editors"
+        href: text-editors/index.md
+        contents:
+          - auto: "text-editors/*.md"
+  page-footer:
+    left: "© Kolen Cheung"
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    respect-user-color-scheme: true
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    email-obfuscation: javascript
+
+execute:
+  freeze: auto

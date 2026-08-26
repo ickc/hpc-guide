@@ -1,5 +1,5 @@
 ---
-title: "Package managers"
+title: "Running jobs"
 listing:
   contents: "*.md"
   type: table
@@ -9,4 +9,4 @@ listing:
   filter-ui: false
 ---
 
-Bootstrapping software environments on systems where you cannot use the system package manager.
+Getting work onto the compute nodes efficiently.
