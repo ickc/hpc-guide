@@ -48,14 +48,16 @@ export TF_NUM_INTRAOP_THREADS=${NUM_THREADS}
 export JULIA_NUM_THREADS=${NUM_THREADS}
 ```
 
-\[TIPS\]
+::: callout-tip
 Set that to the number of physical core avaible to the process,
 i.e. disregard the no. of logical core unless you know what you're doing.
+:::
 
-\[TIPS\]
+::: callout-tip
 As setting these env. var. when they aren't needed does no harm,
 and often time, espcially in Python applications, you unknowingly
 was using some parallelization backends behind the scene,
 I recommend setting all of them in all jobs,
 unless of course when you know what you are doing and require
 something more advanced than that (e.g. nesting!)
+:::
