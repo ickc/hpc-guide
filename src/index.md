@@ -23,5 +23,5 @@ cluster.
 
 ## Sections
 
-:::{#sections}
+::: {#sections}
 :::

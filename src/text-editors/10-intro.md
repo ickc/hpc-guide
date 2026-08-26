@@ -38,7 +38,7 @@ E.g. some HPC systems might reduce the `ulimit` you have on the login node on a 
 which can easily be went over for a typical VSCode setup.
 
 Zed is much more efficient in this aspect, but much younger in its ecosystem,
-and also its more restrictive design (e.g. VSCode being a browser makes writing extensions using web technology,
+and also its more restrictive design (e.g. VSCode being a browser makes writing extensions using web technology,
 such as MathJax/KaTeX almost trivial, while incredibly hard to do in Zed because it doesn't render general HTML/CSS/JS)
 might means you'll be missing some features coming from VSCode.
 But it is much more HPC friendly because it uses very little resources,
@@ -48,7 +48,7 @@ As a sidenote, using any of these requires extra attension when you want to edit
 (say you're running an interactive notebook on the compute nodes).
 This has nothing to do with the text editors themselves,
 but the fact that you want to perform interactive tasks on the compute
-where you often need extra hopping: local -> login -> compute.
+where you often need extra hopping: local -\> login -\> compute.
 We'll talk about this pattern in TODO and some of its pitfalls if setup incorrectly.
 
 TODO: mention how to hop over SSH, security implications, and if setup incorrectly leads to security risks
