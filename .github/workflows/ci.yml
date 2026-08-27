@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,3 +33,43 @@ jobs:
           locked: true
       - run: pixi run build
       - run: pixi run linkcheck-except-429
+      # Handed to the deploy job so the site is built exactly once.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: src/docs
+          include-hidden-files: true
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    # Only main, and only once the formatting and link checks have passed.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are environment secrets,
+    # not repository secrets, so the job has to name the environment to see them.
+    environment:
+      name: production
+      url: https://hpc.kolen.dev
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: src/docs
+      - uses: cloudflare/wrangler-action@v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # --branch is what makes this a *production* deployment, i.e. the one
+          # hpc.kolen.dev serves. Wrangler normally infers it from the checked-out
+          # repository, but this job only downloads the built artifact and so has
+          # no .git to infer from; left off, the upload lands as a preview.
+          command: >-
+            pages deploy src/docs
+            --project-name=hpc-kolen-dev
+            --branch=main
+            --commit-dirty=true

@@ -3,13 +3,10 @@ project:
   output-dir: docs
   render:
     - "**/*.md"
-  resources:
-    # Tell GitHub Pages not to run the output through Jekyll
-    - .nojekyll
 
 website:
   title: "HPC Guide"
-  site-url: "https://ickc.github.io/hpc-guide/"
+  site-url: "https://hpc.kolen.dev"
   description: "A guide to be effective on utilizing HPC resources"
   search:
     location: sidebar
@@ -20,7 +17,7 @@ website:
         text: Home
     right:
       - icon: github
-        href: https://github.com/ickc/hpc-guide
+        href: https://github.com/ickc/hpc.kolen.dev
         aria-label: GitHub
   sidebar:
     style: docked

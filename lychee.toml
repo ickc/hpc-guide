@@ -2,6 +2,6 @@
 # return 404 to unauthenticated requests. Drop an entry once its repo is public
 # (or run lychee with --github-token to check them for real).
 exclude = [
-    "^https://github\\.com/ickc/hpc-guide/?$",
+    "^https://github\\.com/ickc/hpc\\.kolen\\.dev/?$",
     "^https://github\\.com/ickc/isambard-workspace",
 ]
