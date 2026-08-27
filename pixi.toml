@@ -22,5 +22,8 @@ clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove genera
 
 format = { cmd = "python bin/md_formatter.py src --derive-output-file", description = "Normalise markdown through pandoc and derive output-file from filenames" }
 format-check = { cmd = "python bin/md_formatter.py src --derive-output-file --check", description = "Fail if any markdown file is not formatted" }
-linkcheck = { cmd = "lychee --no-ignore --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links in the rendered site via lychee" }
-linkcheck-except-429 = { cmd = "lychee --no-ignore --accept '100..=299, 429' --exclude-loopback --max-redirects 10 -v src/docs", depends-on = ["build"], description = "Check links via lychee, accepting 429 (too many requests). Primarily for CI." }
+# --root-dir resolves the root-relative links Quarto writes into 404.html. It has
+# to be an absolute path, so it cannot live in lychee.toml alongside the rest of
+# the configuration; $PIXI_PROJECT_ROOT supplies one wherever the task is run from.
+linkcheck = { cmd = "lychee --no-ignore --exclude-loopback --max-redirects 10 --root-dir $PIXI_PROJECT_ROOT/src/docs -v src/docs", depends-on = ["build"], description = "Check links in the rendered site via lychee" }
+linkcheck-except-429 = { cmd = "lychee --no-ignore --accept '100..=299, 429' --exclude-loopback --max-redirects 10 --root-dir $PIXI_PROJECT_ROOT/src/docs -v src/docs", depends-on = ["build"], description = "Check links via lychee, accepting 429 (too many requests). Primarily for CI." }
