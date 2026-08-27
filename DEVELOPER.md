@@ -31,6 +31,12 @@ rendered output stays untracked and is uploaded straight to Cloudflare.
 The build runs once and the deploy is gated on both checks, so a formatting or
 link failure stops the publish. Pull requests run steps 1 and 2 only.
 
+That link check runs against the freshly built `src/docs` on disk, never
+against the deployed site, which is why `lychee.toml` drops `sitemap.xml` and
+`robots.txt` from the crawl: they contain only absolute self-references, so
+fetching them would report on whatever is already live rather than on the
+output about to be published.
+
 The credentials — `CLOUDFLARE_API_TOKEN` (scoped to *Cloudflare Pages: Edit*)
 and `CLOUDFLARE_ACCOUNT_ID` — live in the repository's `production`
 **environment**, not in its repository secrets. That is why the deploy job
