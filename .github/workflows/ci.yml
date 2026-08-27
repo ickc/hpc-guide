@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # Every branch, not just main: a push to any other branch produces a preview
+    # deployment at https://<branch>.hpc-kolen-dev.pages.dev.
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
@@ -21,6 +23,10 @@ permissions:
 jobs:
   lint:
     name: Formatting
+    # Branches in this repository are already covered by the `push` trigger, so the
+    # `pull_request` trigger only needs to serve pull requests from forks. Without
+    # this, every same-repo PR would build twice.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -33,6 +39,7 @@ jobs:
 
   build:
     name: Build and check links
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -51,15 +58,32 @@ jobs:
 
   deploy:
     name: Deploy to Cloudflare Pages
-    # Only main, and only once the formatting and link checks have passed.
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    # Two exclusions, both load-bearing:
+    #
+    #   pull_request — a fork pull request must never reach CLOUDFLARE_API_TOKEN.
+    #     That token is account-wide `Cloudflare Pages: Edit`, so it can deploy to
+    #     and delete every Pages project in the account, not just this one. Fork
+    #     pull requests cannot read environment secrets, so this holds by
+    #     construction — but only while deploy stays off the pull_request trigger.
+    #
+    #   dependabot — GitHub routes Dependabot-triggered runs to a separate secrets
+    #     store, so the token would expand to an empty string and every dependency
+    #     bump would fail here.
+    #
+    # Branches in this repository are covered by the `push` trigger, which is what
+    # makes previews appear before a pull request is even opened.
+    if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
     needs: [lint, build]
     runs-on: ubuntu-latest
-    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are environment secrets,
-    # not repository secrets, so the job has to name the environment to see them.
+    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are environment secrets, not
+    # repository secrets, so the job has to name the environment to see them. The
+    # name is conditional so that `production` can later carry a deployment branch
+    # policy restricting it to main without breaking preview deploys.
     environment:
-      name: production
-      url: https://hpc.kolen.dev
+      name: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
+      # Renders as a clickable "View deployment" button on the run, and as the
+      # environment's current URL in the repository sidebar.
+      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
     permissions:
       contents: read
       actions: read
@@ -68,16 +92,31 @@ jobs:
         with:
           name: site
           path: src/docs
-      - uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+      - id: deploy
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # --branch is what makes this a *production* deployment, i.e. the one
-          # hpc.kolen.dev serves. Wrangler normally infers it from the checked-out
-          # repository, but this job only downloads the built artifact and so has
-          # no .git to infer from; left off, the upload lands as a preview.
+          # --branch decides production vs preview. Passing the branch that is
+          # actually being built means main lands as production (the deployment
+          # hpc.kolen.dev serves) and everything else lands as a preview.
+          #
+          # It has to be passed explicitly: wrangler normally infers the branch
+          # from the checked-out repository, but this job only downloads the built
+          # artifact and so has no .git to infer from. Left off entirely, every
+          # upload — main included — would land as a preview.
           command: >-
             pages deploy src/docs
             --project-name=hpc-kolen-dev
-            --branch=main
+            --branch=${{ github.ref_name }}
             --commit-dirty=true
+      - name: Summarise the deployment
+        run: |
+          {
+            echo "### Deployed \`${{ github.ref_name }}\`"
+            echo
+            echo "| | URL |"
+            echo "|---|---|"
+            echo "| Branch (stable) | ${{ steps.deploy.outputs.pages-deployment-alias-url }} |"
+            echo "| This deployment | ${{ steps.deploy.outputs.deployment-url }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
