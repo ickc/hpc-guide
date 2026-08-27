@@ -35,7 +35,11 @@ That link check runs against the freshly built `src/docs` on disk, never
 against the deployed site, which is why `lychee.toml` drops `sitemap.xml` and
 `robots.txt` from the crawl: they contain only absolute self-references, so
 fetching them would report on whatever is already live rather than on the
-output about to be published.
+output about to be published. For the same reason the linkcheck tasks pass
+`--root-dir`: the not-found page links from the site root rather than
+relatively (see below), and without a root directory lychee cannot resolve a
+`/`-prefixed link against a local file. It has to be an absolute path, so it
+lives in the pixi task rather than in `lychee.toml`.
 
 The credentials — `CLOUDFLARE_API_TOKEN` (scoped to *Cloudflare Pages: Edit*)
 and `CLOUDFLARE_ACCOUNT_ID` — live in the repository's `production`
@@ -56,13 +60,15 @@ src/running-jobs/
   30-oversubscription.md        content
 ```
 
-There are exactly two kinds of file, and `pixi run format-check` rejects
-anything else:
+There are exactly two kinds of file in a section, and `pixi run format-check`
+rejects anything else:
 
 - **`index.md`** — a short intro plus a `listing` that enumerates the folder. It
   holds no content of its own; a section with only one page still gets an
   `index.md` and a separate `10-intro.md`, so no folder is a special case.
 - **`NN-name.md`** — a content page. The two-digit prefix sets the order.
+
+`src/404.md` is the one page outside that scheme; see below.
 
 ### Adding a page
 
@@ -74,6 +80,28 @@ without renumbering.
 
 `src/_quarto.yml` only names the sections and their order. It never lists
 individual pages.
+
+### The not-found page
+
+`src/404.md` renders to `docs/404.html`, and Cloudflare Pages serves it — with a
+404 status — for any URL that matches no file. Its presence in the output root
+is the whole configuration: Pages infers a project's not-found behaviour from
+the files it is given, and a site with no `404.html` falls back to answering
+with `index.html` instead, which is why an unknown URL used to land on the home
+page.
+
+It is exempt from the `NN-` rule, and `bin/md_formatter.py` names the exemption
+in `UNNUMBERED_STEMS`. The exemption is not a convenience: the filename *is* the
+contract with Pages here, exactly as `index.md` is with Quarto, so a page named
+by contract cannot also carry an order prefix. It gets no `output-file` either,
+for the same reason. Being outside every section, it appears in no sidebar and
+no listing, and Quarto keeps it out of `sitemap.xml` and the search index.
+
+The one thing to know when editing it: because it is served at URLs of any
+depth, Quarto writes its links and assets from the site root (`/mpi/index.html`)
+rather than relatively, which it can only do because `site-url` is set in
+`src/_quarto.yml`. Links in the source are still written the normal way, to the
+source file — Quarto handles the rest.
 
 ## The permalink contract
 

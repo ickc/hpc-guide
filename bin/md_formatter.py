@@ -40,6 +40,13 @@ COMMON_ARGS: list[str] = [
 FRONT_MATTER_RE = re.compile(r"\A---\n(?P<meta>.*?\n)---\n(?P<body>.*)\Z", re.DOTALL)
 NUMBERED_RE = re.compile(r"\A\d\d-(?P<name>.+)\Z")
 
+# Pages whose filename is fixed by something other than this convention, and so
+# carry no ``NN-`` prefix: ``index`` is the section landing page, and ``404`` is
+# the not-found page, which Quarto renders to ``404.html`` at the project root
+# for the web server to serve on any unmatched URL. Both are named by contract,
+# so neither is ordered and neither may be renumbered.
+UNNUMBERED_STEMS = frozenset({"index", "404"})
+
 
 def split_front_matter(text: str) -> tuple[str | None, str]:
     """Return the front matter body (without delimiters) and the markdown body."""
@@ -122,13 +129,13 @@ def format_file(path: Path, args: argparse.Namespace) -> bool:
 
 
 def misnamed(paths: Sequence[Path]) -> list[Path]:
-    """Pages that are neither a section index nor an NN- prefixed content page.
+    """Pages that are neither named by contract nor an NN- prefixed content page.
 
     Such a file still renders, but its position in the sidebar and in its
     section's listing would be decided by plain alphabetical order rather than
     by the numbering, so the convention is enforced rather than assumed.
     """
-    return [p for p in paths if p.stem != "index" and not NUMBERED_RE.match(p.stem)]
+    return [p for p in paths if p.stem not in UNNUMBERED_STEMS and not NUMBERED_RE.match(p.stem)]
 
 
 def resolve_paths(inputs: Sequence[str], pattern: str) -> list[Path]:
@@ -168,7 +175,8 @@ def main(argv: Sequence[str] = tuple(sys.argv[1:])) -> int:
     if args.derive_output_file:
         offenders = misnamed(paths)
         if offenders:
-            print("Expected 'index.md' or an 'NN-name.md' numbered page:", file=sys.stderr)
+            allowed = " or ".join(f"'{stem}.md'" for stem in sorted(UNNUMBERED_STEMS))
+            print(f"Expected {allowed} or an 'NN-name.md' numbered page:", file=sys.stderr)
             for path in offenders:
                 print(f"  {path}", file=sys.stderr)
             return 1
