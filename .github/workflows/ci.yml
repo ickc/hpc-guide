@@ -10,13 +10,21 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege by default; the deploy job widens nothing, it only restates this.
+permissions:
+  contents: read
+
+# Actions are pinned to commit SHAs rather than tags: a tag can be moved to point at
+# new code, and `wrangler-action` runs in the same job as the Cloudflare API token.
+# The trailing comment is the human-readable version; Dependabot updates both.
+
 jobs:
   lint:
     name: Formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: prefix-dev/setup-pixi@v0.10.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           locked: true
       # Fails when a file is not in the canonical form `pixi run format` produces,
@@ -27,14 +35,14 @@ jobs:
     name: Build and check links
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: prefix-dev/setup-pixi@v0.10.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           locked: true
       - run: pixi run build
       - run: pixi run linkcheck-except-429
       # Handed to the deploy job so the site is built exactly once.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: site
           path: src/docs
@@ -56,11 +64,11 @@ jobs:
       contents: read
       actions: read
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: site
           path: src/docs
-      - uses: cloudflare/wrangler-action@v4.0.0
+      - uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
