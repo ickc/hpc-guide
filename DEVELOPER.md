@@ -13,6 +13,31 @@ pixi tasks, so `pixi install` is the only setup step.
 | `pixi run linkcheck` | check the rendered site's links with lychee |
 | `pixi run clean` | remove generated files |
 
+## Deployment
+
+The site is served by [Cloudflare Pages](https://pages.cloudflare.com) at
+<https://hpc.kolen.dev>. It is not a GitHub Pages site, so nothing here needs a
+`.nojekyll` marker or a `docs/` directory committed to the repository — the
+rendered output stays untracked and is uploaded straight to Cloudflare.
+
+`.github/workflows/ci.yml` does the whole thing on a push to `main`:
+
+1. **lint** — `pixi run format-check`.
+2. **build** — `pixi run build`, then `pixi run linkcheck-except-429`, then
+   uploads `src/docs` as an artifact.
+3. **deploy** — downloads that artifact and hands it to
+   `wrangler pages deploy --project-name=hpc-kolen-dev`.
+
+The build runs once and the deploy is gated on both checks, so a formatting or
+link failure stops the publish. Pull requests run steps 1 and 2 only.
+
+The credentials — `CLOUDFLARE_API_TOKEN` (scoped to *Cloudflare Pages: Edit*)
+and `CLOUDFLARE_ACCOUNT_ID` — live in the repository's `production`
+**environment**, not in its repository secrets. That is why the deploy job
+declares `environment: production`: a job that does not name the environment
+cannot read them, and `secrets.CLOUDFLARE_API_TOKEN` silently expands to the
+empty string rather than failing outright.
+
 ## How pages are laid out
 
 Every folder under `src/` is a section, and every section looks the same:
