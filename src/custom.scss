@@ -1,15 +1,26 @@
 /*-- scss:defaults --*/
 
-// TeX Gyre Schola — see ISSUES.md: assumes font installed locally
+// The families declared by the stylesheet imported below. They are named here
+// rather than read from its `--font-body` / `--font-code` custom properties so
+// that a fallback stack survives if font.kolen.dev is unreachable: an undefined
+// `var()` is invalid at computed-value time and would take the fallbacks with it.
 $font-family-base: 'TeX Gyre Schola', Georgia, 'Times New Roman', serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
 $headings-font-family: $font-family-base;
 $line-height-base: 1.45;
 $font-size-base: 1.0625rem; // ~17px — Butterick recommends ≥ 15–16px
 
 /*-- scss:rules --*/
 
-// Load webfont @font-face declarations from CDN (ickc/markdown-latex-css)
-@import url('https://cdn.jsdelivr.net/gh/ickc/markdown-latex-css/fonts/fonts.min.css');
+// Web fonts from https://font.kolen.dev (ickc/font), which serves them with
+// `access-control-allow-origin: *`, so a cross-origin fetch of the faces works.
+//
+// Only the `@font-face` rules matter to us. The stylesheet also asserts families
+// on `body`, `code` and `:lang()`, but sass hoists a `url()` import to the top of
+// the compiled bundle, so Bootstrap's own rules — built from the variables above —
+// come later and win. Its Greek, Hebrew, Chinese and math faces are declared but
+// never matched by this English-only guide, so no browser downloads them.
+@import url('https://font.kolen.dev/assets/fonts.css');
 
 // Constrain line length for readability (Butterick: 45–90 chars, aim ~65–72)
 .page-columns .column-body,
