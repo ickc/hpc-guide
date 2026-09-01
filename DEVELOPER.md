@@ -48,6 +48,49 @@ declares `environment: production`: a job that does not name the environment
 cannot read them, and `secrets.CLOUDFLARE_API_TOKEN` silently expands to the
 empty string rather than failing outright.
 
+## Fonts
+
+`src/custom.scss` names the families and
+[font.kolen.dev](https://font.kolen.dev) supplies the faces:
+
+```scss
+$font-family-base: 'TeX Gyre Schola', Georgia, 'Times New Roman', serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, ..., monospace;
+
+@import url('https://font.kolen.dev/assets/fonts.css');
+```
+
+That site is [ickc/font](https://github.com/ickc/font), the same author's
+multilingual font pattern, deployed to Cloudflare Pages. Two properties of that
+deployment are what make it usable from here: Pages answers with
+`access-control-allow-origin: *`, which a cross-origin font fetch requires, and
+the `url()` references inside the stylesheet resolve against *its* origin, so
+the `.woff2` files come from font.kolen.dev without anything being copied into
+this repository.
+
+Only its `@font-face` rules have any effect here. It also asserts families on
+`body`, `code` and `:lang()`, but sass hoists a `url()` import to the top of the
+compiled bundle — above every Bootstrap rule generated from the variables — so
+the cascade settles on ours. Setting the families through the SCSS variables
+rather than leaving them to that stylesheet is not merely a workaround for the
+hoisting: it is how the navbar, sidebar, headings, buttons and the syntax
+highlighter all come out in the same font, since Bootstrap builds them from
+`--bs-body-font-family` and `--bs-font-monospace`.
+
+It ships Greek, Hebrew, Traditional Chinese and math faces too. Those cost
+nothing: an unmatched `@font-face` is never fetched, and this guide is in
+English, so a browser downloads only the four Schola faces and the four
+JetBrains Mono ones. The stylesheet does make one request we have no use for —
+it `@import`s Google Fonts' Noto Sans TC — but that is a stylesheet, not a font
+file, and its unicode-ranged faces go unfetched for the same reason.
+
+The families are repeated in `custom.scss` rather than read from the
+`--font-body` and `--font-code` custom properties the stylesheet also defines.
+Those would work, but an undefined `var()` is invalid at computed-value time: if
+font.kolen.dev were unreachable the declaration would be thrown out whole,
+taking the Georgia and Menlo fallbacks with it. Naming the families keeps the
+fallback chain a local fact.
+
 ## How pages are laid out
 
 Every folder under `src/` is a section, and every section looks the same:
