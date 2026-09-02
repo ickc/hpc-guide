@@ -117,6 +117,39 @@ if font.kolen.dev were unreachable the declaration would be thrown out whole,
 taking the Georgia and Menlo fallbacks with it. Naming the families keeps the
 fallback chain a local fact.
 
+### What that origin promises, and what it does not
+
+Depending on someone else's deployment is a trade, and it is worth knowing
+which half of it is written down. The two stylesheet paths, the family names
+they declare and the two custom property names are fixed. A font file is never
+replaced in place: an updated face is published under a new filename with the
+stylesheet pointed at it, which is what lets the `.woff2` files be served
+`max-age=31536000, immutable` — the eight faces this guide actually fetches
+come to about 610 KB, and a returning visitor refetches none of it — while the
+4 KB stylesheet in front of them stays short-lived and bustable.
+
+What there is not is a version to pin. Everyone gets the same two URLs, so a
+face added, dropped or moved to a newer upstream release arrives here once the
+stylesheet's cache entry expires. Reckon on four hours rather than the hour
+`faces.css` asks for: Cloudflare serves whichever is higher, the origin's
+`max-age` or the zone's Browser Cache TTL, and that zone is on Cloudflare's
+four-hour default.
+
+Family names survive such a release. Metrics are not promised with them. An
+upstream release may change advance widths, x-height or vertical metrics, and
+nothing on either side would catch it — `$font-size-base` and
+`$line-height-base` in `custom.scss` are tuned against the current Schola, and
+they are what would show it. In exchange this repository carries no font files
+and no licence files, since the copy a visitor's browser receives comes from
+font.kolen.dev and the OFL and GUST licence texts are published there beside
+the faces.
+
+If that trade ever stops being acceptable, the escape hatch is documented:
+`src/assets/` in ickc/font is self-contained, licence files included, and
+copying it into `src/` here makes this site decide for itself when its fonts
+change — and makes it the party doing the distributing, which is what brings
+those licence files along.
+
 ## How pages are laid out
 
 Every folder under `src/` is a section, and every section looks the same:
