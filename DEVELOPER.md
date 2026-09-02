@@ -111,7 +111,10 @@ and the variables above leave nothing set in it — but an `@import` is fetched
 whether or not anything matches the family, so a third origin would be on the
 critical path of every page load for a font no element asks for. Bootswatch
 guards that rule with `@if $web-font-path`, so setting the variable to `false`
-in `custom.scss` drops it from both bundles.
+in `custom.scss` drops it from both bundles. `$mermaid-font-family` follows it,
+because Quarto derives that one from the theme's `$font-family-sans-serif` —
+the same Lato stack — and diagram labels are body text set in a picture, so they
+should be in the body family rather than in a font the page no longer fetches.
 
 `faces.css` declares Greek, Hebrew, Chinese and math faces too. Those cost
 nothing: an unmatched `@font-face` is never fetched, and this guide is in

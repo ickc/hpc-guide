@@ -21,6 +21,12 @@ $font-size-base: 1.0625rem;
 // `@if $web-font-path`, so `false` drops it from both bundles.
 $web-font-path: false;
 
+// Quarto builds `--mermaid-font-family` from the theme's `$font-family-sans-serif`,
+// which in flatly and darkly is the Lato stack the import above no longer loads.
+// Diagram labels are body text set in a picture, so point them at the body family
+// and they match the prose around them.
+$mermaid-font-family: $font-family-base;
+
 /*-- scss:rules --*/
 
 // Constrain line length for readability (Butterick: 45–90 chars, aim ~65–72)
