@@ -105,6 +105,14 @@ what makes the navbar, sidebar, headings, buttons and the syntax highlighter
 come out in the same font: Bootstrap builds all of them from
 `--bs-body-font-family` and `--bs-font-monospace`.
 
+**`$web-font-path: false`**, because flatly and darkly bring a web font of their
+own. Both open their compiled bundle with an `@import` of Google Fonts' Lato,
+and the variables above leave nothing set in it — but an `@import` is fetched
+whether or not anything matches the family, so a third origin would be on the
+critical path of every page load for a font no element asks for. Bootswatch
+guards that rule with `@if $web-font-path`, so setting the variable to `false`
+in `custom.scss` drops it from both bundles.
+
 `faces.css` declares Greek, Hebrew, Chinese and math faces too. Those cost
 nothing: an unmatched `@font-face` is never fetched, and this guide is in
 English, so a browser downloads only the four Schola faces and the four

@@ -13,6 +13,14 @@ $line-height-base: 1.45;
 // against Schola; font.kolen.dev promises the family names, not their metrics.
 $font-size-base: 1.0625rem;
 
+// Flatly and darkly each open their compiled bundle with an `@import` of Google
+// Fonts' Lato. Nothing on the page is set in it — the families above replace it
+// everywhere Bootstrap uses a font — but the `@import` is still fetched: it is a
+// render-blocking stylesheet request to a third origin on every page load, for a
+// family no element asks for. Bootswatch guards the rule with
+// `@if $web-font-path`, so `false` drops it from both bundles.
+$web-font-path: false;
+
 /*-- scss:rules --*/
 
 // Constrain line length for readability (Butterick: 45–90 chars, aim ~65–72)
