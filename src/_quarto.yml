@@ -54,6 +54,14 @@ format:
       light: [flatly, custom.scss]
       dark: [darkly, custom.scss]
     respect-user-color-scheme: true
+    # Web fonts from font.kolen.dev — see DEVELOPER.md. Linked here rather than
+    # @import'ed from custom.scss so the preload scanner finds the faces while
+    # the theme bundle is still downloading, instead of a round trip behind it.
+    include-in-header:
+      - text: |
+          <link rel="preconnect" href="https://font.kolen.dev">
+          <link rel="preconnect" href="https://font.kolen.dev" crossorigin>
+          <link rel="stylesheet" href="https://font.kolen.dev/assets/faces.css">
     html-math-method: katex
     toc: true
     toc-depth: 3
