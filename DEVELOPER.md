@@ -48,6 +48,119 @@ declares `environment: production`: a job that does not name the environment
 cannot read them, and `secrets.CLOUDFLARE_API_TOKEN` silently expands to the
 empty string rather than failing outright.
 
+## Fonts
+
+`src/custom.scss` names the families, `src/_quarto.yml` links the stylesheet
+that declares them, and [font.kolen.dev](https://font.kolen.dev) serves both
+that stylesheet and the faces behind it:
+
+```scss
+// src/custom.scss
+$font-family-base: 'TeX Gyre Schola', Georgia, 'Times New Roman', serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, ..., monospace;
+```
+
+```html
+<!-- src/_quarto.yml, under format.html.include-in-header -->
+<link rel="preconnect" href="https://font.kolen.dev">
+<link rel="preconnect" href="https://font.kolen.dev" crossorigin>
+<link rel="stylesheet" href="https://font.kolen.dev/assets/faces.css">
+```
+
+That site is [ickc/font](https://github.com/ickc/font), the same author's
+multilingual font pattern, deployed to Cloudflare Pages, and it publishes those
+stylesheets as a [documented
+distribution](https://font.kolen.dev/#using-these-fonts-on-another-site) rather
+than only as a demo of one. Two properties of the deployment are what make it
+usable from here: Pages answers with `access-control-allow-origin: *`, which a
+cross-origin font fetch requires, and the `url()` references inside the
+stylesheet are relative, so the `.woff2` files follow from that origin without
+anything being copied into this repository.
+
+**`faces.css`, not `fonts.css`.** The two differ in what they assert.
+`faces.css` is the `@font-face` declarations and nothing else. `fonts.css` is
+that file plus the rules that make *font.kolen.dev itself* use them — families
+on `body`, `code` and `:lang()` — plus an `@import` of Google Fonts' Noto Sans
+TC. This site has already decided what its elements are set in, through the
+Bootstrap variables above, and renders no Traditional Chinese, so `fonts.css`
+would only add a third-origin stylesheet request per page load and a cascade to
+argue with.
+
+**From the head, not from `custom.scss`.** An `@import` in the SCSS ends up
+inside the compiled theme bundle, so a browser cannot discover the faces until
+it has downloaded and parsed that bundle, and cannot start the `.woff2` files
+until it has parsed the stylesheet that arrives after it. A `<link>` in the
+head is found by the preload scanner during the initial parse instead, so the
+stylesheet is fetched alongside the theme bundle rather than behind it.
+
+**Both `preconnect` lines**, and not because the origin is written twice by
+mistake. A font fetch is anonymous-mode CORS and gets a connection pool of its
+own, so the `crossorigin` line is the one that warms the font requests; the
+stylesheet request is credentialed, uses the other pool, and happens first.
+Either line alone leaves half the connection cost in place. This is the
+two-line form Google Fonts publishes, for the same reason.
+
+Setting the families through the SCSS variables rather than in a `body` rule is
+what makes the navbar, sidebar, headings, buttons and the syntax highlighter
+come out in the same font: Bootstrap builds all of them from
+`--bs-body-font-family` and `--bs-font-monospace`.
+
+**`$web-font-path: false`**, because flatly and darkly bring a web font of their
+own. Both open their compiled bundle with an `@import` of Google Fonts' Lato,
+and the variables above leave nothing set in it — but an `@import` is fetched
+whether or not anything matches the family, so a third origin would be on the
+critical path of every page load for a font no element asks for. Bootswatch
+guards that rule with `@if $web-font-path`, so setting the variable to `false`
+in `custom.scss` drops it from both bundles. `$mermaid-font-family` follows it,
+because Quarto derives that one from the theme's `$font-family-sans-serif` —
+the same Lato stack — and diagram labels are body text set in a picture, so they
+should be in the body family rather than in a font the page no longer fetches.
+
+`faces.css` declares Greek, Hebrew, Chinese and math faces too. Those cost
+nothing: an unmatched `@font-face` is never fetched, and this guide is in
+English, so a browser downloads only the four Schola faces and the four
+JetBrains Mono ones.
+
+The families are repeated in `custom.scss` rather than read from the
+`--font-body` and `--font-code` custom properties `faces.css` also exports.
+Those would work, but an undefined `var()` is invalid at computed-value time:
+if font.kolen.dev were unreachable the declaration would be thrown out whole,
+taking the Georgia and Menlo fallbacks with it. Naming the families keeps the
+fallback chain a local fact.
+
+### What that origin promises, and what it does not
+
+Depending on someone else's deployment is a trade, and it is worth knowing
+which half of it is written down. The two stylesheet paths, the family names
+they declare and the two custom property names are fixed. A font file is never
+replaced in place: an updated face is published under a new filename with the
+stylesheet pointed at it, which is what lets the `.woff2` files be served
+`max-age=31536000, immutable` — the eight faces this guide actually fetches
+come to about 610 KB, and a returning visitor refetches none of it — while the
+4 KB stylesheet in front of them stays short-lived and bustable.
+
+What there is not is a version to pin. Everyone gets the same two URLs, so a
+face added, dropped or moved to a newer upstream release arrives here once the
+stylesheet's cache entry expires. Reckon on four hours rather than the hour
+`faces.css` asks for: Cloudflare serves whichever is higher, the origin's
+`max-age` or the zone's Browser Cache TTL, and that zone is on Cloudflare's
+four-hour default.
+
+Family names survive such a release. Metrics are not promised with them. An
+upstream release may change advance widths, x-height or vertical metrics, and
+nothing on either side would catch it — `$font-size-base` and
+`$line-height-base` in `custom.scss` are tuned against the current Schola, and
+they are what would show it. In exchange this repository carries no font files
+and no licence files, since the copy a visitor's browser receives comes from
+font.kolen.dev and the OFL and GUST licence texts are published there beside
+the faces.
+
+If that trade ever stops being acceptable, the escape hatch is documented:
+`src/assets/` in ickc/font is self-contained, licence files included, and
+copying it into `src/` here makes this site decide for itself when its fonts
+change — and makes it the party doing the distributing, which is what brings
+those licence files along.
+
 ## How pages are laid out
 
 Every folder under `src/` is a section, and every section looks the same:

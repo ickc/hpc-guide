@@ -1,15 +1,33 @@
 /*-- scss:defaults --*/
 
-// TeX Gyre Schola — see ISSUES.md: assumes font installed locally
+// The families declared by https://font.kolen.dev/assets/faces.css, which the
+// document head links (see `_quarto.yml`). They are named here rather than read
+// from that stylesheet's `--font-body` / `--font-code` custom properties so that
+// a fallback stack survives if font.kolen.dev is unreachable: an undefined
+// `var()` is invalid at computed-value time and would take the fallbacks with it.
 $font-family-base: 'TeX Gyre Schola', Georgia, 'Times New Roman', serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
 $headings-font-family: $font-family-base;
 $line-height-base: 1.45;
-$font-size-base: 1.0625rem; // ~17px — Butterick recommends ≥ 15–16px
+// ~17px — Butterick recommends ≥ 15–16px. This and $line-height-base are tuned
+// against Schola; font.kolen.dev promises the family names, not their metrics.
+$font-size-base: 1.0625rem;
+
+// Flatly and darkly each open their compiled bundle with an `@import` of Google
+// Fonts' Lato. Nothing on the page is set in it — the families above replace it
+// everywhere Bootstrap uses a font — but the `@import` is still fetched: it is a
+// render-blocking stylesheet request to a third origin on every page load, for a
+// family no element asks for. Bootswatch guards the rule with
+// `@if $web-font-path`, so `false` drops it from both bundles.
+$web-font-path: false;
+
+// Quarto builds `--mermaid-font-family` from the theme's `$font-family-sans-serif`,
+// which in flatly and darkly is the Lato stack the import above no longer loads.
+// Diagram labels are body text set in a picture, so point them at the body family
+// and they match the prose around them.
+$mermaid-font-family: $font-family-base;
 
 /*-- scss:rules --*/
-
-// Load webfont @font-face declarations from CDN (ickc/markdown-latex-css)
-@import url('https://cdn.jsdelivr.net/gh/ickc/markdown-latex-css/fonts/fonts.min.css');
 
 // Constrain line length for readability (Butterick: 45–90 chars, aim ~65–72)
 .page-columns .column-body,
