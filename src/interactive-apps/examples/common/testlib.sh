@@ -68,11 +68,15 @@ job_running() {
     [[ $state == RUNNING ]]
 }
 
+wait_running() {
+    retry "$QUEUE_TIMEOUT" job_running "$1" || fail "job $1 did not start within ${QUEUE_TIMEOUT}s"
+    log "job $1 is running"
+}
+
 # wait_ready JOBID: wait until the job has published its session info, and
 # load it into this shell.
 wait_ready() {
-    retry "$QUEUE_TIMEOUT" job_running "$1" || fail "job $1 did not start within ${QUEUE_TIMEOUT}s"
-    log "job $1 is running"
+    wait_running "$1"
     retry 120 test -f "$SESSIONS/$1/info.env" || fail "job $1 published no session info; see $WORK/$1.out"
     # shellcheck disable=SC1090
     source "$SESSIONS/$1/info.env"

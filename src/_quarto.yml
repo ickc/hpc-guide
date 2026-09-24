@@ -4,6 +4,9 @@ project:
   render:
     - "**/*.md"
     - "**/*.qmd"
+  # Published as-is, so pages can link to the scripts as downloads.
+  resources:
+    - "interactive-apps/examples/**"
 
 website:
   title: "HPC Guide"
@@ -38,6 +41,10 @@ website:
         href: running-jobs/index.md
         contents:
           - auto: "running-jobs/*.md"
+      - section: "Interactive apps"
+        href: interactive-apps/index.md
+        contents:
+          - auto: "interactive-apps/*"
       - section: "Storage"
         href: storage/index.md
         contents:
