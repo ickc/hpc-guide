@@ -16,7 +16,7 @@ so this is only acceptable with an app that has one and with a strong token
 Quick tunnels are also meant for testing, without any promise that they keep working.
 
 I include it because it is the least effort of anything in this section.
-For regular use prefer [method 2](50-srun-ssh.md),
+For regular use prefer [method 2](50-srun-ssh.qmd),
 or, if you want a relay, 3b, which at least checks who you are.
 (Cloudflare can do that too, with a named tunnel behind Cloudflare Access,
 but that needs an account and a domain, and is beyond this guide.)

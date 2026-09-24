@@ -21,7 +21,16 @@ from wherever you can run `srun`.
 SSH lets you use a command as the connection instead of a network socket (`ProxyCommand`),
 so from the laptop it is one ordinary `ssh -L` port forward:
 
-    laptop --ssh--> login node --srun--> sshd -i on the compute node --> 127.0.0.1:APP_PORT
+```{mermaid}
+flowchart LR
+  laptop["laptop"]
+  login["login node"]
+  sshd["sshd -i<br/>(on the compute node)"]
+  app["app on 127.0.0.1"]
+  laptop -- "ssh" --> login
+  login -- "srun" --> sshd
+  sshd -- "ssh -L" --> app
+```
 
 Only you can attach to your own job with `srun`, SSH does the encryption and authentication end to end,
 and the keys are made fresh for every job.

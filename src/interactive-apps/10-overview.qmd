@@ -12,7 +12,14 @@ They listen on a port, and you use them from a browser or an editor on your lapt
 On an HPC you want them on a compute node, not on the shared login node,
 which leaves a path with one missing piece:
 
-    laptop --ssh--> login node --???--> compute node
+```{mermaid}
+flowchart LR
+  laptop["laptop"]
+  login["login node"]
+  compute["compute node"]
+  laptop -- "ssh" --> login
+  login -. "???" .-> compute
+```
 
 You can SSH to the login node, but normally not onward to a compute node,
 so something has to carry the connection across that last hop.
@@ -64,7 +71,7 @@ flowchart LR
 ```
 
 The app listens only on the compute node's loopback, which nothing else on the cluster can reach.
-[Method 2](50-srun-ssh.md) runs an SSH server over `srun`,
+[Method 2](50-srun-ssh.qmd) runs an SSH server over `srun`,
 so your laptop gets one SSH session that reaches all the way to the app.
 
 ### Group 3: the job connects out to a relay
@@ -80,7 +87,7 @@ flowchart LR
 
 The app again listens only on loopback, and the job connects *out* to a relay that your laptop can also reach.
 They differ in who runs the relay:
-you ([3a](60-own-relay.md)), Microsoft ([3b](70-dev-tunnel.md)), or Cloudflare ([3c](80-cloudflare-tunnel.md)).
+you ([3a](60-own-relay.qmd)), Microsoft ([3b](70-dev-tunnel.md)), or Cloudflare ([3c](80-cloudflare-tunnel.md)).
 
 ## Comparison
 
@@ -89,8 +96,8 @@ you ([3a](60-own-relay.md)), Microsoft ([3b](70-dev-tunnel.md)), or Cloudflare (
 | [0](20-shell.md) shell | (no port) | yes (SSH + Slurm) | nobody | none | Slurm |
 | [1a](30-plain-http.md) HTTP | cluster network | **no** | **anyone on the cluster** | none | Slurm |
 | [1b](40-tls.md) HTTPS | cluster network | yes | anyone on the cluster, stopped by the token | none | Slurm, `openssl` |
-| [2](50-srun-ssh.md) SSH over srun | loopback | yes | only you | none | Slurm, an `sshd` binary |
-| [3a](60-own-relay.md) own relay | loopback | yes | only you | your server | outbound SSH, a server |
+| [2](50-srun-ssh.qmd) SSH over srun | loopback | yes | only you | none | Slurm, an `sshd` binary |
+| [3a](60-own-relay.qmd) own relay | loopback | yes | only you | your server | outbound SSH, a server |
 | [3b](70-dev-tunnel.md) Dev Tunnels | loopback | yes, to the relay | only your account | Microsoft | outbound internet, GitHub/Microsoft account |
 | [3c](80-cloudflare-tunnel.md) Cloudflare | loopback | yes, to the relay | **anyone with the URL**, stopped by the token | Cloudflare | outbound internet |
 
@@ -99,20 +106,20 @@ And what each is like to use:
 | Method | One-off setup | Each time, on the cluster | Each time, on the laptop | Browser warning |
 |------------------------|------------------------|------------------------|------------------------|------------------------|
 | [1b](40-tls.md) HTTPS | none | `sbatch launch.sh` | `connect.sh`, open URL | yes, self-signed certificate |
-| [2](50-srun-ssh.md) SSH over srun | none | `sbatch launch.sh` | `connect.sh`, open URL | no |
-| [3a](60-own-relay.md) own relay | a server and a key | `sbatch launch.sh` | `connect.sh`, open URL | no |
+| [2](50-srun-ssh.qmd) SSH over srun | none | `sbatch launch.sh` | `connect.sh`, open URL | no |
+| [3a](60-own-relay.qmd) own relay | a server and a key | `sbatch launch.sh` | `connect.sh`, open URL | no |
 | [3b](70-dev-tunnel.md) Dev Tunnels | `setup.sh` (sign in) | `sbatch launch.sh` | `connect.sh` opens it; sign in | once per tunnel |
 | [3c](80-cloudflare-tunnel.md) Cloudflare | none | `sbatch launch.sh` | `connect.sh` opens it | no |
 
 ## Which one
 
-- **[Method 2](50-srun-ssh.md)**, if your cluster lets you run `sshd` (most do).
+- **[Method 2](50-srun-ssh.qmd)**, if your cluster lets you run `sshd` (most do).
   Nothing listens on the cluster network, SSH does the rest, and nobody else is involved.
 - **[Method 1b](40-tls.md)**, if you want the smallest change from what you do now.
   Still `ssh -L` and a URL, but encrypted.
 - **[Method 3b](70-dev-tunnel.md)**, if you would rather not handle tunnels at all and don't mind Microsoft in the path,
   especially if your cluster already sends you to `code tunnel` for VS Code.
-- **[Method 3a](60-own-relay.md)**, if you happen to have a server and want everything under your control.
+- **[Method 3a](60-own-relay.qmd)**, if you happen to have a server and want everything under your control.
 - **[Method 3c](80-cloudflare-tunnel.md)**, only for a quick look, with a strong token.
 - **Not [method 1a](30-plain-http.md).**
 
