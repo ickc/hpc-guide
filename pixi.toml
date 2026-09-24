@@ -21,6 +21,8 @@ paragraphic = { version = ">=0.2.1,<0.3", extras = ["quarto"] }
 [tasks]
 build = { cmd = "quarto render", cwd = "src", description = "Render the Quarto site" }
 preview = { cmd = "bash -c 'exec quarto preview src ${QUARTO_ARGS---no-serve --no-browser --no-navigate}'", description = "Re-render what you save into the output directory; QUARTO_ARGS (default: --no-serve --no-browser --no-navigate) replaces the flags, empty for quarto's own server" }
+# Needs a Slurm login node: submits real jobs. Arguments pick examples by name.
+test-examples = { cmd = "bash src/interactive-apps/examples/run-tests.sh", description = "Run the interactive-apps examples' tests on a Slurm cluster" }
 clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove generated files (Quarto output and cache)" }
 
 format = { cmd = "python bin/md_formatter.py src --derive-output-file", description = "Normalise markdown through pandoc and derive output-file from filenames" }

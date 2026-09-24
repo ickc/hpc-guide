@@ -4,3 +4,5 @@
 /src/.quarto/
 /src/docs/
 /src/_freeze/
+# job logs from running the examples by hand
+/src/interactive-apps/examples/*/*.out
