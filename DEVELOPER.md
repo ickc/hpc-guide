@@ -274,6 +274,11 @@ It is a routine and useful abuse, but only if you know the limitations going in:
   ``` ``` sh ``` with a space; a non-breaking space is inserted after an
   abbreviation, so `i.e. x` becomes `i.e.\u00a0x` and is invisible in an editor.
   Neither is adjustable.
+- **Tables are pinned to pipe tables.** Left to itself, pandoc rewrites a table
+  wider than `--columns` as a multiline table, and recomputes its column widths
+  from its own previous output, so a second run changes the file again. The
+  formatter turns the other table extensions off in its output format, which
+  leaves pipe tables as the only way pandoc can write one.
 
 The lack of knobs is the point, in the same way it is the point in Black: there
 is one canonical form, so nobody argues about style in review. Take the whole

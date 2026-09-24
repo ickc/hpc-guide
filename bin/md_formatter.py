@@ -35,6 +35,11 @@ from typing import Sequence
 
 DEFAULT_PATTERNS = ("**/*.md", "**/*.qmd")
 
+# Tables are always written as pipe tables. Pandoc otherwise turns a table wider
+# than --columns into a multiline table, whose column widths it recomputes from
+# its own previous output, so formatting never settles.
+OUTPUT_FORMAT = "markdown-simple_tables-multiline_tables-grid_tables"
+
 # --wrap=preserve keeps the author's semantic line breaks; reflowing them would
 # bury real edits in unrelated rewrapping.
 COMMON_ARGS: list[str] = [
@@ -178,7 +183,7 @@ def resolve_paths(inputs: Sequence[str], patterns: Sequence[str]) -> list[Path]:
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("inputs", nargs="+", metavar="PATH", help="files, directories, or glob patterns")
-    parser.add_argument("-t", dest="format", default="markdown", help="pandoc output format (default: markdown)")
+    parser.add_argument("-t", dest="format", default=OUTPUT_FORMAT, help=f"pandoc output format (default: {OUTPUT_FORMAT})")
     parser.add_argument("-f", dest="source_format", default="markdown", help="pandoc input format (default: markdown)")
     parser.add_argument("-F", dest="filters", nargs="*", default=[], metavar="FILTER", help="filters passed to pandoc")
     parser.add_argument(
