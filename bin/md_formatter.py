@@ -13,9 +13,15 @@ comes back as ``contents: \\*.md``. It also sorts keys and drops quoting. The
 only front matter change this tool makes is the one requested by
 ``--derive-output-file``.
 
+Quarto's executable-cell fences (```` ```{mermaid} ````) are not pandoc
+syntax: pandoc reads one as inline code and joins its lines, destroying it. They
+are swapped for an ordinary fenced block with a placeholder class before the
+round trip and swapped back after it, so the rest of the body is still
+normalised.
+
 Inputs may be files, directories, or glob patterns. A directory is expanded
-with ``--pattern`` (default ``**/*.md``), so ``md_formatter.py src`` formats
-every markdown file underneath it.
+with each ``--pattern`` (default ``**/*.md`` and ``**/*.qmd``), so
+``md_formatter.py src`` formats every page underneath it.
 """
 
 from __future__ import annotations
@@ -27,7 +33,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-DEFAULT_PATTERN = "**/*.md"
+DEFAULT_PATTERNS = ("**/*.md", "**/*.qmd")
 
 # --wrap=preserve keeps the author's semantic line breaks; reflowing them would
 # bury real edits in unrelated rewrapping.
@@ -46,6 +52,14 @@ NUMBERED_RE = re.compile(r"\A\d\d-(?P<name>.+)\Z")
 # for the web server to serve on any unmatched URL. Both are named by contract,
 # so neither is ordered and neither may be renumbered.
 UNNUMBERED_STEMS = frozenset({"index", "404"})
+
+# ```{name} -> ``` {.quarto-cell-name} on the way in, and back on the way out.
+# Only a bare engine name is supported; a cell fence carrying options inline
+# (```{r, echo=FALSE}) is left alone, and pandoc will then mangle it -- write
+# those options as ``#|`` comments inside the cell instead.
+CELL_PREFIX = "quarto-cell-"
+CELL_IN_RE = re.compile(r"^(?P<fence>`{3,})\{(?P<name>[A-Za-z][\w-]*)\}[ \t]*$", re.MULTILINE)
+CELL_OUT_RE = re.compile(rf"^(?P<fence>`{{3,}}) {CELL_PREFIX}(?P<name>[A-Za-z][\w-]*)$", re.MULTILINE)
 
 
 def split_front_matter(text: str) -> tuple[str | None, str]:
@@ -97,6 +111,14 @@ def filter_args(filters: Sequence[str]) -> list[str]:
     return args
 
 
+def protect_cells(body: str) -> str:
+    return CELL_IN_RE.sub(rf"\g<fence> {{.{CELL_PREFIX}\g<name>}}", body)
+
+
+def restore_cells(body: str) -> str:
+    return CELL_OUT_RE.sub(r"\g<fence>{\g<name>}", body)
+
+
 def format_body(body: str, args: argparse.Namespace) -> str:
     command = [
         "pandoc",
@@ -107,8 +129,8 @@ def format_body(body: str, args: argparse.Namespace) -> str:
         args.format,
         *filter_args(args.filters),
     ]
-    result = subprocess.run(command, input=body, capture_output=True, text=True, check=True)
-    return result.stdout
+    result = subprocess.run(command, input=protect_cells(body), capture_output=True, text=True, check=True)
+    return restore_cells(result.stdout)
 
 
 def format_file(path: Path, args: argparse.Namespace) -> bool:
@@ -138,13 +160,14 @@ def misnamed(paths: Sequence[Path]) -> list[Path]:
     return [p for p in paths if p.stem not in UNNUMBERED_STEMS and not NUMBERED_RE.match(p.stem)]
 
 
-def resolve_paths(inputs: Sequence[str], pattern: str) -> list[Path]:
+def resolve_paths(inputs: Sequence[str], patterns: Sequence[str]) -> list[Path]:
     """Expand files, directories, and glob patterns into a sorted file list."""
     paths: set[Path] = set()
     for raw in inputs:
         candidate = Path(raw)
         if candidate.is_dir():
-            paths.update(p for p in candidate.glob(pattern) if p.is_file())
+            for pattern in patterns:
+                paths.update(p for p in candidate.glob(pattern) if p.is_file())
         elif candidate.is_file():
             paths.add(candidate)
         else:
@@ -158,16 +181,24 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser.add_argument("-t", dest="format", default="markdown", help="pandoc output format (default: markdown)")
     parser.add_argument("-f", dest="source_format", default="markdown", help="pandoc input format (default: markdown)")
     parser.add_argument("-F", dest="filters", nargs="*", default=[], metavar="FILTER", help="filters passed to pandoc")
-    parser.add_argument("--pattern", default=DEFAULT_PATTERN, help=f"glob used for directories (default: {DEFAULT_PATTERN})")
+    parser.add_argument(
+        "--pattern",
+        dest="patterns",
+        action="append",
+        metavar="PATTERN",
+        help=f"glob used for directories, repeatable (default: {' '.join(DEFAULT_PATTERNS)})",
+    )
     parser.add_argument("--derive-output-file", action="store_true", help="set output-file from the NN- prefixed filename")
     parser.add_argument("--check", action="store_true", help="report files needing formatting instead of writing them")
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    args.patterns = args.patterns or list(DEFAULT_PATTERNS)
+    return args
 
 
 def main(argv: Sequence[str] = tuple(sys.argv[1:])) -> int:
     args = parse_args(argv)
 
-    paths = resolve_paths(args.inputs, args.pattern)
+    paths = resolve_paths(args.inputs, args.patterns)
     if not paths:
         print(f"No files matched: {' '.join(args.inputs)}", file=sys.stderr)
         return 1
@@ -175,8 +206,8 @@ def main(argv: Sequence[str] = tuple(sys.argv[1:])) -> int:
     if args.derive_output_file:
         offenders = misnamed(paths)
         if offenders:
-            allowed = " or ".join(f"'{stem}.md'" for stem in sorted(UNNUMBERED_STEMS))
-            print(f"Expected {allowed} or an 'NN-name.md' numbered page:", file=sys.stderr)
+            allowed = " or ".join(f"'{stem}'" for stem in sorted(UNNUMBERED_STEMS))
+            print(f"Expected {allowed} or an 'NN-name' numbered page:", file=sys.stderr)
             for path in offenders:
                 print(f"  {path}", file=sys.stderr)
             return 1

@@ -179,7 +179,8 @@ rejects anything else:
 - **`index.md`** — a short intro plus a `listing` that enumerates the folder. It
   holds no content of its own; a section with only one page still gets an
   `index.md` and a separate `10-intro.md`, so no folder is a special case.
-- **`NN-name.md`** — a content page. The two-digit prefix sets the order.
+- **`NN-name.md`** — a content page. The two-digit prefix sets the order. A
+  page that needs a diagram is `NN-name.qmd` instead; see [Diagrams](#diagrams).
 
 `src/404.md` is the one page outside that scheme; see below.
 
@@ -303,5 +304,30 @@ renders empty with no error. Pandoc also sorts metadata keys and drops quoting.
 
 So only the body round-trips; the front matter is copied through untouched apart
 from `output-file`.
+
+### Diagrams
+
+A mermaid diagram is written as a Quarto cell:
+
+````markdown
+```{mermaid}
+flowchart LR
+  laptop --> login
+```
+````
+
+That has two consequences. Quarto only accepts a cell in a `.qmd` file — in a
+`.md` it stops with "You must use the .qmd extension for documents with
+executable code" — so a page with a diagram is a `.qmd`. It is still a plain
+page otherwise: mermaid is drawn by Quarto itself, so no Jupyter or knitr engine
+is involved.
+
+And `{mermaid}` is not pandoc syntax. Pandoc reads the fence as inline code and
+joins its lines, which would destroy the diagram on the first format. The
+formatter therefore rewrites each ```` ```{name} ```` fence to
+```` ``` {.quarto-cell-name} ```` before the round trip and back after it, so
+the body of a `.qmd` is normalised like any other page. Only a bare engine name
+survives this; put cell options in `%%|` (mermaid) or `#|` comments inside the
+cell rather than inline in the braces.
 
 Formatting is expected to change nothing about the rendered site.
