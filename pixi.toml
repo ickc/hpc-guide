@@ -4,7 +4,7 @@ name = "hpc-guide"
 version = "0.1.0"
 description = "A guide to be effective on utilizing HPC resources"
 channels = ["conda-forge"]
-platforms = ["linux-64", "osx-arm64", "osx-64"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "linux-aarch64"]
 
 [dependencies]
 quarto = "*"
