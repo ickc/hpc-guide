@@ -30,10 +30,12 @@ until grep -q '^Ready to accept connections' "$SESSION/devtunnel.log"; do sleep 
 TUNNEL_ID="$(sed -n 's/^Ready to accept connections for tunnel: //p' "$SESSION/devtunnel.log")"
 URL="$(sed -n 's/^Connect via browser: //p' "$SESSION/devtunnel.log")"
 
-cat >"$SESSION/info.env" <<INFO
+# Written aside and moved into place, so connect.sh never reads half of it.
+cat >"$SESSION/info.env.tmp" <<INFO
 JOBID=$SLURM_JOB_ID
 TUNNEL_ID=$TUNNEL_ID
 URL=$URL
 INFO
+mv "$SESSION/info.env.tmp" "$SESSION/info.env"
 echo "open $URL"
 wait

@@ -35,7 +35,8 @@ FINGERPRINT="$(openssl x509 -in "$SESSION/cert.pem" -noout -fingerprint -sha256 
 APP_TOKEN="$(openssl rand -hex 24)"
 export APP_TOKEN
 
-cat >"$SESSION/info.env" <<INFO
+# Written aside and moved into place, so connect.sh never reads half of it.
+cat >"$SESSION/info.env.tmp" <<INFO
 JOBID=$SLURM_JOB_ID
 LISTEN_IP=$LISTEN_IP
 TLS_PORT=$TLS_PORT
@@ -43,6 +44,7 @@ APP_TOKEN=$APP_TOKEN
 FINGERPRINT=$FINGERPRINT
 SESSION=$SESSION
 INFO
+mv "$SESSION/info.env.tmp" "$SESSION/info.env"
 
 echo "https://$LISTEN_IP:$TLS_PORT, certificate SHA-256 $FINGERPRINT"
 echo "now run on your laptop: ./connect.sh $SLURM_JOB_ID"

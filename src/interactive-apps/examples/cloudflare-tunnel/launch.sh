@@ -41,10 +41,12 @@ python3 "${DEMO_APP:-$SLURM_SUBMIT_DIR/../common/demo_app.py}" --host 127.0.0.1 
 "$CLOUDFLARED" tunnel --no-autoupdate --url "http://127.0.0.1:$APP_PORT" >"$SESSION/cloudflared.log" 2>&1 &
 until URL="$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' "$SESSION/cloudflared.log")"; do sleep 1; done
 
-cat >"$SESSION/info.env" <<INFO
+# Written aside and moved into place, so connect.sh never reads half of it.
+cat >"$SESSION/info.env.tmp" <<INFO
 JOBID=$SLURM_JOB_ID
 URL=$URL
 APP_TOKEN=$APP_TOKEN
 INFO
+mv "$SESSION/info.env.tmp" "$SESSION/info.env"
 echo "the URL is in $SESSION/info.env; connect.sh prints it with the token"
 wait
