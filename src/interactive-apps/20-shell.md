@@ -16,8 +16,7 @@ this is all you need, and nothing on this page opens a port.
 
 Account, partition, time limit and so on are whatever your cluster normally needs.
 They are left out of the commands below;
-add them as options (`-A`, `-p`, `-t`) or set them once in the environment
-(`SLURM_ACCOUNT`, `SLURM_PARTITION`, ...).
+add them as options (`-A`, `-p`, `-t`) as usual.
 
 ## Three ways in
 

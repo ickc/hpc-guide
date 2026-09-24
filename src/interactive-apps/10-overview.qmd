@@ -1,0 +1,156 @@
+---
+title: "Overview"
+output-file: overview
+description: "The problem, the ways around it, and which one to pick."
+---
+
+## The problem
+
+Some tools are not programs you run but services you connect to:
+JupyterLab, RStudio Server, VS Code's server, TensorBoard, a Dask dashboard.
+They listen on a port, and you use them from a browser or an editor on your laptop.
+On an HPC you want them on a compute node, not on the shared login node,
+which leaves a path with one missing piece:
+
+    laptop --ssh--> login node --???--> compute node
+
+You can SSH to the login node, but normally not onward to a compute node,
+so something has to carry the connection across that last hop.
+The recipe you will most often find is to make the app listen on the compute node's network address and tunnel to it
+([method 1a](30-plain-http.md)).
+That works, but it leaves your app, and whatever you type into it, open to everyone else on the cluster.
+Keep in mind that a Jupyter or RStudio session is a way to run any code as you,
+so whoever gets into it gets your account.
+
+All the methods here run without any help from the admins.
+If your facility offers something like [Open OnDemand](https://openondemand.org/),
+which is built to solve exactly this, use that instead.
+
+## The methods
+
+If what you want runs in a terminal, you don't need any of this:
+[method 0](20-shell.md) is just a shell on the compute node.
+For everything with a port, the methods fall into three groups,
+by *where the app listens* and *how your laptop gets to it*.
+
+### Group 1: the app listens on the cluster network
+
+```{mermaid}
+flowchart LR
+  laptop["laptop"]
+  login["login node"]
+  app["app on the compute node<br/>(cluster network address)"]
+  other["anyone else on the cluster"]
+  laptop -- "ssh -L (encrypted)" --> login
+  login -- "1a: HTTP, unencrypted<br/>1b: HTTPS, encrypted" --> app
+  other -. "can connect too" .-> app
+```
+
+[1a](30-plain-http.md) is the usual recipe, in plain HTTP.
+[1b](40-tls.md) is the same with HTTPS, so nobody can read your token off the network any more.
+In both, anyone on the cluster can still connect to the port, so the app's own token is what keeps them out.
+
+### Group 2: SSH over Slurm
+
+```{mermaid}
+flowchart LR
+  laptop["laptop"]
+  login["login node"]
+  sshd["sshd -i<br/>(on the compute node)"]
+  app["app on 127.0.0.1"]
+  laptop -- "ssh" --> login
+  login -- "srun" --> sshd
+  sshd -- "ssh -L" --> app
+```
+
+The app listens only on the compute node's loopback, which nothing else on the cluster can reach.
+[Method 2](50-srun-ssh.md) runs an SSH server over `srun`,
+so your laptop gets one SSH session that reaches all the way to the app.
+
+### Group 3: the job connects out to a relay
+
+```{mermaid}
+flowchart LR
+  laptop["laptop"]
+  relay["relay<br/>3a: your server<br/>3b: Microsoft Dev Tunnels<br/>3c: Cloudflare"]
+  app["app on 127.0.0.1"]
+  app -- "outbound connection" --> relay
+  laptop -- "ssh or https" --> relay
+```
+
+The app again listens only on loopback, and the job connects *out* to a relay that your laptop can also reach.
+They differ in who runs the relay:
+you ([3a](60-own-relay.md)), Microsoft ([3b](70-dev-tunnel.md)), or Cloudflare ([3c](80-cloudflare-tunnel.md)).
+
+## Comparison
+
+| Method | App listens on | Encrypted all the way | Who can connect to the app | Third party | Needs |
+|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|
+| [0](20-shell.md) shell | (no port) | yes (SSH + Slurm) | nobody | none | Slurm |
+| [1a](30-plain-http.md) HTTP | cluster network | **no** | **anyone on the cluster** | none | Slurm |
+| [1b](40-tls.md) HTTPS | cluster network | yes | anyone on the cluster, stopped by the token | none | Slurm, `openssl` |
+| [2](50-srun-ssh.md) SSH over srun | loopback | yes | only you | none | Slurm, an `sshd` binary |
+| [3a](60-own-relay.md) own relay | loopback | yes | only you | your server | outbound SSH, a server |
+| [3b](70-dev-tunnel.md) Dev Tunnels | loopback | yes, to the relay | only your account | Microsoft | outbound internet, GitHub/Microsoft account |
+| [3c](80-cloudflare-tunnel.md) Cloudflare | loopback | yes, to the relay | **anyone with the URL**, stopped by the token | Cloudflare | outbound internet |
+
+And what each is like to use:
+
+| Method | One-off setup | Each time, on the cluster | Each time, on the laptop | Browser warning |
+|------------------------|------------------------|------------------------|------------------------|------------------------|
+| [1b](40-tls.md) HTTPS | none | `sbatch launch.sh` | `connect.sh`, open URL | yes, self-signed certificate |
+| [2](50-srun-ssh.md) SSH over srun | none | `sbatch launch.sh` | `connect.sh`, open URL | no |
+| [3a](60-own-relay.md) own relay | a server and a key | `sbatch launch.sh` | `connect.sh`, open URL | no |
+| [3b](70-dev-tunnel.md) Dev Tunnels | `setup.sh` (sign in) | `sbatch launch.sh` | `connect.sh` opens it; sign in | once per tunnel |
+| [3c](80-cloudflare-tunnel.md) Cloudflare | none | `sbatch launch.sh` | `connect.sh` opens it | no |
+
+## Which one
+
+- **[Method 2](50-srun-ssh.md)**, if your cluster lets you run `sshd` (most do).
+  Nothing listens on the cluster network, SSH does the rest, and nobody else is involved.
+- **[Method 1b](40-tls.md)**, if you want the smallest change from what you do now.
+  Still `ssh -L` and a URL, but encrypted.
+- **[Method 3b](70-dev-tunnel.md)**, if you would rather not handle tunnels at all and don't mind Microsoft in the path,
+  especially if your cluster already sends you to `code tunnel` for VS Code.
+- **[Method 3a](60-own-relay.md)**, if you happen to have a server and want everything under your control.
+- **[Method 3c](80-cloudflare-tunnel.md)**, only for a quick look, with a strong token.
+- **Not [method 1a](30-plain-http.md).**
+
+## Using the examples
+
+Every method comes with scripts that work as they are, serving a small demo app in place of Jupyter and friends.
+They are in [this guide's repository](https://github.com/ickc/hpc.kolen.dev) under `src/interactive-apps/examples`,
+so the easiest way to get them is to clone it on the cluster and, for the laptop side, on your laptop.
+Each method's page shows its scripts in full and says where to put your own app.
+
+They assume as little as possible about your cluster, and each page lists what it does assume.
+Common to all of them:
+
+- **Slurm.** You submit jobs with `sbatch` and run things in them with `srun`.
+- **Your cluster's options are yours to add.** Nothing in the scripts names an account, partition or QoS.
+  Pass them as usual (`sbatch -A myproject -p mypartition launch.sh`),
+  or set them once in the environment:
+  `SBATCH_ACCOUNT` and `SBATCH_PARTITION` for `sbatch`, `SLURM_ACCOUNT` and `SLURM_PARTITION` for `srun`.
+- **A shared home directory.** The job writes what the laptop side needs (ports, keys, URLs) to
+  `~/.interactive-apps/<JOBID>`, readable only by you, and the laptop side reads it from the login node.
+- **`LOGIN_HOST`** is whatever you type after `ssh` to reach the login node, e.g. an alias from your `~/.ssh/config`.
+- **Submit from the example's directory**, since the job finds the demo app relative to it.
+
+## Testing the examples
+
+Each example has a `test.sh` that runs on a login node, submits the real job, connects the way your laptop would,
+and checks the demo page comes back.
+The one hop it cannot do from the login node is laptop to login node, which is your ordinary SSH login.
+The tests are necessarily a little different for each method; each page says what its test does.
+
+Run them all, in parallel, with
+
+``` bash
+./run-tests.sh                 # or: ./run-tests.sh srun-ssh tls
+```
+
+from the `examples` directory (or `pixi run test-examples` from the top of the repository).
+A test passes, fails, or is skipped when something it needs is missing,
+e.g. a relay for 3a or a signed-in `devtunnel` for 3b.
+Each test cancels its jobs when it finishes, and gives up if its job has not started within
+`QUEUE_TIMEOUT` seconds (default 900).
