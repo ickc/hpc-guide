@@ -70,5 +70,10 @@ format:
     code-overflow: wrap
     email-obfuscation: javascript
 
+# Embeds a file verbatim as a code block: ```{.bash include="launch.sh"}.
+# The example scripts shown on a page are then the same files the tests run.
+filters:
+  - include-code-files
+
 execute:
   freeze: auto
