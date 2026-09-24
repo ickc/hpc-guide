@@ -32,7 +32,8 @@ openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 
 FINGERPRINT="$(openssl x509 -in "$SESSION/cert.pem" -noout -fingerprint -sha256 | cut -d= -f2)"
 
 # A strong token. The demo app reads APP_TOKEN; Jupyter makes its own.
-export APP_TOKEN="$(openssl rand -hex 24)"
+APP_TOKEN="$(openssl rand -hex 24)"
+export APP_TOKEN
 
 cat >"$SESSION/info.env" <<INFO
 JOBID=$SLURM_JOB_ID

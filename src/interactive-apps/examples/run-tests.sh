@@ -7,7 +7,7 @@
 # The tests run in parallel, since most of their time is spent waiting in the
 # queue. Pass Slurm options the usual way, e.g. SBATCH_ACCOUNT=... SBATCH_PARTITION=...
 set -uo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 
 if (($#)); then names=("$@"); else names=(*/test.sh) && names=("${names[@]%/test.sh}"); fi
 

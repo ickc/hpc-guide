@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by each example's test.sh. Runs on a login node.
 #
 # A test exits 0 when the method works, 1 when it does not, and 77 when it
@@ -23,9 +24,13 @@ WORK="$(mktemp -d "$SESSIONS/test.XXXXXX")"
 
 JOBS=()
 PIDS=()
+AT_EXIT=()
+# at_exit COMMAND: run it when the test ends, before the jobs are cancelled.
+at_exit() { AT_EXIT+=("$1"); }
 cleanup() {
     local rc=$?
-    local pid jid
+    local cmd pid jid
+    for cmd in ${AT_EXIT[@]+"${AT_EXIT[@]}"}; do eval "$cmd" || true; done
     for pid in ${PIDS[@]+"${PIDS[@]}"}; do kill "$pid" 2>/dev/null || true; done
     for jid in ${JOBS[@]+"${JOBS[@]}"}; do
         scancel "$jid" 2>/dev/null || true
