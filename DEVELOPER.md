@@ -336,3 +336,42 @@ survives this; put cell options in `%%|` (mermaid) or `#|` comments inside the
 cell rather than inline in the braces.
 
 Formatting is expected to change nothing about the rendered site.
+
+## Examples that run
+
+Some sections come with scripts that readers run on a real cluster, currently
+`src/interactive-apps/examples/`. The pages do not copy the scripts: they embed
+the files themselves with the vendored
+[include-code-files](https://github.com/quarto-ext/include-code-files) filter,
+
+````markdown
+``` {.bash include="examples/srun-ssh/launch.sh"}
+```
+````
+
+with the path relative to the page, and `project.resources` in
+`src/_quarto.yml` publishes the directory so the pages can link to each file.
+What a reader sees is therefore exactly what the tests run.
+
+Each example directory follows the same contract:
+
+| File | Runs on | Does |
+| --- | --- | --- |
+| `launch.sh` | a compute node, via `sbatch` | starts the app and writes what the laptop needs to `~/.interactive-apps/<JOBID>/info.env` |
+| `connect.sh` | the laptop | reads that through `LOGIN_HOST` and connects |
+| `test.sh` | a login node | submits, connects, checks the demo page comes back, cancels |
+
+`test.sh` sources `common/testlib.sh` and exits 0 (pass), 1 (fail), or 77
+(skipped: a prerequisite such as a relay host or a signed-in account is
+missing), the convention automake uses. `run-tests.sh` runs them in parallel
+and summarises.
+
+These tests submit real jobs, so they only run on a Slurm login node, by hand:
+
+```sh
+SBATCH_ACCOUNT=... SBATCH_PARTITION=... pixi run test-examples [NAME...]
+```
+
+CI does not run them. Scripts that run on compute nodes are kept to bash and a
+Python 3.6-compatible standard library, the oldest `python3` still found on
+clusters.
