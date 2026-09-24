@@ -4,6 +4,7 @@ project:
   output-dir: docs
   render:
     - "**/*.md"
+    - "**/*.qmd"
   # The post graph (the template's README, "The post graph"): graph.json and its viewer.
   post-render:
     - paragraphic build --preset quarto --groups directories --exclude 404.html
