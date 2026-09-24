@@ -7,10 +7,10 @@ channels = ["conda-forge"]
 platforms = ["linux-64", "osx-arm64", "osx-64", "linux-aarch64"]
 
 [dependencies]
-quarto = "*"
-lychee = "*"
-pandoc = "*"
-python = ">=3.11"
+quarto = ">=1.9.38,<2"
+lychee = ">=0.24.2,<0.25"
+pandoc = ">=3.8.3,<4"
+python = ">=3.14.7,<3.15"
 
 [activation]
 env = { QUARTO_PORT = "8018" }
