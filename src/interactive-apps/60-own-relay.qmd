@@ -12,7 +12,14 @@ and the job connects *out* to a server you control (a small cloud VM, a machine 
 with `ssh -R`, which makes the app appear on that server's loopback.
 From your laptop you then `ssh -L` to the server as you would to anything else.
 
-    compute node --ssh -R (outbound)--> your server <--ssh -L-- laptop
+```{mermaid}
+flowchart LR
+  app["app on 127.0.0.1<br/>(compute node)"]
+  relay["your server"]
+  laptop["laptop"]
+  app -- "ssh -R (outbound)" --> relay
+  laptop -- "ssh -L" --> relay
+```
 
 Nothing listens on the cluster network, everything is inside SSH,
 and the only party involved besides the cluster is you.

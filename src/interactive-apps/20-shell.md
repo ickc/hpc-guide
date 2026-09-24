@@ -72,7 +72,7 @@ A shell gets *you* onto the node, but not your browser.
 Jupyter, RStudio Server, TensorBoard and friends listen on a port and expect a browser to connect to it,
 and your laptop cannot reach a port on a compute node directly.
 That is what the rest of this section is about.
-The `srun` pipe used here turns out to be useful for that too, though: [method 2](50-srun-ssh.md) runs SSH over it.
+The `srun` pipe used here turns out to be useful for that too, though: [method 2](50-srun-ssh.qmd) runs SSH over it.
 
 ## Testing
 

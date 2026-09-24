@@ -12,7 +12,7 @@ What it fixes: nobody on the cluster network can read your token or your traffic
 What it does not: the app still listens on the cluster network, so anyone can *connect* to it.
 They just get nowhere without the token, which is therefore the only thing keeping them out.
 Use a strong one: Jupyter's default token is fine; don't replace it with a short password.
-If you would rather have nothing listening on the network at all, use [method 2](50-srun-ssh.md).
+If you would rather have nothing listening on the network at all, use [method 2](50-srun-ssh.qmd).
 
 ## What you need
 

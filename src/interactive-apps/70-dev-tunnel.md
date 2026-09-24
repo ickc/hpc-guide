@@ -13,7 +13,7 @@ with the same account the job used.
 So there is nothing listening on the cluster and no server of your own to run.
 In exchange Microsoft's relay is in the path of your traffic, and you need a GitHub or Microsoft account.
 If your cluster already recommends `code tunnel` for VS Code, this trusts nobody new.
-If your project's data must not go through a third party, use [method 2](50-srun-ssh.md) instead.
+If your project's data must not go through a third party, use [method 2](50-srun-ssh.qmd) instead.
 
 ::: callout-tip
 If you already use `code tunnel` on a compute node,
