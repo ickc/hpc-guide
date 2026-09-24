@@ -41,13 +41,15 @@ CONF
 # Any free port will do, since only this node's loopback can see it.
 APP_PORT="$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')"
 
-cat >"$SESSION/info.env" <<INFO
+# Written aside and moved into place, so connect.sh never reads half of it.
+cat >"$SESSION/info.env.tmp" <<INFO
 JOBID=$SLURM_JOB_ID
 NODE=$(hostname)
 APP_PORT=$APP_PORT
 SSHD=$SSHD
 SESSION=$SESSION
 INFO
+mv "$SESSION/info.env.tmp" "$SESSION/info.env"
 
 echo "app on $(hostname) 127.0.0.1:$APP_PORT; now run on your laptop: ./connect.sh $SLURM_JOB_ID"
 

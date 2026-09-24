@@ -23,11 +23,13 @@ chmod 700 "$HOME/.interactive-apps" "$SESSION"
 trap 'rm -rf "$SESSION"' EXIT
 APP_PORT="$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')"
 
-cat >"$SESSION/info.env" <<INFO
+# Written aside and moved into place, so connect.sh never reads half of it.
+cat >"$SESSION/info.env.tmp" <<INFO
 JOBID=$SLURM_JOB_ID
 RELAY_HOST=$RELAY_HOST
 RELAY_PORT=$RELAY_PORT
 INFO
+mv "$SESSION/info.env.tmp" "$SESSION/info.env"
 
 # --- your app, bound to 127.0.0.1:$APP_PORT --------------------------------
 python3 "${DEMO_APP:-$SLURM_SUBMIT_DIR/../common/demo_app.py}" --host 127.0.0.1 --port "$APP_PORT" &
