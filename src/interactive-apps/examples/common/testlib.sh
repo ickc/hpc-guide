@@ -27,7 +27,10 @@ cleanup() {
     local rc=$?
     local pid jid
     for pid in ${PIDS[@]+"${PIDS[@]}"}; do kill "$pid" 2>/dev/null || true; done
-    for jid in ${JOBS[@]+"${JOBS[@]}"}; do scancel "$jid" 2>/dev/null || true; done
+    for jid in ${JOBS[@]+"${JOBS[@]}"}; do
+        scancel "$jid" 2>/dev/null || true
+        rm -rf "${SESSIONS:?}/$jid"
+    done
     if [[ $rc -eq 0 || $rc -eq $SKIP ]]; then rm -rf "$WORK"; else echo "logs kept in $WORK" >&2; fi
 }
 trap cleanup EXIT
