@@ -50,3 +50,11 @@ dl dt {
 code {
   font-size: 0.9em;
 }
+
+// Bootstrap gives inline code one fixed light background (#f8f9fa) in both
+// themes, while darkly makes its text white. Quarto overrides the background for
+// code in paragraphs, lists and tables, but not in headings, where code came out
+// white on near-white in dark mode. A translucent grey works on either.
+code {
+  background-color: rgba(128, 128, 128, 0.15);
+}

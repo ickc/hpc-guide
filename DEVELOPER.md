@@ -179,7 +179,8 @@ rejects anything else:
 - **`index.md`** — a short intro plus a `listing` that enumerates the folder. It
   holds no content of its own; a section with only one page still gets an
   `index.md` and a separate `10-intro.md`, so no folder is a special case.
-- **`NN-name.md`** — a content page. The two-digit prefix sets the order.
+- **`NN-name.md`** — a content page. The two-digit prefix sets the order. A
+  page that needs a diagram is `NN-name.qmd` instead; see [Diagrams](#diagrams).
 
 `src/404.md` is the one page outside that scheme; see below.
 
@@ -273,6 +274,11 @@ It is a routine and useful abuse, but only if you know the limitations going in:
   ``` ``` sh ``` with a space; a non-breaking space is inserted after an
   abbreviation, so `i.e. x` becomes `i.e.\u00a0x` and is invisible in an editor.
   Neither is adjustable.
+- **Tables are pinned to pipe tables.** Left to itself, pandoc rewrites a table
+  wider than `--columns` as a multiline table, and recomputes its column widths
+  from its own previous output, so a second run changes the file again. The
+  formatter turns the other table extensions off in its output format, which
+  leaves pipe tables as the only way pandoc can write one.
 
 The lack of knobs is the point, in the same way it is the point in Black: there
 is one canonical form, so nobody argues about style in review. Take the whole
@@ -304,4 +310,68 @@ renders empty with no error. Pandoc also sorts metadata keys and drops quoting.
 So only the body round-trips; the front matter is copied through untouched apart
 from `output-file`.
 
+### Diagrams
+
+A mermaid diagram is written as a Quarto cell:
+
+````markdown
+```{mermaid}
+flowchart LR
+  laptop --> login
+```
+````
+
+That has two consequences. Quarto only accepts a cell in a `.qmd` file — in a
+`.md` it stops with "You must use the .qmd extension for documents with
+executable code" — so a page with a diagram is a `.qmd`. It is still a plain
+page otherwise: mermaid is drawn by Quarto itself, so no Jupyter or knitr engine
+is involved.
+
+And `{mermaid}` is not pandoc syntax. Pandoc reads the fence as inline code and
+joins its lines, which would destroy the diagram on the first format. The
+formatter therefore rewrites each ```` ```{name} ```` fence to
+```` ``` {.quarto-cell-name} ```` before the round trip and back after it, so
+the body of a `.qmd` is normalised like any other page. Only a bare engine name
+survives this; put cell options in `%%|` (mermaid) or `#|` comments inside the
+cell rather than inline in the braces.
+
 Formatting is expected to change nothing about the rendered site.
+
+## Examples that run
+
+Some sections come with scripts that readers run on a real cluster, currently
+`src/interactive-apps/examples/`. The pages do not copy the scripts: they embed
+the files themselves with the vendored
+[include-code-files](https://github.com/quarto-ext/include-code-files) filter,
+
+````markdown
+``` {.bash include="examples/srun-ssh/launch.sh"}
+```
+````
+
+with the path relative to the page, and `project.resources` in
+`src/_quarto.yml` publishes the directory so the pages can link to each file.
+What a reader sees is therefore exactly what the tests run.
+
+Each example directory follows the same contract:
+
+| File | Runs on | Does |
+| --- | --- | --- |
+| `launch.sh` | a compute node, via `sbatch` | starts the app and writes what the laptop needs to `~/.interactive-apps/<JOBID>/info.env` |
+| `connect.sh` | the laptop | reads that through `LOGIN_HOST` and connects |
+| `test.sh` | a login node | submits, connects, checks the demo page comes back, cancels |
+
+`test.sh` sources `common/testlib.sh` and exits 0 (pass), 1 (fail), or 77
+(skipped: a prerequisite such as a relay host or a signed-in account is
+missing), the convention automake uses. `run-tests.sh` runs them in parallel
+and summarises.
+
+These tests submit real jobs, so they only run on a Slurm login node, by hand:
+
+```sh
+SBATCH_ACCOUNT=... SBATCH_PARTITION=... pixi run test-examples [NAME...]
+```
+
+CI does not run them. Scripts that run on compute nodes are kept to bash and a
+Python 3.6-compatible standard library, the oldest `python3` still found on
+clusters.

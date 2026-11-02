@@ -49,9 +49,8 @@ As a sidenote, using any of these requires extra attension when you want to edit
 This has nothing to do with the text editors themselves,
 but the fact that you want to perform interactive tasks on the compute
 where you often need extra hopping: `local -> login -> compute`.
-We'll talk about this pattern in TODO and some of its pitfalls if setup incorrectly.
+See [running apps interactively on compute nodes](../interactive-apps/index.md) for this pattern,
+and how it goes wrong if set up carelessly.
 
-TODO: mention how to hop over SSH, security implications, and if setup incorrectly leads to security risks
-(such as bridge login-compute through insecure HTTP).
-Also mention code tunnel, why it is useful, and why it might be another security problem that some HPC centres
+TODO: mention code tunnel, why it is useful, and why it might be another security problem that some HPC centres
 would restrict you from using it.

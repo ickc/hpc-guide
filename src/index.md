@@ -7,6 +7,7 @@ listing:
     - package-managers/index.md
     - mpi/index.md
     - running-jobs/index.md
+    - interactive-apps/index.md
     - storage/index.md
     - text-editors/index.md
   type: table
