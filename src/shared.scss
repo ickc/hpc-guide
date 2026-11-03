@@ -69,6 +69,14 @@ code {
   }
 }
 
+// Links are in flatly's and darkly's teal ($link-color), which on the chip of
+// inline code is 2.2:1 in the light theme and 2:1 in the dark one. Linked code
+// in the page takes that teal shaded towards the text colour instead: towards
+// black in the light theme, white in the dark, about 5:1 on the chip.
+main a > code:not(.sourceCode) {
+  color: if(lightness($body-bg) > 50%, shade-color($link-color, 40%), tint-color($link-color, 40%));
+}
+
 // Diagrams are SVGs with a transparent background and dark ink (Graphviz, or
 // drawn by hand), which vanish on the dark theme. Give them the light page they
 // were drawn on — except one marked `.dark-content` (or inside a div that is),
