@@ -4,6 +4,9 @@ project:
   output-dir: docs
   render:
     - "**/*.md"
+  # The post graph (the template's README, "The post graph"): graph.json and its viewer.
+  post-render:
+    - paragraphic build --preset quarto --groups directories --exclude 404.html
 
 website:
   title: "HPC Guide"
@@ -16,6 +19,8 @@ website:
     left:
       - href: index.md
         text: Home
+      - href: graph.md
+        text: Graph
     right:
       - icon: github
         href: https://github.com/ickc/hpc.kolen.dev
@@ -48,3 +53,9 @@ website:
           - auto: "text-editors/*.md"
   page-footer:
     left: "© {{< copyright-year 2026 >}} Kolen Cheung"
+
+format:
+  html:
+    # The page's own graph card (the post graph).
+    include-after-body:
+      - _paragraphic.html
