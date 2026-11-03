@@ -48,14 +48,23 @@ declares `environment: production`: a job that does not name the environment
 cannot read them, and `secrets.CLOUDFLARE_API_TOKEN` silently expands to the
 empty string rather than failing outright.
 
+## Shared configuration
+
+`src/_quarto.yml`, `src/shared.scss` and `src/_extensions/copyright-year/` are
+shared with the author's other Quarto sites and copied verbatim from
+[ickc/quarto-template](https://github.com/ickc/quarto-template): do not edit
+them here, as the next sync overwrites them. This site's own settings are in
+`src/_quarto-site.yml`, which Quarto merges on top of `src/_quarto.yml`, and its
+own styles in `src/custom.scss`, loaded after `src/shared.scss`.
+
 ## Fonts
 
-`src/custom.scss` names the families, `src/_quarto.yml` links the stylesheet
+`src/shared.scss` names the families, `src/_quarto.yml` links the stylesheet
 that declares them, and [font.kolen.dev](https://font.kolen.dev) serves both
 that stylesheet and the faces behind it:
 
 ```scss
-// src/custom.scss
+// src/shared.scss
 $font-family-base: 'TeX Gyre Schola', Georgia, 'Times New Roman', serif;
 $font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, ..., monospace;
 ```
@@ -111,7 +120,7 @@ and the variables above leave nothing set in it — but an `@import` is fetched
 whether or not anything matches the family, so a third origin would be on the
 critical path of every page load for a font no element asks for. Bootswatch
 guards that rule with `@if $web-font-path`, so setting the variable to `false`
-in `custom.scss` drops it from both bundles. `$mermaid-font-family` follows it,
+in `shared.scss` drops it from both bundles. `$mermaid-font-family` follows it,
 because Quarto derives that one from the theme's `$font-family-sans-serif` —
 the same Lato stack — and diagram labels are body text set in a picture, so they
 should be in the body family rather than in a font the page no longer fetches.
@@ -121,7 +130,7 @@ nothing: an unmatched `@font-face` is never fetched, and this guide is in
 English, so a browser downloads only the four Schola faces and the four
 JetBrains Mono ones.
 
-The families are repeated in `custom.scss` rather than read from the
+The families are repeated in `shared.scss` rather than read from the
 `--font-body` and `--font-code` custom properties `faces.css` also exports.
 Those would work, but an undefined `var()` is invalid at computed-value time:
 if font.kolen.dev were unreachable the declaration would be thrown out whole,
@@ -149,7 +158,7 @@ four-hour default.
 Family names survive such a release. Metrics are not promised with them. An
 upstream release may change advance widths, x-height or vertical metrics, and
 nothing on either side would catch it — `$font-size-base` and
-`$line-height-base` in `custom.scss` are tuned against the current Schola, and
+`$line-height-base` in `shared.scss` are tuned against the current Schola, and
 they are what would show it. In exchange this repository carries no font files
 and no licence files, since the copy a visitor's browser receives comes from
 font.kolen.dev and the OFL and GUST licence texts are published there beside
@@ -187,11 +196,11 @@ rejects anything else:
 
 Drop in a new `NN-name.md` with a `title`, then run `pixi run format`. Nothing
 else needs editing: the sidebar picks it up through an `auto` glob in
-`src/_quarto.yml`, and the section's `index.md` listing picks it up through its
+`src/_quarto-site.yml`, and the section's `index.md` listing picks it up through its
 own glob. Leave gaps in the numbering (10, 20, 30) so pages can be inserted
 without renumbering.
 
-`src/_quarto.yml` only names the sections and their order. It never lists
+`src/_quarto-site.yml` only names the sections and their order. It never lists
 individual pages.
 
 ### The not-found page
