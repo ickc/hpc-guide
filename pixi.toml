@@ -12,13 +12,9 @@ lychee = ">=0.24.2,<0.25"
 pandoc = ">=3.8.3,<4"
 python = ">=3.14.7,<3.15"
 
-[activation]
-env = { QUARTO_PORT = "8018" }
-
 [tasks]
 build = { cmd = "quarto render", cwd = "src", description = "Render the Quarto site" }
-preview = { cmd = "quarto preview src --port $QUARTO_PORT --host 0.0.0.0", description = "Live preview on port QUARTO_PORT: quarto re-renders what you save" }
-serve = { cmd = "python3 -m http.server $QUARTO_PORT -d src/docs", description = "Serve the rendered site in src/docs on port QUARTO_PORT, as is" }
+preview = { cmd = "bash -c 'exec quarto preview src ${QUARTO_ARGS---no-serve --no-browser --no-navigate}'", description = "Re-render what you save into the output directory; QUARTO_ARGS (default: --no-serve --no-browser --no-navigate) replaces the flags, empty for quarto's own server" }
 clean = { cmd = "rm -rf docs .quarto", cwd = "src", description = "Remove generated files (Quarto output and cache)" }
 
 format = { cmd = "python bin/md_formatter.py src --derive-output-file", description = "Normalise markdown through pandoc and derive output-file from filenames" }
