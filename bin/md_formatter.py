@@ -47,6 +47,10 @@ NUMBERED_RE = re.compile(r"\A\d\d-(?P<name>.+)\Z")
 # so neither is ordered and neither may be renumbered.
 UNNUMBERED_STEMS = frozenset({"index", "404"})
 
+# Shared files from ickc/quarto-template (project-quarto's bin/sync copies them
+# over whatever is here), so they are not this site's to format or name.
+SHARED = frozenset({"graph.md"})
+
 
 def split_front_matter(text: str) -> tuple[str | None, str]:
     """Return the front matter body (without delimiters) and the markdown body."""
@@ -167,7 +171,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 def main(argv: Sequence[str] = tuple(sys.argv[1:])) -> int:
     args = parse_args(argv)
 
-    paths = resolve_paths(args.inputs, args.pattern)
+    paths = [p for p in resolve_paths(args.inputs, args.pattern) if p.name not in SHARED]
     if not paths:
         print(f"No files matched: {' '.join(args.inputs)}", file=sys.stderr)
         return 1
