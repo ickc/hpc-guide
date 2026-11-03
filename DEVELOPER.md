@@ -7,8 +7,7 @@ pixi tasks, so `pixi install` is the only setup step.
 | Task | What it does |
 | --- | --- |
 | `pixi run build` | render the site into `src/docs` |
-| `pixi run preview` | live preview on `$QUARTO_PORT` (8018) |
-| `pixi run serve` | serve the rendered `src/docs` as is, on the same port |
+| `pixi run preview` | re-render on save into `src/docs`, serving nothing; `QUARTO_ARGS= pixi run preview` for quarto's own server |
 | `pixi run format` | normalise markdown and derive permalinks |
 | `pixi run format-check` | fail if anything is unformatted — this is what CI runs |
 | `pixi run linkcheck` | check the rendered site's links with lychee |
