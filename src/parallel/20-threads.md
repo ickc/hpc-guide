@@ -125,12 +125,12 @@ To check a job while it runs, look at its CPU use. `pi_threads.py` and `matmul.p
 srun --jobid=<job ID> --overlap --pty top
 ```
 
-`--overlap` lets this run alongside the job, on the same CPUs, rather than waiting for them to be free. In `top`, 100% in the `%CPU` column is one core, so a process with 8 threads on its own 8 cores shows about 800%. A process with many threads at about 100%, as the copies above were, is sharing its cores; so, on a node your job has to itself, is a *load average*, at the top, well above the number of CPUs.
+`--overlap` lets this run alongside the job, on the same CPUs, rather than waiting for them to be free. In `top`, 100% in the `%CPU` column is one core, so a process with 8 threads on its own 8 cores shows about 800%. A process with many threads at about 100%, as the copies above were, is sharing its cores. On a node your job has to itself, so is a *load average*, at the top of `top`, well above the number of CPUs.
 
-Threads stop at the edge of a node, and at the edge of one process. The [next page](30-one-node.md) is about many processes, many independent tasks at once, on one node.
+Threads cannot go beyond the process they belong to, and so beyond its node. The [next page](30-one-node.md) is about many processes instead, many independent tasks at once, on one node.
 
 [^1]: On a *free-threaded* build of Python, which has no GIL, threads run Python code at once too. The [documentation of map_parallel](https://ickc.github.io/python-map_parallel/backends/) goes through which kind of work gains from threads and which needs processes.
 
-[^2]: The timings on this page are from running the jobs on 8 cores of an x86 desktop, with the job's environment set by hand. On a cluster the numbers differ, and the ratios are what to look at.
+[^2]: The timings on this page were measured on 8 cores of an x86 workstation. On the nodes of your cluster the times will be different, but not the ratios between them.
 
 [^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the page on hybrid MPI, later in this part.

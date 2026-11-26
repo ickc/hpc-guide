@@ -84,7 +84,7 @@ The files are all under [`examples/`](https://github.com/ickc/hpc-guide/tree/mai
 
 The next page starts with the kind that needs no change to how you run your program, only to what you ask the scheduler for: threads.
 
-[^1]: It is a slow way to compute π: the error shrinks only as one over the square root of the number of points, so each extra digit takes 100 times as many. That is fine here: what matters is that it is a real computation, that its pieces are independent, and that the answer is known, so you can tell when a run gets it wrong.
+[^1]: It is a slow way to compute π: the error shrinks only as one over the square root of the number of points, so each extra digit takes 100 times as many. That is fine here, since its pieces are independent, and the answer is known, so you can tell when a run gets it wrong.
 
 [^2]: Each task's random numbers come from `np.random.default_rng([seed, ROOT_SEED])`, a list of the task's own seed and one shared by all of them, which is how [NumPy's documentation](https://numpy.org/doc/stable/reference/random/parallel.html) recommends giving each worker an independent stream. Adding the task's number to a root seed, the obvious alternative, is the one it singles out as unsafe.
 
