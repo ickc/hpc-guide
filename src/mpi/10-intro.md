@@ -3,6 +3,6 @@ title: "Introduction"
 output-file: intro
 ---
 
-See [conda](../package-managers/30-conda-mpi.md)
+See [conda](30-conda.md)
 
-See [Spack](../package-managers/50-spack-mpi.md)
+See [Spack](40-spack.md)

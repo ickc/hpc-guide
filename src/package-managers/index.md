@@ -1,5 +1,5 @@
 ---
-title: "Package managers"
+title: "Software environments"
 listing:
   contents: "*.md"
   type: table

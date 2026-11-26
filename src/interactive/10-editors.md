@@ -1,6 +1,7 @@
 ---
 title: "Introduction"
-output-file: intro
+output-file: editors
+aliases: [../text-editors/intro.html]
 ---
 
 There are many text editors you can run on a remote UNIX system such as an HPC.

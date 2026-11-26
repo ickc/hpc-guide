@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   lint:
-    name: Formatting
+    name: Formatting and licences
     # Branches in this repository are already covered by the `push` trigger, so the
     # `pull_request` trigger only needs to serve pull requests from forks. Without
     # this, every same-repo PR would build twice.
@@ -37,6 +37,8 @@ jobs:
       # Fails when a file is not in the canonical form `pixi run format` produces,
       # including a missing or stale output-file permalink.
       - run: pixi run format-check
+      # Every file carries a licence: prose CC-BY-SA-4.0, the rest BSD-3-Clause (REUSE.toml).
+      - run: pixi run reuse-lint
 
   build:
     name: Build and check links

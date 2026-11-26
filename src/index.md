@@ -6,9 +6,9 @@ listing:
   contents:
     - package-managers/index.md
     - mpi/index.md
-    - running-jobs/index.md
+    - parallel/index.md
     - storage/index.md
-    - text-editors/index.md
+    - interactive/index.md
   type: table
   fields: [title, description]
   sort: false

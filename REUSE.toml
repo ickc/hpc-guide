@@ -1,0 +1,27 @@
+version = 1
+SPDX-PackageName = "hpc-guide"
+SPDX-PackageSupplier = "Kolen Cheung"
+SPDX-PackageDownloadLocation = "https://github.com/ickc/hpc-guide"
+
+# Later annotations win over earlier ones.
+
+# Code: examples, scripts, CI, configuration, and everything not listed below.
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Kolen Cheung"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+# Prose: the guide's pages and the documents about it.
+[[annotations]]
+path = ["src/**/*.md", "README.md", "DEVELOPER.md"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Kolen Cheung"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# Vendored, with its own licence.
+[[annotations]]
+path = "src/_extensions/quarto-ext/include-code-files/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2020 Bruno Beaufils"
+SPDX-License-Identifier = "MIT"

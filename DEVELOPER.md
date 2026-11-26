@@ -11,6 +11,8 @@ pixi tasks, so `pixi install` is the only setup step.
 | `pixi run format` | normalise markdown and derive permalinks |
 | `pixi run format-check` | fail if anything is unformatted — this is what CI runs |
 | `pixi run linkcheck` | check the rendered site's links with lychee |
+| `pixi run reuse-lint` | check that every file has a licence (CI runs this too) |
+| `pixi run test-examples [NAME...]` | run the examples' tests on a Slurm login node; see [Examples](#examples-and-their-tests) |
 | `pixi run clean` | remove generated files |
 
 ## Deployment
@@ -22,7 +24,7 @@ rendered output stays untracked and is uploaded straight to Cloudflare.
 
 `.github/workflows/ci.yml` does the whole thing on a push to `main`:
 
-1. **lint** — `pixi run format-check`.
+1. **lint** — `pixi run format-check` and `pixi run reuse-lint`.
 2. **build** — `pixi run build`, then `pixi run linkcheck-except-429`, then
    uploads `src/docs` as an artifact.
 3. **deploy** — downloads that artifact and hands it to
@@ -175,11 +177,11 @@ those licence files along.
 Every folder under `src/` is a section, and every section looks the same:
 
 ```
-src/running-jobs/
-  index.md                      section intro + a listing of the folder
-  10-workflow.md                content
-  20-embarassingly-parallel.md  content
-  30-oversubscription.md        content
+src/parallel/
+  index.md         section intro + a listing of the folder
+  10-intro.md      content
+  20-threads.md    content
+  80-workflows.md  content
 ```
 
 There are exactly two kinds of file in a section, and `pixi run format-check`
@@ -234,11 +236,11 @@ page declares the name it renders to:
 ```yaml
 ---
 title: "Workflow managers"
-output-file: workflow
+output-file: workflows
 ---
 ```
 
-`src/running-jobs/10-workflow.md` then renders to `running-jobs/workflow.html`.
+`src/parallel/80-workflows.md` then renders to `parallel/workflows.html`.
 Renumbering the file changes nothing that anyone can link to.
 
 Two details matter:
@@ -251,17 +253,96 @@ Two details matter:
   any filter runs, so the value has to be in the source before the render
   starts.
 
+## Moving a page
+
+The filename is the contract for the URL, so moving or renaming a page changes
+its address, and every link someone has made to it breaks. Whenever a page's URL
+changes (a different folder, or a different name after the `NN-`), the page gets
+`aliases:` in its front matter with the old path, relative to the new location,
+and Quarto writes a redirect page there:
+
+```yaml
+---
+title: "Threads and oversubscription"
+output-file: threads
+aliases: [../running-jobs/oversubscription.html]
+---
+```
+
+The same goes for the `index.md` of a section that is removed or renamed.
+Renumbering alone changes no URL and needs no alias. After a move, run
+`pixi run format` (it rewrites `output-file`), build, and open each old URL under
+`src/docs/` to check that it redirects.
+
 ## Linking between pages
 
 Link to the **source** file, not the rendered one:
 
 ```markdown
-be careful about [oversubscription](30-oversubscription.md)
+be careful about [oversubscription](20-threads.md)
 ```
 
 Quarto resolves that to the target's output path — honouring `output-file` — and
-rewrites it with the right relative depth. Linking to `oversubscription.html`
+rewrites it with the right relative depth. Linking to `threads.html`
 directly would bypass that and break when a page moves.
+
+## Examples and their tests
+
+Code a page shows is a real file under `src/examples/<name>/`, so the page shows
+exactly what runs. A page embeds it with the `include-code-files` filter
+(vendored in `src/_extensions/quarto-ext/`, and registered in
+`src/_quarto-site.yml`, since the shared `src/_quarto.yml` is not this site's to
+edit), with a path relative to the page:
+
+````markdown
+``` {.bash include="../examples/hello/job.sh"}
+```
+````
+
+`project.resources: examples/**` publishes the example files as they are, so a
+page can also link to one as a download. There are no `.md` files in
+`src/examples/`: they would be rendered as pages, and the formatter would reject
+them. Whatever there is to say about an example goes on the page that embeds it.
+
+Each example directory is also a test. The contract:
+
+- `test.sh` sources `../common/testlib.sh`, runs the example on the cluster
+  and checks the result. It exits 0 when the example works, 1 when it does not,
+  and 77 when it cannot run here (a missing prerequisite, and also no Slurm at
+  all).
+- A batch-job example is run with `batch job.sh`, which does `sbatch --wait`
+  from the example's directory, fails unless the job exits 0, and leaves the
+  job's output in `$OUT`; then `expect_output REGEX` checks it. For anything
+  else `testlib.sh` has `submit`, `wait_running`, `retry`, `background` and
+  `at_exit`, and cancels every job it submitted when the test ends.
+- Slurm options come from the environment (`SBATCH_ACCOUNT`,
+  `SBATCH_PARTITION`, ...), never from the scripts or the tests. The tests set
+  a ten-minute time limit (`SBATCH_TIMELIMIT`) and wait up to 15 minutes in the
+  queue (`QUEUE_TIMEOUT`).
+- An example that needs packages beyond bash and the Python standard library
+  says so with an `environment.yml` or `pixi.toml` in its own directory, and
+  keeps them out of the site's own pixi workspace.
+- Job output goes to `~/.cache/hpc-guide-examples/`, and is kept there only when
+  a test fails. A `*.out` written into an example directory by running it by
+  hand is gitignored.
+
+`pixi run test-examples` runs every `src/examples/*/test.sh` in parallel on a
+Slurm login node and prints PASS, FAIL or SKIP for each, with the log of
+every one that did not pass; `pixi run test-examples hello mpi` runs only those.
+CI never runs them, since it has no cluster, so a change to an example is
+tested by hand on one before it is merged.
+
+## Licence
+
+The text of the guide (`src/**/*.md`, the README and this file) is CC BY-SA 4.0.
+Everything else, meaning the example scripts, `bin/`, the workflow and the
+configuration, is BSD-3-Clause. Both are copyright 2026 Kolen Cheung, except the
+vendored `include-code-files` extension, which is MIT and keeps its author's
+copyright. `REUSE.toml` maps paths to licences following the
+[REUSE](https://reuse.software) specification, `LICENSES/` holds the texts, and
+`pixi run reuse-lint` (in CI) fails on a file without one. A new kind of file
+that is prose needs a line in `REUSE.toml`; the rest is covered by default. The
+root `LICENSE` is the BSD-3-Clause text, kept there for GitHub to detect.
 
 ## The formatter
 
@@ -282,6 +363,12 @@ It is a routine and useful abuse, but only if you know the limitations going in:
   ``` ``` sh ``` with a space; a non-breaking space is inserted after an
   abbreviation, so `i.e. x` becomes `i.e.\u00a0x` and is invisible in an editor.
   Neither is adjustable.
+
+- **Tables are pinned to pipe tables.** Left to itself, pandoc rewrites a table
+  wider than `--columns` as a multiline table, and recomputes its column widths
+  from its own previous output, so a second run changes the file again. The
+  formatter turns the other table extensions off in its output format, which
+  leaves pipe tables as the only way pandoc can write one.
 
 The lack of knobs is the point, in the same way it is the point in Black: there
 is one canonical form, so nobody argues about style in review. Take the whole

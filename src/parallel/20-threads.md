@@ -1,6 +1,7 @@
 ---
 title: "Oversubscription"
-output-file: oversubscription
+output-file: threads
+aliases: [../running-jobs/oversubscription.html]
 ---
 
 On an HPC, it is quite often you'd run into a situation

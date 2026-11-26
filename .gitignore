@@ -4,3 +4,5 @@
 /src/.quarto/
 /src/docs/
 /src/_freeze/
+# job output from running the examples by hand
+/src/examples/*/*.out

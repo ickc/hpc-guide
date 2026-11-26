@@ -1,6 +1,7 @@
 ---
 title: "Spack & MPI"
-output-file: spack-mpi
+output-file: spack
+aliases: [../package-managers/spack-mpi.html]
 ---
 
 TODO: introduce how to link libfabrics, etc. properly to compose an
