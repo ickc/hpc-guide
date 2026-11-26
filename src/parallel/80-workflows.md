@@ -171,10 +171,10 @@ Lastly, the steps of a real pipeline need software, often a different tool for e
 
 A workflow manager is one more tool to learn, with its own language and its own ways of failing, and for two steps, a chain of `sbatch` with `--dependency` is simpler. It also adds its own overhead to every task, on top of Slurm's, so a workflow of many tiny tasks is still better grouped, as above, or run inside one allocation. And none of them makes a single task faster: within each step, the earlier pages of this part still apply.
 
-That is the end of this part. Every way of running in parallel here reads and writes files, often many of them, on filesystems shared by everyone, and the next part, [Storage](../storage/index.md), is about those: where to put your data, how much room you have, and how not to overwhelm a shared filesystem with many small files.
+That is the end of this part. Every way of running in parallel here reads and writes files, often many of them, on filesystems shared by everyone, and the next part, [Storage](../storage/10-where.md), is about those: where to put your data, how much room you have, and how not to overwhelm a shared filesystem with many small files.
 
 [^1]: So after a head dies, `scancel` its stray jobs before you rerun the workflow: Nextflow with `-resume` reuses the tasks that completed, and Snakemake reruns only what is missing.
 
-[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while, and `$PROJECTDIR` is what some call the space shared by a project, with its own quota. Neither name is universal, so look for those kinds of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while, and `$PROJECTDIR` is what some call the space shared by a project, with its own quota. Neither name is universal, so look for those kinds of storage in your centre's documentation; [the part on storage](../storage/10-where.md) is about the kinds there are.
 
 [^3]: Node-local disk does support locks, but each node sees only its own, and it is often wiped at the end of the job, so it cannot hold a working directory that tasks on other nodes write to.
