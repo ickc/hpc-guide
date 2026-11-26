@@ -68,9 +68,10 @@ website:
     left: "© {{< copyright-year 2026 >}} Kolen Cheung. Text under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), code under [BSD-3-Clause](https://github.com/ickc/hpc-guide/blob/main/LICENSE)."
 
 # Embeds a file verbatim as a code block: ```{.bash include="../examples/hello/job.sh"}.
+# panclude (https://github.com/ickc/panclude), vendored at commit 281c3e3.
 # Here, not in the shared _quarto.yml, which is not this site's to edit.
 filters:
-  - include-code-files
+  - filters/panclude.lua
 
 format:
   html:

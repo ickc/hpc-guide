@@ -289,10 +289,11 @@ directly would bypass that and break when a page moves.
 ## Examples and their tests
 
 Code a page shows is a real file under `src/examples/<name>/`, so the page shows
-exactly what runs. A page embeds it with the `include-code-files` filter
-(vendored in `src/_extensions/quarto-ext/`, and registered in
-`src/_quarto-site.yml`, since the shared `src/_quarto.yml` is not this site's to
-edit), with a path relative to the page:
+exactly what runs. A page embeds it with the `include` attribute of
+[panclude](https://github.com/ickc/panclude) (vendored as
+`src/filters/panclude.lua`, and registered in `src/_quarto-site.yml`, since the
+shared `src/_quarto.yml` is not this site's to edit), with a path relative to
+the page:
 
 ````markdown
 ``` {.bash include="../examples/hello/job.sh"}
@@ -336,9 +337,8 @@ tested by hand on one before it is merged.
 
 The text of the guide (`src/**/*.md`, the README and this file) is CC BY-SA 4.0.
 Everything else, meaning the example scripts, `bin/`, the workflow and the
-configuration, is BSD-3-Clause. Both are copyright 2026 Kolen Cheung, except the
-vendored `include-code-files` extension, which is MIT and keeps its author's
-copyright. `REUSE.toml` maps paths to licences following the
+configuration, is BSD-3-Clause. Both are copyright 2026 Kolen Cheung, the vendored
+`src/filters/panclude.lua` included. `REUSE.toml` maps paths to licences following the
 [REUSE](https://reuse.software) specification, `LICENSES/` holds the texts, and
 `pixi run reuse-lint` (in CI) fails on a file without one. A new kind of file
 that is prose needs a line in `REUSE.toml`; the rest is covered by default. The

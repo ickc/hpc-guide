@@ -68,7 +68,7 @@ There are also full package managers for a whole system that can be installed in
 
 But as an end user, trust is more difficult to establish, because there are many different layers between you and the software. It is not a single package manager in a sense, so who are you trusting, even?
 
-For example, if you run `mise use -g ubi:sigstore/cosign` ([cosign](https://github.com/sigstore/cosign) is a tool to sign and verify software, i.e. to tell you what else to trust), you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases from `sigstore`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall, especially with a binary as sensitive as this one, whose whole job is to decide what else you trust:
+For example, if you run `mise use -g ubi:jgm/pandoc`, you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases of `jgm/pandoc`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall:
 
 ``` bash
 #!/usr/bin/env bash
@@ -81,35 +81,40 @@ BINDIR="${__OPT_ROOT}/bin"
 # shellcheck disable=SC2312
 read -r __OSTYPE __ARCH <<< "$(uname -sm)"
 
-cosign_install() {
+pandoc_install() {
+    # The latest version, from the address GitHub redirects releases/latest to.
+    version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/jgm/pandoc/releases/latest)"
+    version="${version##*/}"
     case "${__OSTYPE}-${__ARCH}" in
-        Darwin-arm64) filename="cosign-darwin-arm64" ;;
-        Darwin-x86_64) filename="cosign-darwin-amd64" ;;
-        Linux-x86_64) filename="cosign-linux-amd64" ;;
-        Linux-aarch64) filename="cosign-linux-arm64" ;;
+        Darwin-arm64) archive="pandoc-${version}-arm64-macOS.zip" ;;
+        Darwin-x86_64) archive="pandoc-${version}-x86_64-macOS.zip" ;;
+        Linux-x86_64) archive="pandoc-${version}-linux-amd64.tar.gz" ;;
+        Linux-aarch64) archive="pandoc-${version}-linux-arm64.tar.gz" ;;
         *) exit 1 ;;
     esac
-    url="https://github.com/sigstore/cosign/releases/latest/download/${filename}"
+    url="https://github.com/jgm/pandoc/releases/download/${version}/${archive}"
 
+    tmpdir="$(mktemp -d)"
+    trap 'rm -rf "${tmpdir}"' EXIT
+    curl -fL "${url}" -o "${tmpdir}/${archive}"
+    case "${archive}" in
+        *.zip) unzip -q "${tmpdir}/${archive}" -d "${tmpdir}" ;;
+        *) tar -xzf "${tmpdir}/${archive}" -C "${tmpdir}" ;;
+    esac
     mkdir -p "${BINDIR}"
-    if command -v curl > /dev/null; then
-        curl -fL "${url}" -o "${BINDIR}/cosign"
-    elif command -v wget > /dev/null; then
-        wget "${url}" -O "${BINDIR}/cosign"
-    fi
-    chmod +x "${BINDIR}/cosign"
+    cp "${tmpdir}"/pandoc-*/bin/pandoc "${BINDIR}/pandoc"
 }
 
-cosign_uninstall() {
-    rm -f "${BINDIR}/cosign"
+pandoc_uninstall() {
+    rm -f "${BINDIR}/pandoc"
 }
 
 case "${1:-}" in
     install)
-        cosign_install
+        pandoc_install
         ;;
     uninstall)
-        cosign_uninstall
+        pandoc_uninstall
         ;;
     *)
         echo "Usage: __OPT_ROOT=... ${0} [install|uninstall]"
@@ -118,7 +123,7 @@ case "${1:-}" in
 esac
 ```
 
-It works out the OS and architecture with the same `uname -sm` as [the introduction](10-intro.md), picks the matching file from the project's latest release, and puts it in `$__OPT_ROOT/bin`, which, with the `~/.bashrc` from the introduction, is the architecture-dependent one. Run it with `install` to install or update, and `uninstall` to remove it. The same pattern works for any tool that publishes a single binary per platform on its GitHub Releases.
+It finds the version of the latest release from the address that GitHub redirects `releases/latest` to, works out the OS and architecture with the same `uname -sm` as [the introduction](10-intro.md), downloads the matching archive of that release, and copies the `pandoc` program out of it into `$__OPT_ROOT/bin`, which, with the `~/.bashrc` from the introduction, is the architecture-dependent one. Run it with `install` to install or update, and `uninstall` to remove it. The same pattern works for any tool that publishes its programs for each platform on its GitHub Releases, with the names of its files in place of pandoc's.
 
 A conda-forge package adds layers too, the package's maintainers and conda-forge's. But as [the page on conda](30-conda.md) explained, those maintainers build the package openly in CI, from a recipe anyone can read, so they are layers of defence. A layer that only passes a download along is one more party to trust, with nobody checking anything in between.
 
