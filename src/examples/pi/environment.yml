@@ -1,0 +1,9 @@
+name: pi
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy
+  # for the pages on many tasks: GNU parallel, and map_parallel
+  - parallel
+  - map_parallel

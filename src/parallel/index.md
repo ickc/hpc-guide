@@ -10,4 +10,4 @@ listing:
 aliases: [../running-jobs/index.html]
 ---
 
-Running many tasks at once, on one node or many, and how to pick the right way.
+This part is about making a computation that takes too long on one core use many: first working out which kind of parallel it is, then threads in one process, many independent tasks on one node with GNU parallel or a pool of processes, job arrays across nodes, Python tasks spread over nodes with `mpi4py.futures` and DragonHPC, MPI with threads in each rank, and workflows of tasks that depend on each other. Every page solves the same problem, a Monte Carlo estimate of π, so that the ways compare.

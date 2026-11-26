@@ -107,3 +107,13 @@ background() {
     "$@" >"$WORK/background.${#PIDS[@]}.log" 2>&1 &
     PIDS+=($!)
 }
+
+# conda_env FILE: create the environment in FILE (relative to the example
+# directory) under $WORK, and export CONDA_ENV, which the jobs activate.
+conda_env() {
+    command -v conda >/dev/null || skip "no conda here: install miniforge first"
+    log "creating the environment"
+    CONDA_ALWAYS_YES=true conda env create -q -p "$WORK/env" -f "$EXAMPLE_DIR/$1" >"$WORK/create.log" 2>&1 ||
+        fail "could not create the environment; see $WORK/create.log"
+    export CONDA_ENV="$WORK/env"
+}
