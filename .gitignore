@@ -6,3 +6,6 @@
 /src/_freeze/
 # job output from running the examples by hand
 /src/examples/*/*.out
+# results and logs written by the parallelism examples
+/src/examples/*/results/
+/src/examples/*/joblog.tsv
