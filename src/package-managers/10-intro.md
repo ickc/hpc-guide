@@ -54,9 +54,9 @@ bash: /home/you/.local/bin/jq: cannot execute binary file: Exec format error
 A program compiled for one architecture cannot run on the other, and the same goes for a whole conda environment. Worse, if you install it again from the second node, you overwrite the first.
 
 ::: callout-note
-## For example, on Isambard 3
+## For example
 
-Isambard 3's Grace nodes (`aarch64`) and its MACS nodes (`x86_64`) share one Lustre filesystem, home directories included, and each has its own login nodes. So the same `~/.local/bin` is seen from both architectures.
+On one cluster I have used, the Arm (`aarch64`) nodes and a smaller set of `x86_64` nodes share one Lustre filesystem, home directories included, and each kind has its own login nodes. So the same `~/.local/bin` is seen from both architectures.
 :::
 
 The fix is an architecture-dependent prefix: put everything you install under a directory named after the operating system and the architecture of the node you are on. Add this to your `~/.bashrc`:

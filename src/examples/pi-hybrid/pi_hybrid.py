@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Monte Carlo π on MPI ranks, each with a pool of threads:
 
-    srun python pi_hybrid.py THREADS
+    srun python -m mpi4py pi_hybrid.py THREADS
 
 Each rank runs its share of the tasks on its threads, and rank 0 adds up the hits.
 Rank 0 also prints where every rank ran: its node, its CPUs, and their NUMA nodes.

@@ -9,9 +9,9 @@ The previous page ended with software that is more than a conda environment can 
 On your laptop, that is Docker. On an HPC, it is usually [Apptainer](https://apptainer.org) (formerly Singularity), because Docker needs a daemon running as root, which a shared system will not give you.[^1] Apptainer runs a container as you, with your own permissions, and by default mounts your home directory, the current directory and `/tmp` inside it, so a program in a container reads and writes your files as if it were not in one.
 
 ::: callout-note
-## For example, on Isambard 3
+## Which one your cluster has
 
-Isambard 3 offers both Singularity and Podman-HPC, a version of Podman adapted for HPC.
+Clusters differ in what they offer: one I have used has `singularity` rather than `apptainer`, and Podman-HPC, a version of Podman adapted for HPC, as well. The commands on this page are the same with `singularity` in place of `apptainer`.
 :::
 
 ## When to reach for one

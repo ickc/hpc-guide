@@ -21,4 +21,4 @@ source ../pi/num-threads.sh
 
 # 4 ranks, 2 per node, each pinned to 4 cores of its own, with 4 threads.
 srun --cpus-per-task="$SLURM_CPUS_PER_TASK" --cpu-bind=verbose,cores \
-    python pi_hybrid.py "$NUM_THREADS"
+    python -m mpi4py pi_hybrid.py "$NUM_THREADS"

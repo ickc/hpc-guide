@@ -131,7 +131,7 @@ srun --jobid=<job ID> --overlap --pty top
 
 Threads cannot go beyond the process they belong to, and so beyond its node. The [next page](30-one-node.md) is about many processes instead, many independent tasks at once, on one node.
 
-[^1]: On a *free-threaded* build of Python, which has no GIL, threads run Python code at once too. The [documentation of map_parallel](https://ickc.github.io/python-map_parallel/backends/) goes through which kind of work gains from threads and which needs processes.
+[^1]: On a *free-threaded* build of Python, which has no GIL, threads run Python code at once too: see [Python's HOWTO on free threading](https://docs.python.org/3/howto/free-threading-python.html).
 
 [^2]: The timings on this page were measured on 8 cores of an x86 workstation. On the nodes of your cluster the times will be different, but not the ratios between them.
 

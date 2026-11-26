@@ -59,8 +59,8 @@ Each task also pays for itself. It waits in the queue, then starts from nothing:
 
 Clusters protect themselves with limits. `MaxArraySize` in Slurm's configuration caps the indices of an array (by default, 1001, so indices up to 1000), and many clusters also limit how many jobs one user can have in the queue, which a large array can run into. `scontrol show config | grep -i MaxArraySize` shows the first.
 
-::: {.callout-note title="For example, on Isambard 3"}
-Isambard's [Slurm troubleshooting guide](https://docs.isambard.ac.uk/user-documentation/guides/slurm-troubleshooting/) lists `QOSMaxSubmitJobPerUserLimit`, too many jobs queued, as a reason a job stays pending, and its [FAQ](https://docs.isambard.ac.uk/user-documentation/faqs/) warns that a large array with a long `--time` can reserve enough of a project's credits to block new submissions until some of its tasks complete.
+::: {.callout-note title="Other limits you may run into"}
+A limit on how many jobs one user can have queued shows up in `squeue` as a pending reason such as `QOSMaxSubmitJobPerUserLimit`. And on a cluster that charges a project's time as credits, Slurm may reserve credits for every queued task by its requested resources and `--time`, so a large array with a long `--time` can block new submissions until some of its tasks complete.
 :::
 
 So an array is for tasks that are each worth a job: few enough, and long enough. When you have many short tasks, group them, so that each array task runs many of them.
@@ -81,8 +81,8 @@ The results go to the same `results/<seed>.txt` as before, so the reduce is the 
 
 The sizes here are small, to keep the example quick: 2 nodes for 64 tasks of a second each is a waste of both. In real use, each array task's share would be hundreds or thousands of tasks, sized so that one node gets through them in a few hours, and the array would be as many nodes as you want to use at a time.
 
-::: {.callout-note title="For example, on Isambard 3"}
-A node of Isambard 3 has [144 cores](https://docs.isambard.ac.uk/user-documentation/information/how-isambard-works/), in two Grace CPUs of 72 each. So an array of 10 whole nodes runs 1,440 tasks at a time, as 10 jobs, where a plain array would need 1,440 array tasks running at once to do the same.
+::: {.callout-note title="For example"}
+On nodes of 144 cores, such as those with two 72-core NVIDIA Grace CPUs, an array of 10 whole nodes runs 1,440 tasks at a time, as 10 jobs, where a plain array would need 1,440 array tasks running at once to do the same.
 :::
 
 This is where the tasks are no longer Python functions that one script hands out, but whole commands. When they are Python functions, and you want them spread over many nodes from one script, without an array, the [next page](50-mpi4py-futures.md), on `mpi4py.futures`, does that, with MPI underneath.

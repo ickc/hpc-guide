@@ -49,7 +49,7 @@ nodes in world: 1
 
 and ends with `RESULT: FAIL - ranks did not join a single MPI world`, so the job fails too. That is the singleton world: the program ran, and no MPI communication happened at all.
 
-With an MPI that is wired up properly, as on the [next page](30-conda.md), you get one report, from the one rank 0, and on Isambard 3 it looks like this:
+With an MPI that is wired up properly, as on the [next page](30-conda.md), you get one report, from the one rank 0, and on a Cray EX system it looks like this:
 
 ``` text
 MPI library: MPI VERSION    : CRAY MPICH version 8.1.30.9 (ANL base 3.4a2)

@@ -32,7 +32,7 @@ This is still worse than not building an MPI at all, though.
 
 ## Better, the vendor's MPI itself
 
-Better is to add the vendor's MPI, and the vendor's PMI that it uses to talk to Slurm, as non-buildable externals too, and tell Spack that this is the MPI to use. Then Spack builds no MPI, and your program is built against the vendor's, as if you had compiled it with the vendor's compiler wrappers yourself. On a Cray system such as Isambard 3, an environment that builds the [OSU micro-benchmarks](https://mvapich.cse.ohio-state.edu/benchmarks/) this way is
+Better is to add the vendor's MPI, and the vendor's PMI that it uses to talk to Slurm, as non-buildable externals too, and tell Spack that this is the MPI to use. Then Spack builds no MPI, and your program is built against the vendor's, as if you had compiled it with the vendor's compiler wrappers yourself. On a Cray system, an environment that builds the [OSU micro-benchmarks](https://mvapich.cse.ohio-state.edu/benchmarks/) this way is
 
 ``` {.yaml include="../examples/spack-mpi/spack.yaml"}
 ```
@@ -40,9 +40,9 @@ Better is to add the vendor's MPI, and the vendor's PMI that it uses to talk to 
 `providers: mpi: [cray-mpich]` makes Cray MPICH the package that provides MPI to everything else, and the three externals are Cray MPICH, Cray's PMI, and libfabric. The versions and prefixes are your system's, and change when the vendor's software is upgraded, so take them from the modules: `module show cray-mpich` (or the module for your vendor's MPI) shows where it is installed, and the same for `cray-pmi` and `libfabric`. On a Cray system, `MPICH_DIR` is also set to Cray MPICH's prefix once a programming environment is loaded.
 
 ::: callout-note
-## For example, on Isambard 3
+## Your centre may have one already
 
-Isambard's [Spack guide](https://docs.isambard.ac.uk/user-documentation/guides/spack/setup/) starts from a `packages.yaml` its team maintains, in [isambard-sc/buildit](https://github.com/isambard-sc/buildit), which already has Cray MPICH, Cray's PMI, libfabric and the compilers as externals. With it, `spack spec` shows `cray-mpich` and `libfabric` marked `[e]`, for external.
+Some centres maintain a `packages.yaml` for their system, with the vendor's MPI, PMI, libfabric and compilers already as externals, and their Spack documentation says where to find it. If yours does, start from it rather than writing your own. With it, `spack spec` shows `cray-mpich` and `libfabric` marked `[e]`, for external.
 :::
 
 Build it as in [the Spack page](../package-managers/70-spack.md), with `spack install` in the environment, and run it on 2 nodes with:

@@ -5,7 +5,6 @@ channels:
 dependencies:
   - python=3.13
   - numpy
-  - map_parallel
   # mpi4py, built against an MPICH that the vendor's MPI stands in for at run time
   - mpi4py
   - mpich * external_*
