@@ -1,58 +1,53 @@
 ---
-title: "Introduction"
+title: "Text editors"
+description: "Editing files on the cluster in real time: editors that run in the terminal, and editors that run on your laptop with a server on the cluster, with what each costs the shared login node."
 output-file: editors
 aliases: [../text-editors/intro.html]
 ---
 
-There are many text editors you can run on a remote UNIX system such as an HPC.
-The key problem to solve is how can you edit text files on a remote system in real time,
-without having to manually transferring them back and forth?
+There are many text editors you can run on a remote UNIX system such as an HPC. The key problem to solve is how you can edit text files on a remote system in real time, without having to transfer them back and forth by hand.
 
-There are two classes of text editors you can use:
+There are two classes of text editors you can use.
 
 ## Terminal based text editors
 
-TODO: add links
+These run on the cluster itself, in the terminal you logged in with:
 
-- nano
-- emacs
-- vim
-- helix
+- [nano](https://www.nano-editor.org)
+- [GNU Emacs](https://www.gnu.org/software/emacs/)
+- [Vim](https://www.vim.org)
+- [Helix](https://helix-editor.com)
 
-If you don't know where to start, nano is a good option, often time available by defaults on many HPC systems (not Isambard though).
+If you don't know where to start, nano is a good option, often available by default on many HPC systems (though not on all of them). If the one you want is not there, you can install it yourself, as [the part on software environments](../package-managers/index.md) shows.
 
 ## GUI based text editors with a remote mechanism
 
-- VSCode with Remote SSH
-- Zed editor with "Remote Development"
-- Jupyterlab
+- [VS Code](https://code.visualstudio.com) with [Remote - SSH](https://code.visualstudio.com/docs/remote/ssh)
+- [Zed](https://zed.dev) with [Remote Development](https://zed.dev/docs/remote-development)
+- [JupyterLab](https://jupyterlab.readthedocs.io)
 
-All of these has a sort of client server model so that you can edit as if it is local but main computations and IO
-are happening on the remote server.
-Jupyterlab uses browser as the client directly (where main selling point is not text editing but notebook editing).
-Each of these deserves its own page for introduction.
-The one main caveat to decide which one(s) to use is the resource consumed.
+All of these have a sort of client-server model, so that you can edit as if it is local, while the main computation and IO happen on the remote server. VS Code and Zed run their user interface on your laptop, and a server of their own on the cluster, which they start and talk to over SSH. JupyterLab uses the browser as the client directly (where its main selling point is not text editing but notebook editing).
 
-VSCode consumes more resources because of how inefficient it is in itself,
-but also how its extensions often forks a lot of processes which can be constraining.
-E.g. some HPC systems might reduce the `ulimit` you have on the login node on a much smaller amount (say 900)
-which can easily be went over for a typical VSCode setup.
+The one main caveat in deciding which one(s) to use is the resources they consume.
 
-Zed is much more efficient in this aspect, but much younger in its ecosystem,
-and also its more restrictive design (e.g. VSCode being a browser makes writing extensions using web technology,
-such as MathJax/KaTeX almost trivial, while incredibly hard to do in Zed because it doesn't render general HTML/CSS/JS)
-might means you'll be missing some features coming from VSCode.
-But it is much more HPC friendly because it uses very little resources,
-and HPC login nodes are very limited shared resources.
+VS Code consumes more resources, because of how inefficient it is in itself,[^1] but also because its extensions often fork a lot of processes, which can be constraining. E.g. some HPC systems reduce the number of processes you may have on the login node to a much smaller number (say 900), which a typical VS Code setup can easily go over. `ulimit -u` shows the limit you have.[^2]
 
-As a sidenote, using any of these requires extra attension when you want to edit files on the compute nodes
-(say you're running an interactive notebook on the compute nodes).
-This has nothing to do with the text editors themselves,
-but the fact that you want to perform interactive tasks on the compute
-where you often need extra hopping: `local -> login -> compute`.
-We'll talk about this pattern in TODO and some of its pitfalls if setup incorrectly.
+Zed is much more efficient in this aspect, but much younger in its ecosystem, and also its more restrictive design might mean you'll be missing some features coming from VS Code. E.g. VS Code being a browser makes writing extensions using web technology, such as MathJax or KaTeX, almost trivial, while that is incredibly hard to do in Zed, because it doesn't render general HTML, CSS and JavaScript. But it is much more HPC friendly, because it uses very little resources, and HPC login nodes are very limited shared resources.
 
-TODO: mention how to hop over SSH, security implications, and if setup incorrectly leads to security risks
-(such as bridge login-compute through insecure HTTP).
-Also mention code tunnel, why it is useful, and why it might be another security problem that some HPC centres
-would restrict you from using it.
+## Editing on a compute node
+
+As a side note, using any of these requires extra attention when you want to work on the compute nodes, say you're running an interactive notebook there. This has nothing to do with the text editors themselves, but with the fact that you want to perform interactive tasks on a compute node, where you often need an extra hop: laptop → login node → compute node. You can SSH to the login node, but usually not to a compute node.
+
+That pattern is what the rest of this part is about: first [a shell on a compute node](20-shell.md), which is all a terminal editor needs, then [why a web app such as JupyterLab is harder](30-services.md), and how the usual recipe for it, if set up this way, bridges the login node and the compute node with insecure HTTP. The pages after that are ways to do it securely, including [an SSH connection to a compute node](50-srun-ssh.md) that goes through Slurm.
+
+### VS Code tunnels
+
+VS Code has one more way in, [Remote Tunnels](https://code.visualstudio.com/docs/remote/tunnels). You run `code tunnel` on the cluster, which can be in a job on a compute node, and it connects out to a relay run by Microsoft. VS Code on your laptop, or in a browser at vscode.dev, connects to the same relay, after you sign in to the same GitHub or Microsoft account on both ends. This is useful because it skips the hop to the compute node altogether: nothing listens on the cluster, and you don't need SSH to the node.
+
+Some centres document this as the way to use VS Code on a compute node, with a job script that runs `code tunnel`. But it is also why other centres restrict it. A tunnel is a way into the cluster that does not go through the centre's own login, whatever that checks (your SSH key, a certificate, a second factor), so whoever gets into your GitHub account gets a shell on the cluster as you. And all of it goes through a third party. So whether you may use it depends on your centre: look in its documentation, or its acceptable use policy, for VS Code or tunnels, and ask its helpdesk if it says nothing. It also needs the compute node to reach the internet, which some clusters allow and some don't. Its relay is Microsoft's Dev Tunnels service, which [a later page](70-dev-tunnel.md) uses for any web app, with more on what trusting it means.
+
+The [next page](20-shell.md) starts with the simplest of these: a shell on a compute node.
+
+[^1]: Its own documentation asks for at least 1 GB of RAM on the remote host, and recommends at least 2 GB and 2 cores, for the server alone.
+
+[^2]: It counts every process of yours on that login node, from all your sessions, and on Linux every thread too. When you hit it, the next program you start fails, often with a message like `fork: retry: Resource temporarily unavailable`, and that can be your shell as well as VS Code.

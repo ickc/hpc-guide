@@ -1,0 +1,6 @@
+# Only for the test: JupyterLab, wherever it comes from on your cluster.
+name: jupyter-https
+channels:
+  - conda-forge
+dependencies:
+  - jupyterlab

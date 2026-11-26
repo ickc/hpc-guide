@@ -1,0 +1,14 @@
+digraph hpc_relay {
+    // The job connects out to a relay, in 60-own-relay.md.
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fillcolor=white, fontsize=12];
+    edge [fontsize=10];
+
+    app [label="compute node\nJupyterLab, RStudio…\non 127.0.0.1", fillcolor=lightgrey];
+    relay [label="relay"];
+    laptop [label="laptop"];
+
+    app -> relay [label="connects out"];
+    // Drawn from the relay, so that it sits between the two, but pointing at it.
+    relay -> laptop [label="connects", dir=back];
+}
