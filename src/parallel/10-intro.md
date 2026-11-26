@@ -35,19 +35,19 @@ So, crossing the two:
 
 |  | One node | Many nodes |
 |----------------------------------------|----------------------------------------|----------------------------------------|
-| Many independent tasks | GNU parallel, or a pool of processes in Python ([one node](30-one-node.md)) | a Slurm job array ([job arrays](40-job-arrays.md)), `mpi4py.futures`, or DragonHPC |
+| Many independent tasks | GNU parallel, or a pool of processes in Python ([one node](30-one-node.md)) | a Slurm job array ([job arrays](40-job-arrays.md)), [`mpi4py.futures`](50-mpi4py-futures.md), or [DragonHPC](60-dragon.md) |
 | One process, many cores | threads ([threads](20-threads.md)) | not possible: threads share memory |
-| Ranks that communicate | MPI | MPI, with threads in each rank (hybrid MPI) |
-| Tasks with dependencies | a workflow manager | a workflow manager |
+| Ranks that communicate | MPI | MPI, with threads in each rank ([hybrid MPI](70-hybrid-mpi.md)) |
+| Tasks with dependencies | a [workflow manager](80-workflows.md) | a [workflow manager](80-workflows.md) |
 
 Or, as a guide to the pages of this part:
 
 - If your program already uses threads, or could, start with [threads](20-threads.md), which is also where oversubscription is explained: running more threads than cores, which every other page has to avoid.
 - If you have many independent tasks that fit on one node, use [GNU parallel or a pool of processes](30-one-node.md).
 - If you have more of them than one node can run in the time you have, use a [job array](40-job-arrays.md), possibly with GNU parallel inside each of its tasks.
-- If your tasks are Python functions and you want to spread them over many nodes from one script, the page on `mpi4py.futures` (`50-mpi4py-futures`) does that with MPI underneath, and the one on DragonHPC (`60-dragon`) with a runtime of its own.
-- If your program is MPI, with threads in each rank, the page on hybrid MPI (`70-hybrid-mpi`) is about placing the ranks and threads on the cores.
-- If your tasks depend on each other, the page on workflows (`80-workflows`) goes from `sbatch --dependency` to workflow managers such as Snakemake and Nextflow.
+- If your tasks are Python functions and you want to spread them over many nodes from one script, the page on [`mpi4py.futures`](50-mpi4py-futures.md) does that with MPI underneath, and the one on [DragonHPC](60-dragon.md) with a runtime of its own.
+- If your program is MPI, with threads in each rank, the page on [hybrid MPI](70-hybrid-mpi.md) is about placing the ranks and threads on the cores.
+- If your tasks depend on each other, the page on [workflows](80-workflows.md) goes from `sbatch --dependency` to workflow managers such as Snakemake and Nextflow.
 
 The [listing of this part](index.md) has all of them.
 
@@ -80,7 +80,7 @@ pi = 3.141543 from 4294967296 samples
 
 Every strategy in this part prints this same line, from the same 64 tasks,[^3] so you know it did all of the work, once. What changes is how long it takes, which `sacct -j <job ID> --format=JobID,Elapsed,TotalCPU` shows for any job: the time from start to end, and the CPU time of all its processes added up. On one core the two are about equal; if a job had 8 cores and used them all, the CPU time is about 8 times the elapsed time.
 
-The files are all under [`examples/`](https://github.com/ickc/hpc-guide/tree/main/src/examples) in the guide's repository: `pi/` holds `pi.py`, the environment, and `num-threads.sh`, which the [next page](20-threads.md) is about; each other directory is one strategy, and is meant to be submitted from inside it, since the job scripts find `pi.py` at `../pi/`.
+The files are all under [`examples/`](https://github.com/ickc/hpc-guide/tree/main/src/examples) in the guide's repository: `pi/` holds `pi.py`, the environment (and a second one, for the pages that use MPI), and `num-threads.sh`, which the [next page](20-threads.md) is about; each other directory is one strategy, and is meant to be submitted from inside it, since the job scripts find `pi.py` at `../pi/`.
 
 The next page starts with the kind that needs no change to how you run your program, only to what you ask the scheduler for: threads.
 

@@ -1,0 +1,11 @@
+name: pi-workflow
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.13
+  - numpy
+  - snakemake
+  - make
+  # for running each job through Slurm
+  - snakemake-executor-plugin-slurm

@@ -9,3 +9,5 @@
 # results and logs written by the parallelism examples
 /src/examples/*/results/
 /src/examples/*/joblog.tsv
+/src/examples/*/pi.txt
+/src/examples/*/.snakemake/

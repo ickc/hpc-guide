@@ -1,0 +1,27 @@
+# Monte Carlo π as a workflow: 64 tasks, each writing its counts to a file of its
+# own, and the reduce, which needs all of them.
+SEEDS = range(1, 65)
+
+
+rule all:
+    input:
+        "pi.txt",
+
+
+rule count:
+    output:
+        "results/{seed}.txt",
+    # On a cluster, put several of these in one Slurm job (see the profile).
+    group:
+        "count"
+    shell:
+        "python ../pi/pi.py count {wildcards.seed} > {output}"
+
+
+rule reduce:
+    input:
+        expand("results/{seed}.txt", seed=SEEDS),
+    output:
+        "pi.txt",
+    shell:
+        "python ../pi/pi.py reduce {input} > {output}"

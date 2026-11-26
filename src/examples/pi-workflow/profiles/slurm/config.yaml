@@ -1,0 +1,13 @@
+# snakemake --profile profiles/slurm: every job of the workflow through Slurm.
+executor: slurm
+# At most 4 Slurm jobs in the queue at a time, and at most 1 submitted per second.
+jobs: 4
+max-jobs-per-timespan: 1/1s
+# 16 count tasks to a Slurm job, so 4 jobs for the 64 of them.
+group-components:
+  - count=16
+default-resources:
+  runtime: 10 # minutes
+  mem_mb: 2000
+# Wait up to a minute for a job's output files to show up on the login node.
+latency-wait: 60

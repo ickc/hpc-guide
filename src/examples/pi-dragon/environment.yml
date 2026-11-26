@@ -1,0 +1,10 @@
+name: pi-dragon
+channels:
+  - conda-forge
+dependencies:
+  # DragonHPC supports Python 3.11 to 3.13, and is only on PyPI
+  - python=3.13
+  - numpy
+  - pip
+  - pip:
+      - dragonhpc
