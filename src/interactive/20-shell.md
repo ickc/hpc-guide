@@ -45,7 +45,7 @@ This is handy for watching a running job from the inside: `top` to see whether i
 `sleep infinity` never ends by itself, so the job lasts until its time limit, or until you `scancel` it. In practice, this is your real job script, and you get into it to see how it is doing.
 
 ::: callout-tip
-Run these from inside `tmux` or `screen` on the login node. Then the shell on the compute node survives your laptop going to sleep or your Wi-Fi dropping, since it is the login node that holds the connection to it.[^2]
+Run these from inside `tmux` or `screen` on the login node. Then the shell on the compute node survives your laptop going to sleep or your Wi-Fi dropping, since it is the login node that holds the connection to it.[^2] Some clusters do not allow such a session to keep running after you disconnect, as [the page on workflows](../parallel/80-workflows.md#where-the-head-process-runs) explains, so check yours before you rely on it.
 :::
 
 ## Limitations
