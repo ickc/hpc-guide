@@ -56,7 +56,7 @@ A program compiled for one architecture cannot run on the other, and the same go
 ::: callout-note
 ## For example, on Isambard 3
 
-Isambard 3 shares one home directory between its Arm (`aarch64`) Grace nodes and its `x86_64` nodes, and has login nodes of both kinds, so the same `~/.local/bin` is seen by both.
+Isambard 3's Grace nodes (`aarch64`) and its MACS nodes (`x86_64`) share one Lustre filesystem, home directories included, and each has its own login nodes. So the same `~/.local/bin` is seen from both architectures.
 :::
 
 The fix is an architecture-dependent prefix: put everything you install under a directory named after the operating system and the architecture of the node you are on. Add this to your `~/.bashrc`:

@@ -47,7 +47,7 @@ and `pi.py`, which estimates π from random points:
 
 ## Tasks
 
-The `[tasks]` table is a built-in task runner, so that you don't need to rely on an ad hoc Makefile, or notes, to remind you what can be done. `pixi run pi` runs `python pi.py` in the environment, creating it first if needed. `pixi task list` lists every task a project has, with its description, which is the first thing I run in a project I haven't seen before.
+The `[tasks]` table is a built-in task runner, so that you don't need to rely on an ad hoc Makefile, or notes, to remind you what can be done. `pixi run pi` runs `python pi.py` in the environment, creating it first if needed. Run `pixi task list` and see all the tasks you can perform, with their descriptions.
 
 ## Using it in a batch job
 

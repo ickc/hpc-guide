@@ -1,5 +1,5 @@
 ---
-title: "Conda, mamba, micromamba & pixi"
+title: "Conda and mamba"
 description: "Why conda, why conda-forge rather than Anaconda's channels, how to install miniforge, and how to use an environment in a batch job."
 output-file: conda
 ---
@@ -16,7 +16,7 @@ Conda exists because scientific Python ran into exactly this. In 2012, at a pane
 
 > it really sounds like your needs are so unusual compared to the larger Python community that you're just better off building your own
 
-([the panel](https://www.youtube.com/watch?v=QjXJLVINsSA&t=3555), and [Jake VanderPlas's account of what followed](https://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions/)). They did, and that was conda. It has since grown into a language-agnostic, multi-platform package manager. Language-agnostic means a conda package can be anything: a Python package, but also a C library, a Fortran compiler, R, Rust, or a shell script. So an environment can contain the compilers and libraries your Python packages are built with, rather than relying on the system's. Multi-platform means the same package is built for Linux on `x86_64`, `aarch64` and `ppc64le`, macOS on Intel and Apple Silicon, and Windows, so the same environment file works on your laptop and on the cluster.
+([the panel](https://www.youtube.com/watch?v=QjXJLVINsSA&t=3555), and [Jake VanderPlas's account of what followed](https://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions/)). That statement became the catalyst for creating conda, which has since grown into a language-agnostic, multi-platform package manager. Language-agnostic means a conda package can be anything: a Python package, but also a C library, a Fortran compiler, R, Rust, or a shell script. So an environment can contain the compilers and libraries your Python packages are built with, rather than relying on the system's. Multi-platform means the same package is built for Linux on `x86_64`, `aarch64` and `ppc64le`, macOS on Intel and Apple Silicon, and Windows, so the same environment file works on your laptop and on the cluster.
 
 A conda package is built with its dependencies separated into three kinds:
 
@@ -26,13 +26,13 @@ A conda package is built with its dependencies separated into three kinds:
 | **Host**  | the package being built, when it is linked | the target platform, e.g. `aarch64` | `openssl`, `python`, `libpng` |
 | **Run**   | you, when you use it                       | the target platform                 | `python`, `numpy`             |
 
-Because the build brings its own compilers and libraries rather than whatever is on the build machine, it is close to *hermetic*, and the result does not depend on the machine it was built on. That is not a guarantee that an environment that works on your computer works on another, but the chance is much higher than with packages that build themselves at install time.
+Because the build brings its own compilers and libraries rather than whatever is on the build machine, it is close to *hermetic*, and the result depends very little on the machine it was built on. That is not a guarantee that an environment that works on your computer works on another, but the chance is much higher than with packages that build themselves at install time.
 
 ## conda-forge, not Anaconda's channels
 
 Conda installs packages from *channels*, which are like an APT repository if you are familiar with Ubuntu. Out of the box, conda from Anaconda (the company) uses Anaconda's own channels, often called `defaults`. The other big one is [conda-forge](https://conda-forge.org), a [NumFOCUS project](https://numfocus.org/project/conda-forge) run by an independent community of maintainers. Every conda-forge package has a "feedstock" on GitHub with its recipe, and is built openly in CI, for every platform and, where relevant, every Python version and variant. To get a package on conda-forge, the build has to be reproducible (that is, the hermetic-ish build above), and the licence has to be there. And because it adds layers of maintainers, those of the package and those of conda-forge, between you and the upstream developer, it adds layers of defence against a supply chain attack.
 
-I'd recommend using conda-forge only, for two reasons. It has far more of the scientific packages you are likely to need. And it takes you out of Anaconda's licensing altogether. Use of Anaconda's channels is governed by Anaconda's terms of service, which have changed more than once. As of July 2025, an organization with more than 200 employees needs a paid licence, and an eligible academic institution can use them for free under an academic licence agreement. Whether that covers you is a question for your institution, and with conda-forge, which has no such terms, it is a question you never have to ask.
+I'd recommend using conda-forge only, for two reasons. It has far more of the scientific packages you are likely to need. And it takes you out of Anaconda's licensing altogether. Use of Anaconda's channels is governed by [Anaconda's terms of service](https://www.anaconda.com/legal/terms/terms-of-service), which have changed more than once, and under which a large organization, as a university is, may need a paid licence. Whether that covers you is a question for your institution, and with conda-forge, which has no such terms, it is a question you never have to ask.
 
 So install [miniforge](https://github.com/conda-forge/miniforge), a minimal distribution of `conda` and `mamba` that uses conda-forge only, not Anaconda or Miniconda. Into the architecture-dependent prefix from [the introduction](10-intro.md):
 
@@ -115,10 +115,10 @@ Everything between `<<'EOF_JOB'` and `EOF_JOB` is given to `sbatch` as the job s
 There is one exception to the above. When conda solves an environment, it takes into account the machine it is running on, through *virtual packages*. `conda info` lists them:
 
 ``` text
-       virtual packages : __archspec=1=zen5
-                          __cuda=13.5=0
-                          __glibc=2.39=0
-                          __linux=6.12.0=0
+       virtual packages : __archspec=1=zen4
+                          __cuda=12.4=0
+                          __glibc=2.34=0
+                          __linux=5.14.0=0
 ```
 
 `__cuda` is the CUDA version the GPU driver supports, `__archspec` is the CPU microarchitecture, and `__glibc` the version of the system C library. A package can depend on them: the GPU build of a package needs `__cuda`, and a microarchitecture-optimized build needs a matching `__archspec`. So the same `environment.yml` can resolve to different packages on a login node with no GPU and an older CPU, than on a compute node with a GPU and a newer one. On such exotic platforms, where login nodes and compute nodes are fundamentally different, it is better to create the environment on the hardware your job will run on, in an interactive job on a compute node. If you can't, you can tell conda what to assume, for example `CONDA_OVERRIDE_CUDA=12.4 mamba env create -f environment.yml` for a GPU environment from a login node without one.
