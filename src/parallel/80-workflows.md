@@ -1,6 +1,7 @@
 ---
 title: "Workflow managers"
-output-file: workflow
+output-file: workflows
+aliases: [../running-jobs/workflow.html]
 ---
 
 Workflow managers are useful for reproducible workflow, especially

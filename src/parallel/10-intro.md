@@ -1,6 +1,7 @@
 ---
 title: "Embarassingly parallel jobs"
-output-file: embarassingly-parallel
+output-file: intro
+aliases: [../running-jobs/embarassingly-parallel.html]
 ---
 
 There are many ways to launch a bunch of embarassingly-parallel (TODO: def)
@@ -16,7 +17,7 @@ Limitation: overwhelming the scheduler
 
 TODO
 
-Limitation: license (cite), be careful about [oversubscription](30-oversubscription.md)
+Limitation: license (cite), be careful about [oversubscription](20-threads.md)
 
 ## `mpi4py.futures`
 

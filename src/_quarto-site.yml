@@ -4,6 +4,9 @@ project:
   output-dir: docs
   render:
     - "**/*.md"
+  # Example scripts are published as they are, so pages can link to them as downloads.
+  resources:
+    - "examples/**"
   # The post graph (the template's README, "The post graph"): graph.json and its viewer.
   post-render:
     - paragraphic build --preset quarto --groups directories --exclude 404.html
@@ -15,6 +18,12 @@ website:
   search:
     location: sidebar
     type: textbox
+  announcement:
+    content: "This guide is in alpha: pages are still being written, and may change or move."
+    icon: exclamation-triangle
+    dismissable: false
+    type: warning
+    position: above-navbar
   navbar:
     left:
       - href: index.md
@@ -23,7 +32,7 @@ website:
         text: Graph
     right:
       - icon: github
-        href: https://github.com/ickc/hpc.kolen.dev
+        href: https://github.com/ickc/hpc-guide
         aria-label: GitHub
   sidebar:
     style: docked
@@ -31,7 +40,7 @@ website:
     contents:
       - href: index.md
         text: Overview
-      - section: "Package managers"
+      - section: "Software environments"
         href: package-managers/index.md
         contents:
           - auto: "package-managers/*.md"
@@ -39,20 +48,25 @@ website:
         href: mpi/index.md
         contents:
           - auto: "mpi/*.md"
-      - section: "Running jobs"
-        href: running-jobs/index.md
+      - section: "Parallelism"
+        href: parallel/index.md
         contents:
-          - auto: "running-jobs/*.md"
+          - auto: "parallel/*.md"
       - section: "Storage"
         href: storage/index.md
         contents:
           - auto: "storage/*.md"
-      - section: "Text editors"
-        href: text-editors/index.md
+      - section: "Working interactively"
+        href: interactive/index.md
         contents:
-          - auto: "text-editors/*.md"
+          - auto: "interactive/*.md"
   page-footer:
-    left: "© {{< copyright-year 2026 >}} Kolen Cheung"
+    left: "© {{< copyright-year 2026 >}} Kolen Cheung. Text under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), code under [BSD-3-Clause](https://github.com/ickc/hpc-guide/blob/main/LICENSE)."
+
+# Embeds a file verbatim as a code block: ```{.bash include="../examples/hello/job.sh"}.
+# Here, not in the shared _quarto.yml, which is not this site's to edit.
+filters:
+  - include-code-files
 
 format:
   html:
