@@ -1,0 +1,15 @@
+digraph hpc_srun_ssh {
+    // SSH over srun, in 50-srun-ssh.md.
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fillcolor=white, fontsize=12];
+    edge [fontsize=10];
+
+    laptop [label="laptop"];
+    login [label="login node", fillcolor=lightgrey];
+    sshd [label="compute node\nsshd -i", fillcolor=lightgrey];
+    app [label="JupyterLab, RStudio…\non 127.0.0.1", fillcolor=lightgrey];
+
+    laptop -> login [label="ssh"];
+    login -> sshd [label="srun"];
+    sshd -> app [label="forwards"];
+}

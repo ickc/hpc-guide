@@ -1,0 +1,13 @@
+digraph hpc_service {
+    // The missing hop, in 30-services.md.
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fillcolor=white, fontsize=12];
+    edge [fontsize=10];
+
+    laptop [label="laptop"];
+    login [label="login node", fillcolor=lightgrey];
+    compute [label="compute node\nJupyterLab, RStudio…", fillcolor=lightgrey];
+
+    laptop -> login [label="ssh"];
+    login -> compute [label="?", style=dashed];
+}
