@@ -1,0 +1,6 @@
+name: mpi4py-openmpi
+channels:
+  - conda-forge
+dependencies:
+  - mpi4py
+  - openmpi

@@ -1,0 +1,6 @@
+name: mpi4py-source
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip

@@ -1,0 +1,6 @@
+name: mpi4py-plain
+channels:
+  - conda-forge
+dependencies:
+  - mpi4py
+  - mpich
