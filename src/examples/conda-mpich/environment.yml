@@ -1,0 +1,7 @@
+name: mpi4py-mpich
+channels:
+  - conda-forge/label/mpi-external
+  - conda-forge
+dependencies:
+  - mpi4py
+  - mpich * external_*
