@@ -16,6 +16,7 @@ You often get threads without asking for them:
 - **BLAS**, the library that does linear algebra, e.g. matrix products, for NumPy, SciPy, R, and most compiled programs. Its common implementations, OpenBLAS and Intel MKL, use threads by default, so `a @ b` in NumPy may use every core it can see.
 - **OpenMP**, in compiled code (C, C++, Fortran), where a loop marked with `#pragma omp parallel for` is split between threads. Many libraries are built with it.
 - **Numba**, in Python, where a function compiled with `@njit(parallel=True)` runs its `prange` loops on threads.
+- **JAX**, on the CPU, which is the odd one out: it [doesn't parallelize operations across CPU cores](https://github.com/jax-ml/jax/issues/5022#issuecomment-1222336766) unless you use explicit parallelism constructs, but some of its operations, such as BLAS or LAPACK, have their own internal parallelism.
 - **Python's own threads**, with `threading` or `concurrent.futures.ThreadPoolExecutor`. With the usual build of Python, only one thread runs Python code at a time, because of its global interpreter lock (the GIL), but NumPy, like many libraries written in C, releases the GIL while it computes, so threads that spend their time in NumPy do run at once.[^1]
 
 Here is Monte Carlo π that way: one process, a pool of threads, each running tasks of `pi.py` until all 64 are done.
@@ -104,7 +105,8 @@ So you'd often want to set some environment variables, to match the number of th
 - **numexpr**, which pandas uses to evaluate expressions, has `NUMEXPR_NUM_THREADS`.
 - **OpenBLAS**, the BLAS that NumPy and SciPy come with from conda-forge and from PyPI, has `OPENBLAS_NUM_THREADS`.
 - **Numba** has `NUMBA_NUM_THREADS`, for functions compiled with `parallel=True`.
-- **Machine learning frameworks**: `JAX_NUM_CPU_DEVICES=1` keeps JAX to one CPU device, and TensorFlow runs independent operations one at a time (`TF_NUM_INTEROP_THREADS=1`), each on the given number of threads (`TF_NUM_INTRAOP_THREADS`). `NPROC` is not a library's, but a name some scripts read for the number of processors to use.
+- **JAX** has no `JAX_NUM_THREADS`, and how to limit its threads on the CPU is very obscure. `XLA_FLAGS='--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1'` [was the recommendation](https://github.com/jax-ml/jax/issues/743#issuecomment-511684879), and [it is now recommended to use `NPROC=1`](https://github.com/jax-ml/jax/issues/743#issuecomment-2405731890) instead, to disable the multithreading used in Eigen, the library XLA uses for some operations. `NPROC` is a generic name, which other programs may read too, so it might have side effects, and setting it to the same number as everything else keeps those harmless. `JAX_NUM_CPU_DEVICES=1` keeps JAX to one CPU device.
+- **TensorFlow** runs independent operations one at a time (`TF_NUM_INTEROP_THREADS=1`), each on the given number of threads (`TF_NUM_INTRAOP_THREADS`).
 - **Julia** has `JULIA_NUM_THREADS`.
 
 ::: callout-tip

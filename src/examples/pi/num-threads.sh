@@ -28,9 +28,13 @@ export OPENBLAS_NUM_THREADS="${NUM_THREADS}"
 # Numba, for functions compiled with parallel=True.
 export NUMBA_NUM_THREADS="${NUM_THREADS}"
 
-# Machine learning: JAX and TensorFlow, and NPROC, which some scripts read.
+# JAX has no JAX_NUM_THREADS: NPROC disables the multithreading of Eigen, which
+# XLA uses on the CPU, as JAX's issue tracker now recommends. Other programs may
+# read NPROC too. JAX_NUM_CPU_DEVICES=1 keeps JAX to one CPU device.
 export NPROC="${NUM_THREADS}"
 export JAX_NUM_CPU_DEVICES=1
+
+# TensorFlow: independent operations one at a time, each on NUM_THREADS threads.
 export TF_NUM_INTEROP_THREADS=1
 export TF_NUM_INTRAOP_THREADS="${NUM_THREADS}"
 
