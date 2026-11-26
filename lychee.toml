@@ -9,14 +9,13 @@ exclude_path = [
     "src/docs/robots.txt",
 ]
 
-# Links lychee cannot verify anonymously. The first two are private GitHub
-# repos, which return 404 to unauthenticated requests: drop an entry once its
-# repo is public (or run lychee with --github-token to check them for real).
+# Links lychee cannot verify anonymously. The first is a private GitHub repo,
+# which returns 404 to unauthenticated requests: drop it once the repo is
+# public (or run lychee with --github-token to check it for real).
 # mpich.org answers 403 to automated clients, and gnu.org times out from CI's
 # runners; both are fine in a browser.
 exclude = [
     "^https://github\\.com/ickc/hpc\\.kolen\\.dev/?$",
-    "^https://github\\.com/ickc/isambard-workspace",
     "^https://www\\.mpich\\.org/",
     "^https://www\\.gnu\\.org/",
 ]

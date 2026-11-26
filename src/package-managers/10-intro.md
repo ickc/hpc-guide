@@ -81,4 +81,4 @@ With a prefix decided, the next page starts with the software that is already th
 
 [^2]: The name is the one my own dotfiles use. Anything that includes the architecture works, as long as you use it consistently.
 
-[^3]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+[^3]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/10-where.md) is about the kinds there are.

@@ -80,4 +80,4 @@ If what you need is compiled software built for the machine, with the vendor's c
 
 [^1]: Apptainer is the Linux Foundation's continuation of Singularity, and SingularityCE is a separate fork by Sylabs, with the same commands. Some clusters offer rootless Podman instead, or as well.
 
-[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/10-where.md) is about the kinds there are.

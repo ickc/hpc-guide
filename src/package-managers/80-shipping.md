@@ -87,6 +87,6 @@ That is the end of this part. The next part is about MPI, and how to compose an 
 
 [^1]: Not on a login node, where everyone shares the same `/tmp`, and which may not be the same kind of machine.
 
-[^2]: Some centres give each job node-local storage under a name of their own instead, such as `$LOCALDIR`, often only for the length of the job, and on a job of several nodes, each node has its own. Look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+[^2]: Some centres give each job node-local storage under a name of their own instead, such as `$LOCALDIR`, often only for the length of the job, and on a job of several nodes, each node has its own. Look for that kind of storage in your centre's documentation; [the part on storage](../storage/10-where.md) is about the kinds there are.
 
 [^3]: If you use pixi, [pixi-pack](https://github.com/Quantco/pixi-pack) does the same for a pixi environment.

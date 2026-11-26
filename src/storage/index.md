@@ -9,4 +9,4 @@ listing:
   filter-ui: false
 ---
 
-Working with the shared file systems on a cluster.
+This part is about where your data lives on a cluster, and how it gets there: the kinds of storage there are, from your home directory to the disk of each compute node, with their quotas, backups and purge policies, and how to stage data in and out of node-local storage in a job; then Lustre, the shared filesystem of many clusters, how to check your quota on it, and why many small files are slow there; and last, how to move data onto the cluster and the results off it with `rsync`.
