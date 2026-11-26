@@ -5,6 +5,8 @@ output-file: editors
 aliases: [../text-editors/intro.html]
 ---
 
+[The last part](../storage/30-moving-data.md) ended with your data in the right place. This last part of the guide is about working on the cluster as you go, rather than through batch jobs, and it starts with the most basic case, editing a file there.
+
 There are many text editors you can run on a remote UNIX system such as an HPC. The key problem to solve is how you can edit text files on a remote system in real time, without having to transfer them back and forth by hand.
 
 There are two classes of text editors you can use.

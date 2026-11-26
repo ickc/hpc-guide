@@ -1,5 +1,6 @@
 ---
 title: "Software environments"
+description: "Installing the software your analysis needs without sudo: modules, conda and pixi, containers and Spack, and shipping an environment to the nodes."
 listing:
   contents: "*.md"
   type: table

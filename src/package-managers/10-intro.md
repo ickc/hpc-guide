@@ -4,7 +4,7 @@ description: "Why the usual way of installing software does not work on an HPC, 
 output-file: intro
 ---
 
-Sooner or later, your job needs software that the cluster does not have: a newer Python, a library your analysis depends on, or a command-line tool you are used to on your laptop. On your own computer, you would install it with the system package manager, `sudo apt install ffmpeg` on Ubuntu or `sudo dnf install ffmpeg` on Fedora. On an HPC, that does not work, and the reason why shapes everything in this part.
+The checklist at the end of [Getting started](../getting-started/40-failed-jobs.md) traced most failed jobs to the environment, so this part is about getting it right. Sooner or later, your job needs software that the cluster does not have: a newer Python, a library your analysis depends on, or a command-line tool you are used to on your laptop. On your own computer, you would install it with the system package manager, `sudo apt install ffmpeg` on Ubuntu or `sudo dnf install ffmpeg` on Fedora. On an HPC, that does not work, and the reason why shapes everything in this part.
 
 ## No `sudo`, so you need a PREFIX
 

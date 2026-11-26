@@ -1,5 +1,6 @@
 ---
 title: "Parallelism"
+description: "Making a computation use many cores and nodes, by the kind of parallel it is: threads, many independent tasks, ranks that communicate, and workflows."
 listing:
   contents: "*.md"
   type: table

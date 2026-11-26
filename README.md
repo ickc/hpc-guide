@@ -1,6 +1,6 @@
 # hpc.kolen.dev
 
-A guide to be effective on utilizing HPC resources, published at
+A practical guide, by example, to getting your analysis done on an HPC cluster, published at
 <https://hpc.kolen.dev>.
 
 **This guide is in alpha**: pages are still being written, and may change or move.

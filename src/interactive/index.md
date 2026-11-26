@@ -1,5 +1,6 @@
 ---
 title: "Working interactively"
+description: "Editing files on the cluster, a shell on a compute node, and JupyterLab or RStudio on one, securely."
 listing:
   contents: "*.md"
   type: table
