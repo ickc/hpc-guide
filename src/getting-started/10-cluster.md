@@ -30,11 +30,11 @@ Your allocation is usually measured in what your jobs use, in core-hours, node-h
 
 Every node, login or compute, sees the same files. That is how the script you write on the login node is there when your job starts on a compute node, and how the job's results are there when you come back. These shared filesystems are network filesystems, and there are usually several of them, each for a different purpose:
 
-- your *home* directory, `$HOME`, small, for your configuration, scripts and source code;
-- a *project* directory, shared with the other members of your project, for what you all need to keep for the length of the project;
-- a *scratch* filesystem, large and fast, for the data your jobs read and write while you work on them. On many clusters, files on scratch that nobody has used for a while (60 days, on one cluster I have used) are deleted automatically, which is called a *purge* policy.
+- your *home* directory, `$HOME`, mounted on every node, small, and slow under heavy reading and writing, for your configuration, scripts and source code;
+- a *project* directory, often `$PROJECTDIR`,[^1] shared with the other members of your project, with a quota of its own, for what you all need to keep for the length of the project;
+- a *scratch* filesystem, often `$SCRATCH`,[^2] large and fast, for the data your jobs read and write while you work on them. On many clusters, files on scratch that nobody has used for a while (60 days, on one cluster I have used) are deleted automatically, which is called a *purge* policy.
 
-Each has a quota, and on many clusters, none of them is backed up. So keep a copy of anything you cannot afford to lose somewhere else. Compute nodes may also have a disk of their own, which is not shared but is much faster for a job that reads or writes many small files. The names, sizes and policies differ from cluster to cluster, so look them up in your cluster's documentation before you put anything big anywhere. The [Storage part](../storage/index.md) goes into how to use each of them.
+Each has a quota, and on many clusters, none of them is backed up. So keep a copy of anything you cannot afford to lose somewhere else. Compute nodes may also have storage of their own, e.g. `$LOCALDIR`,[^3] which is not shared: each node sees its own, often only for the length of the job, so a job on several nodes sees a different one on each. But it is much faster for a job that reads or writes many small files. The names, sizes and policies differ from cluster to cluster, so look them up in your cluster's documentation before you put anything big anywhere. The [Storage part](../storage/index.md) goes into how to use each of them.
 
 ## What not to do on a login node
 
@@ -42,7 +42,7 @@ Since the login nodes are shared by everyone, anything heavy you run there slows
 
 - Your analysis, or anything that uses many cores or a lot of memory for more than a few minutes. That goes in a job.
 - Many processes at once, e.g. `make -j` with no number, which starts as many compilers as there are cores, or GNU parallel without `--jobs`. Compiling on the login node is fine. Compiling on all of its cores at once is not.
-- Something that keeps running after you leave, such as a JupyterLab server, or an AI coding agent. Some clusters forbid running an agent on a login node outright.[^1]
+- Something that keeps running after you leave, such as a JupyterLab server, or an AI coding agent. Some clusters forbid running an agent on a login node outright.[^4]
 - Asking the scheduler about your jobs in a tight loop, e.g. `watch -n 1 squeue --me`. The scheduler is shared too, and every query is work for it. Every 15 seconds or so is plenty.
 
 Nothing necessarily stops you. On one cluster I have used, a login shell could keep all 144 cores of the login node busy, with no limit on any user. So it is up to you. Other clusters do limit each user on a login node, e.g. to a few cores, in which case a heavy program there is not only antisocial but slow. Editing, looking at output, moving files, installing software into an environment, and submitting jobs are what login nodes are for, so do those there without worrying.
@@ -59,4 +59,10 @@ The rest of this part is the minimum to get work done: [the next page](20-first-
 
 The next page starts with the smallest job there is.
 
-[^1]: Run the agent on your own computer instead, and copy the commands it suggests into your terminal on the cluster once you have checked them.
+[^1]: The name depends on the system: some centres call it something else, and some have no variable for it at all. Look for this kind of storage, shared by a project with its own quota, in your centre's documentation.
+
+[^2]: Again, the name depends on the system, and not every centre sets it. Look for large, fast storage with a purge policy in your centre's documentation.
+
+[^3]: A name some centres use, and others don't; look for node-local storage in your centre's documentation.
+
+[^4]: Run the agent on your own computer instead, and copy the commands it suggests into your terminal on the cluster once you have checked them.
