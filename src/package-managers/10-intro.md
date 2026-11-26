@@ -73,10 +73,12 @@ export PATH="${__OPT_ROOT}/bin:${PATH}"
 
 That leaves one thing to be careful about. By default, a Slurm job inherits the environment variables of the shell you submit it from, `$PATH` and `$__OPT_ROOT` included. So submit a job from a login node of the same architecture as the compute nodes it will run on, and the paths it inherits are the right ones.
 
-Architecture is not the only thing to consider. Environments are many small files, often tens of thousands of them, and they can be several gigabytes, so check your home quota before you start. And don't put them on a scratch filesystem that is purged of files not used for a while, or one day your environment will be missing half of its files.
+Architecture is not the only thing to consider. Environments are many small files, often tens of thousands of them, and they can be several gigabytes, so check your home quota before you start. And don't put them in `$SCRATCH`,[^3] or on any filesystem that is purged of files not used for a while, or one day your environment will be missing half of its files.
 
 With a prefix decided, the next page starts with the software that is already there: modules.
 
 [^1]: This is also why a very long prefix can cause trouble. Linux has long limited the first line of a script to 127 characters (256 in recent kernels), so conda, given a prefix longer than that, writes `#!/usr/bin/env python` instead, which runs whichever `python` comes first on your `PATH`, and that may not be the one in the environment.
 
 [^2]: The name is the one my own dotfiles use. Anything that includes the architecture works, as long as you use it consistently.
+
+[^3]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.

@@ -159,7 +159,7 @@ A workflow manager keeps its state in files: which tasks ran, with which inputs,
 
 They have to be on a filesystem that every node can see, since a task on a compute node writes its outputs there and the head reads them, which rules out node-local disk. They also see the latency of that filesystem: a task's output may only show up on the head's node some seconds after the task has finished, which is what Snakemake's `latency-wait` (60 seconds in the profile above) and Nextflow's `exitReadTimeout` are for.
 
-And Nextflow relies on file locking: it locks its cache of completed tasks, which is what `-resume` reads, and on a filesystem without working locks, that fails, or worse, appears to work. Lustre, the filesystem of many clusters, supports locks, but whether they work across nodes is set by an option when it is mounted, `flock`, `localflock` or `noflock`, and `findmnt -t lustre` shows which. So put the working directory on a shared filesystem with `flock`, typically your scratch or project space, which also has the room for the many intermediate files.[^2]
+And Nextflow relies on file locking: it locks its cache of completed tasks, which is what `-resume` reads, and on a filesystem without working locks, that fails, or worse, appears to work. Lustre, the filesystem of many clusters, supports locks, but whether they work across nodes is set by an option when it is mounted, `flock`, `localflock` or `noflock`, and `findmnt -t lustre` shows which. So put the working directory on a shared filesystem with `flock`, typically `$SCRATCH` or `$PROJECTDIR`,[^2] which also have the room for the many intermediate files.[^3]
 
 Snakemake keeps a lock of its own instead, as files under `.snakemake/locks`, so that two runs of the same workflow don't write to the same directory at once. If the head is killed, e.g. when its job runs out of time, those files stay, and the next run refuses to start until you run `snakemake --unlock` in the same directory.
 
@@ -175,4 +175,6 @@ That is the end of this part. Every way of running in parallel here reads and wr
 
 [^1]: So after a head dies, `scancel` its stray jobs before you rerun the workflow: Nextflow with `-resume` reuses the tasks that completed, and Snakemake reruns only what is missing.
 
-[^2]: Node-local disk does support locks, but each node sees only its own, and it is often wiped at the end of the job, so it cannot hold a working directory that tasks on other nodes write to.
+[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while, and `$PROJECTDIR` is what some call the space shared by a project, with its own quota. Neither name is universal, so look for those kinds of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+
+[^3]: Node-local disk does support locks, but each node sees only its own, and it is often wiped at the end of the job, so it cannot hold a working directory that tasks on other nodes write to.

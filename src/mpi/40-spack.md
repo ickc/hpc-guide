@@ -23,10 +23,10 @@ packages:
     buildable: false
     externals:
     - spec: libfabric@1.22.0 fabrics=cxi
-      prefix: /opt/cray/libfabric/1.22.0
+      prefix: /path/to/libfabric
 ```
 
-`spec` says what the external is, a libfabric of that version with the `cxi` fabric, and `prefix` where it is installed. `buildable: false` is the important line: without it, Spack is free to build a libfabric anyway, if it decides that another version fits the rest of the environment better. With it, any MPICH Spack builds is built against the vendor's libfabric, and talks to the network through it.
+`spec` says what the external is, a libfabric of that version with the `cxi` fabric, and `prefix` where it is installed, which you substitute: on a Cray system, `module show libfabric` shows it, and so does `pkg-config --variable=prefix libfabric` with the module loaded. `buildable: false` is the important line: without it, Spack is free to build a libfabric anyway, if it decides that another version fits the rest of the environment better. With it, any MPICH Spack builds is built against the vendor's libfabric, and talks to the network through it.
 
 This is still worse than not building an MPI at all, though.
 
@@ -37,7 +37,7 @@ Better is to add the vendor's MPI, and the vendor's PMI that it uses to talk to 
 ``` {.yaml include="../examples/spack-mpi/spack.yaml"}
 ```
 
-`providers: mpi: [cray-mpich]` makes Cray MPICH the package that provides MPI to everything else, and the three externals are Cray MPICH, Cray's PMI, and libfabric. The versions and prefixes are your system's, and change when the vendor's software is upgraded, so take them from the modules: `module show cray-mpich` (or the module for your vendor's MPI) shows where it is installed, and the same for `cray-pmi` and `libfabric`. On a Cray system, `MPICH_DIR` is also set to Cray MPICH's prefix once a programming environment is loaded.
+`providers: mpi: [cray-mpich]` makes Cray MPICH the package that provides MPI to everything else, and the three externals are Cray MPICH, Cray's PMI, and libfabric. The versions and prefixes are your system's, and change when the vendor's software is upgraded, so take them from the modules: `module show cray-mpich` (or the module for your vendor's MPI) shows where it is installed, and the same for `cray-pmi` and `libfabric`. On a Cray system, `MPICH_DIR` is also set to Cray MPICH's prefix once a programming environment is loaded, and `pkg-config --variable=prefix cray-pmi` gives Cray PMI's. Replace each `/path/to/...` with those.
 
 ::: callout-note
 ## Your centre may have one already
