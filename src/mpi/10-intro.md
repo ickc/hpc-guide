@@ -4,7 +4,7 @@ description: "What MPI is, why the MPI the vendor installed is the one that know
 output-file: intro
 ---
 
-The previous part was about getting software onto the cluster, and it mostly treated a package as something that either works or doesn't. MPI is where that stops being true: an MPI program can install fine, start fine, and finish fine, while not doing what you asked for. This part is for you if you have an MPI program, whether you wrote it, use one someone else wrote, or use mpi4py from Python, and have never had to think about which MPI it runs on.
+The previous part was about getting software onto the cluster, and it mostly treated a package as something that either works or doesn't. MPI is where that stops being true: an MPI program can install and run to the end without an error, while not doing what you asked for. This part is for you if you have an MPI program, whether you wrote it, use one someone else wrote, or use mpi4py from Python, and have never had to think about which MPI it runs on.
 
 ## What MPI is
 
