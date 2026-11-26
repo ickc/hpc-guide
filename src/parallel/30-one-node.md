@@ -1,6 +1,6 @@
 ---
 title: "Many tasks on one node"
-description: "Running many independent tasks at once inside one job: GNU parallel with a task list, a job log and resuming what failed, and in Python, a pool of processes with concurrent.futures, or map_parallel as a drop-in for map."
+description: "Running many independent tasks at once inside one job: GNU parallel with a task list, a job log and resuming what failed, and in Python, a pool of processes with concurrent.futures, and what it takes for an exception in a task to reach your script."
 output-file: one-node
 ---
 
@@ -77,16 +77,23 @@ The pool is started under `if __name__ == "__main__":`. Depending on the platfor
 
 The older interface, `multiprocessing.Pool`, does the same, with `pool.map` too. And if your function spends its time in NumPy, or anything else that releases the GIL, `ThreadPoolExecutor` from the [page on threads](20-threads.md) does it in one process, with nothing copied between processes.
 
-### map_parallel
+### When a task fails
 
-[map_parallel](https://ickc.github.io/python-map_parallel/), a package I wrote, wraps those pools, and others, behind one function, which is a drop-in replacement for `map`:
+A pool runs your function in other processes, so when a task raises an exception, it is raised in a worker, where you don't see it. The pool catches it and raises it again in your script, but only when you ask for that task's result. `pool.map` returns an iterator of the results, and it is going through it, here with `sum`, that asks for them: the exception of the first task that failed is raised there, and the tasks not yet started are cancelled.[^6] So always go through the results. A `pool.map(...)` whose results nobody reads, or a `pool.submit(...)` whose future nobody calls `.result()` on, loses its exceptions without a word, and the script ends as if every task had succeeded.
 
-``` {.python include="../examples/pi-map-parallel/pi_map_parallel.py"}
+If you'd rather run every task and collect the failures at the end, than stop at the first one, catch the exception in the task itself, and return it with the task's input:
+
+``` python
+def task(seed):
+    try:
+        return seed, pi.count_hits(seed), None
+    except Exception as e:
+        return seed, None, repr(e)
 ```
 
-The serial version is the comment: `map` becomes `map_parallel`, and the rest is the same. By default it runs on a pool of processes, as above, and its `mode` argument switches the backend without changing anything else: `mode="multithreading"` for threads, or `mode="mpi"` for `mpi4py.futures`, which goes beyond one node. It is on PyPI as `map-parallel` and on conda-forge as `map_parallel`, and its [documentation on choosing a backend](https://ickc.github.io/python-map_parallel/backends/) goes through which one suits which kind of work.
+Then every result says which seed it was, and whether it failed, and the script can list the failed ones, to rerun only those, as GNU parallel's job log does.
 
-The job is the same as for the pool, running `pi_map_parallel.py` instead.
+[map_parallel](https://ickc.github.io/python-map_parallel/), a package I wrote, is a complete example of this pattern: a drop-in replacement for `map`, on a pool of processes, of threads, or of MPI ranks, with the care above taken for each of them, so that an exception in any task is raised in your script.
 
 All of these, GNU parallel and the pools in Python, give the same π as the baseline, about 8 times faster, and all of them stop at the edge of the node. The [next page](40-job-arrays.md) is about going beyond it, with the scheduler running the tasks for you.
 
@@ -99,3 +106,5 @@ All of these, GNU parallel and the pools in Python, give the same π as the base
 [^4]: Since Python 3.13, `os.process_cpu_count()` is the same as `len(os.sched_getaffinity(0))`, and it is what `ProcessPoolExecutor` uses when you give it no `max_workers`. Before 3.13, the default was `os.cpu_count()`.
 
 [^5]: How workers start is the *start method*. On Linux, it was `fork` until Python 3.14, which [changed the default](https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor) to one that does not fork the parent, since forking a process that has threads running can deadlock.
+
+[^6]: And leaving the `with` block, as the exception goes up, waits for the tasks that were already running, so the script stops once they have finished.

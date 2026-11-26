@@ -62,7 +62,7 @@ It is embarrassingly parallel: the points are independent, so the work splits in
 
 `count_hits` is the task: given a seed, it draws the points in chunks of 65,536 at a time, so the memory it needs stays small, and returns the number of hits. Each task gets its own seed, from 1 to 64, so that the tasks draw different points.[^2] From the command line, `python pi.py count 1 2 3` runs 3 tasks and prints one line for each, the hits and the number of points, and `python pi.py reduce` adds up such lines, from files or from its input, and prints the estimate.
 
-The examples run in one conda environment, with NumPy, and two packages for later pages, GNU parallel and map_parallel:
+The examples run in one conda environment, with NumPy, and GNU parallel for a later page:
 
 ``` {.yaml include="../examples/pi/environment.yml"}
 ```

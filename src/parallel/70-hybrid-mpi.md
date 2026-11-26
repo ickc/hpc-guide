@@ -28,8 +28,8 @@ with a line `NUMA node(s):`, and one line per domain with the CPUs that belong t
 
 A thread runs fastest when the memory it uses is in its own domain. Linux puts a page of memory in the domain of the core that first writes to it, so if a rank's threads move between domains, or a rank's threads are spread over both, some of them end up reading the other domain's memory all the time. So a good place to start is one rank per NUMA domain, with its threads on the cores of that domain, e.g. 2 ranks per node of 2 domains.
 
-::: {.callout-note title="For example, on Isambard 3"}
-A node of Isambard 3 has [2 Grace CPUs of 72 cores each](https://docs.isambard.ac.uk/user-documentation/information/how-isambard-works/), and its [Slurm guide](https://docs.isambard.ac.uk/user-documentation/guides/slurm/) shows `numactl -s` on a compute node with `membind: 0 1`, the two NUMA domains. Its [guide to advanced Slurm](https://docs.isambard.ac.uk/user-documentation/guides/slurm-advanced/) gives one rank per Grace CPU with 72 OpenMP threads as a typical mapping: `--nodes=2 --ntasks-per-node=2 --cpus-per-task=72`.
+::: {.callout-note title="For example"}
+A node with two 72-core NVIDIA Grace CPUs has 2 NUMA domains, one per CPU, and `numactl -s` on it shows `membind: 0 1`. One rank per CPU, with 72 OpenMP threads each, is a typical mapping there: `--nodes=2 --ntasks-per-node=2 --cpus-per-task=72`.
 :::
 
 ## Asking for ranks and threads
@@ -46,7 +46,7 @@ It runs in the same environment as [the previous pages](50-mpi4py-futures.md), w
 ``` {.bash include="../examples/pi-hybrid/job.sh"}
 ```
 
-The resources are requested per node. `--ntasks-per-node=2` is 2 ranks on each node, and `--cpus-per-task=4` is 4 CPUs for each rank, so the job is 2 nodes × 2 ranks × 4 CPUs, 16 cores. `--ntasks-per-node` times `--cpus-per-task` should be at most the cores of a node, and on whole nodes, equal to it: for the Isambard 3 example above, 2 × 72 = 144. Small numbers keep this example quick; on a real run you'd add `--exclusive` and fill the nodes.
+The resources are requested per node. `--ntasks-per-node=2` is 2 ranks on each node, and `--cpus-per-task=4` is 4 CPUs for each rank, so the job is 2 nodes × 2 ranks × 4 CPUs, 16 cores. `--ntasks-per-node` times `--cpus-per-task` should be at most the cores of a node, and on whole nodes, equal to it: for the Grace nodes above, 2 × 72 = 144. Small numbers keep this example quick; on a real run you'd add `--exclusive` and fill the nodes.
 
 Then `srun` places the ranks:
 
@@ -54,6 +54,8 @@ Then `srun` places the ranks:
 - `--cpu-bind=cores` pins each rank to its own cores, so that the operating system cannot move a rank, and its memory, to another NUMA domain. `verbose` makes `srun` print the mask of CPUs it gives each rank, before the program starts.
 
 `source ../pi/num-threads.sh` sets the number of threads to `SLURM_CPUS_PER_TASK`, here 4, for every threaded library, and the script starts 4 threads of its own.
+
+The script runs as `python -m mpi4py pi_hybrid.py`, rather than `python pi_hybrid.py`, because of what happens when a rank fails. Each rank runs its share on its own, then meets the others at `comm.reduce`. If one rank raises an exception before it gets there, that rank ends, and the others wait at the reduce for a rank that will never come, until the job runs out of time. With `-m mpi4py`, an exception that nothing catches calls `MPI_Abort`, which ends every rank of the job at once, with the traceback in the output. `srun --kill-on-bad-exit=1` does the same from Slurm's side, ending the whole step as soon as one task exits with an error, which works for any MPI program, compiled ones included.
 
 ### Threads within the rank
 

@@ -68,7 +68,7 @@ There are also full package managers for a whole system that can be installed in
 
 But as an end user, trust is more difficult to establish, because there are many different layers between you and the software. It is not a single package manager in a sense, so who are you trusting, even?
 
-For example, if you run `mise use -g ubi:isambard-sc/clifton` (clifton is the client that gets you the SSH certificate to log in to Isambard), you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases from `isambard-sc`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall, especially with a binary as sensitive as this one, which holds the key to your account:
+For example, if you run `mise use -g ubi:isambard-sc/clifton` (clifton is the client one HPC centre uses to issue the SSH certificate you log in with), you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases from `isambard-sc`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall, especially with a binary as sensitive as this one, which holds the key to your account:
 
 ``` bash
 #!/usr/bin/env bash

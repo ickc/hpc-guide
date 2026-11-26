@@ -61,9 +61,9 @@ gcc --version
 What you find with `module avail` varies a lot from one cluster to another. Some have hundreds of modules of research software, others very few. In either case, I think the modules worth using are the ones tied to the machine: compilers, the MPI library, and libraries the vendor has tuned for the hardware, such as BLAS and FFT, or CUDA on a GPU system. These are hard to get right yourself, and the sysadmins have done it for you.
 
 ::: callout-note
-## For example, on Isambard 3
+## For example, on a Cray system
 
-Isambard 3 is a Cray system, and its modules are mostly the Cray programming environment: `PrgEnv-gnu` loads the GNU compilers wrapped by Cray's compiler drivers, with Cray MPICH, and `gcc-native` loads the plain GNU compilers. There is almost no research software to load beyond that, so nearly everything else comes from conda.
+On a Cray EX system, the modules are mostly the Cray programming environment: `PrgEnv-gnu` loads the GNU compilers wrapped by Cray's compiler drivers, with Cray MPICH, and `gcc-native` loads the plain GNU compilers. On the one I have used most, there is almost no research software to load beyond that, so nearly everything else comes from conda.
 :::
 
 For the rest, such as Python and its packages, a module is usually not what you want. It has the version the sysadmins chose, at the time they chose it, and you cannot add packages to it. You end up with a module's Python plus a `pip install --user` on top, in `~/.local/lib/python3.X`, which every other Python of the same version picks up too, the ones in your conda environments included.

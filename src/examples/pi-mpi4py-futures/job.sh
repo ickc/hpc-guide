@@ -20,4 +20,4 @@ export PYTHONPATH="$PWD/../pi"
 source ../pi/num-threads.sh 1
 
 # 8 ranks: rank 0 runs the script, and the other 7 are its workers.
-srun --cpu-bind=cores python -m mpi4py.futures "${1:-pi_mpi4py_futures.py}"
+srun --cpu-bind=cores python -m mpi4py.futures pi_mpi4py_futures.py

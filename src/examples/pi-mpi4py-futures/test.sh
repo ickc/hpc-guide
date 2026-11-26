@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The 64 tasks on 7 worker ranks over 2 nodes, with mpi4py.futures and with map_parallel.
+# The 64 tasks on 7 worker ranks over 2 nodes, with mpi4py.futures.
 source "$(dirname "$0")/../common/testlib.sh"
 
 command -v mamba >/dev/null || skip "no mamba here: install miniforge first"
@@ -15,5 +15,3 @@ expect_output '^7 workers$'
 [[ $(grep -Ec ': [0-9]+ tasks$' "$OUT") -eq 2 ]] || fail "expected the tasks to run on 2 nodes; see $OUT"
 expect_output '^pi = 3\.141[0-9]+ from 4294967296 samples$'
 
-batch job.sh pi_map_parallel_mpi.py
-expect_output '^pi = 3\.141[0-9]+ from 4294967296 samples$'

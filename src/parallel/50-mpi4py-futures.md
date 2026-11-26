@@ -1,6 +1,6 @@
 ---
 title: "Python tasks over many nodes with mpi4py.futures"
-description: "A pool of worker processes that spans the nodes of a job, from one Python script: MPIPoolExecutor launched with srun python -m mpi4py.futures, rank 0 as the controller and every other rank a worker, how to size --ntasks for it, and map_parallel's mode=\"mpi\" as the same thing behind map."
+description: "A pool of worker processes that spans the nodes of a job, from one Python script: MPIPoolExecutor launched with srun python -m mpi4py.futures, rank 0 as the controller and every other rank a worker, how to size --ntasks for it, and what happens when a task fails."
 output-file: mpi4py-futures
 ---
 
@@ -21,12 +21,12 @@ Here is Monte Carlo π that way:
 
 Compared with `pi_futures.py` on the one-node page, `ProcessPoolExecutor` became `MPIPoolExecutor`, and it is given no number of workers. Each task also returns the name of the node it ran on, so that the output shows where the work went.
 
-It needs mpi4py, and an mpi4py that works across nodes is the subject of [the page on conda and the vendor's MPI](../mpi/30-conda.md). The examples on this page and on the page on [hybrid MPI](70-hybrid-mpi.md) use its first route, conda-forge's external MPICH bound to the vendor's MPI at run time, with NumPy and map_parallel added:
+It needs mpi4py, and an mpi4py that works across nodes is the subject of [the page on conda and the vendor's MPI](../mpi/30-conda.md). The examples on this page and on the page on [hybrid MPI](70-hybrid-mpi.md) use its first route, conda-forge's external MPICH bound to the vendor's MPI at run time, with NumPy added:
 
 ``` {.yaml include="../examples/pi/environment-mpi.yml"}
 ```
 
-created as before, with `mamba env create --channel-priority flexible -f environment-mpi.yml`. Then the job, on a Cray system such as Isambard 3:
+created as before, with `mamba env create --channel-priority flexible -f environment-mpi.yml`. Then the job, on a Cray system:
 
 ``` {.bash include="../examples/pi-mpi4py-futures/job.sh"}
 ```
@@ -57,16 +57,9 @@ And as with any pool, more workers than tasks is a waste: with 64 tasks, any wor
 
 You may find examples that run the script with plain `python pi_mpi4py_futures.py`, or with `mpiexec -n 1`. Then `MPIPoolExecutor` starts its workers itself, as new MPI processes, with MPI's *dynamic process management* (`MPI_Comm_spawn`). That needs the MPI library, and the batch system, to support starting processes after the job has started, and mpi4py's documentation warns that some vendor MPIs do not, and that batch systems on supercomputers may pose additional complications. So on a cluster, I'd always launch with `srun ... python -m mpi4py.futures`, where every rank is started by `srun` at the beginning, and no spawning is needed.[^2]
 
-## map_parallel with `mode="mpi"`
+## When a task fails
 
-[map_parallel](30-one-node.md#map_parallel), from the one-node page, has `mpi4py.futures` as one of its backends. With `mode="mpi"`, it is the same `MPIPoolExecutor` behind a drop-in replacement for `map`:
-
-``` {.python include="../examples/pi-mpi4py-futures/pi_map_parallel_mpi.py"}
-```
-
-Compared with the one-node version, the only change is `mode="mpi"`, without `processes`: run with `python -m mpi4py.futures`, the number of workers is set by the number of ranks, so every rank but rank 0. The job is the same, with the script's name after it, `sbatch job.sh pi_map_parallel_mpi.py`, and it prints the same π.
-
-So the same script can run serially, on a pool of processes on one node, or on MPI ranks over many nodes, by changing one argument. map_parallel also has `mode="mpi_simple"`, which splits the tasks into one equal block per rank up front, without a controller, for an MPI where `mpi4py.futures` does not work. Its [documentation on backends](https://ickc.github.io/python-map_parallel/backends/) has the details.
+It is the same as [on one node](30-one-node.md#when-a-task-fails): when a task raises an exception on a worker, `MPIPoolExecutor` raises it again on rank 0 when its result is retrieved, so go through the results, as `list(pool.map(...))` does here, and the tasks not yet started are cancelled. Then the exception ends your script on rank 0, and under `-m mpi4py.futures` that ends every rank, so a failed task does not leave the job running until its time limit.
 
 ## Limitations
 

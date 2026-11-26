@@ -26,14 +26,14 @@ mamba env create --channel-priority flexible -f environment.yml
 
 The label is listed before `conda-forge`, and `mpich * external_*` asks for a build whose name starts with `external_`, which only the label has. `--channel-priority flexible` is there because many conda installations use strict channel priority, and with strict priority, the ordinary `conda-forge` channel can hide the external builds even though the label comes first, and then the solver finds no MPICH that matches.
 
-In the job, the vendor's MPI has to be loaded, and its `libmpi.so.12` has to be where the dynamic linker looks for it. On a Cray system such as Isambard 3, the job script is
+In the job, the vendor's MPI has to be loaded, and its `libmpi.so.12` has to be where the dynamic linker looks for it. On a Cray system, the job script is
 
 ``` {.bash include="../examples/conda-mpich/job.sh"}
 ```
 
 `PrgEnv-gnu` is the Cray programming environment with the GNU compilers, which loads Cray MPICH, and the libfabric it talks to the network through. It also sets `MPICH_DIR` to where Cray MPICH is installed, and `lib-abi-mpich` under it is the copy of Cray MPICH with the MPICH ABI, named `libmpi.so.12` like MPICH's. Since the environment has no `libmpi.so.12` of its own, putting that directory on `LD_LIBRARY_PATH` is all it takes for mpi4py to find it. Without that line, mpi4py fails to import, since there is no MPI library to load. On another system, you load whichever module provides the vendor's MPI, and point `LD_LIBRARY_PATH` at the directory with its `libmpi.so.12`, if the module doesn't already.
 
-On Isambard 3, this gives the PASS from the previous page, with Cray MPICH as the MPI library and 8 ranks over 2 nodes. When I tested it with 576 ranks on 4 nodes, the libraries it loaded were Cray MPICH, Cray's libfabric, Cray's PMI, and `libcxi`, the library for the Slingshot network, which is the evidence that it uses the fast network.
+On a Cray EX system with Slingshot, this gives the PASS from the previous page, with Cray MPICH as the MPI library and 8 ranks over 2 nodes. When I tested it with 576 ranks on 4 nodes, the libraries it loaded were Cray MPICH, Cray's libfabric, Cray's PMI, and `libcxi`, the library for the Slingshot network, which is the evidence that it uses the fast network.
 
 This is convenient, but it is not the most direct way to use the vendor's MPI: everything in the environment was built against conda-forge's MPICH, and only runs on the vendor's through the ABI. For production runs where MPI performance matters, I'd build mpi4py against the vendor's MPI directly, which is the next route.
 
@@ -56,7 +56,7 @@ The job is the same as before, without the `LD_LIBRARY_PATH` line, since mpi4py 
 ``` {.bash include="../examples/conda-mpi4py-source/job.sh"}
 ```
 
-Load the same modules in the job as for the build. On Isambard 3, this also passes, with Cray MPICH, and the mpi4py it builds links directly to Cray MPICH, Cray's libfabric and PMI, and `libcxi`.
+Load the same modules in the job as for the build. On the same system, this also passes, with Cray MPICH, and the mpi4py it builds links directly to Cray MPICH, Cray's libfabric and PMI, and `libcxi`.
 
 The cost is that you now build a package yourself, and anything else in the environment that needs MPI, h5py say, has to be built the same way, or come from the first route.
 
@@ -84,6 +84,6 @@ If you only need mpi4py, or a conda-forge package with an MPICH variant, start w
 
 Conda is the right tool when MPI is one dependency among many in a Python environment. For compiled MPI codes, the ones built from source that spend their time communicating, [the next page](40-spack.md) is about doing the same with Spack.
 
-[^1]: On Isambard 3, each process prints "No PMIx server was reachable" before it starts on its own. PMIx is the kind of PMI Open MPI 5 expects.
+[^1]: On the Cray EX system I tested this on, each process prints "No PMIx server was reachable" before it starts on its own. PMIx is the kind of PMI Open MPI 5 expects.
 
 [^2]: conda-forge's own documentation also notes that its MPI builds lack some features that speed up communication even within a node, such as XPMEM for MPICH and CMA for Open MPI.

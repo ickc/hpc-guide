@@ -106,11 +106,11 @@ Whichever executor you use, the workflow manager itself is a process, the *head*
 
 **On a login node.** This is the simplest, and it is what the Snakemake Slurm plugin expects: it warns when you run it inside a job, that this "is not recommended", and to run Snakemake directly on the login node. The head mostly waits, so it takes little CPU. But it has to keep running for as long as the workflow does, hours or days, and it ends when your `ssh` connection does, unless it runs in a terminal multiplexer such as `tmux` or `screen`, which some clusters do not allow to persist.
 
-::: {.callout-note title="For example, on Isambard 3"}
-Isambard's [guide to the login nodes](https://docs.isambard.ac.uk/user-documentation/guides/login/#working-on-the-login-node) says that long-running `tmux`, `screen` or similar sessions left running on login nodes are against its security policy, and may be terminated without warning: its SSH certificates are valid for 12 hours, and a persistent session would bypass that. Login nodes are also assigned at random, so you may not get back to the one where you started a session.
+::: {.callout-note title="When persistent sessions are not allowed"}
+Some clusters forbid `tmux`, `screen` or similar sessions left running on a login node after you disconnect, and may stop them without warning. A cluster that logs you in with short-lived SSH certificates, valid for 12 hours say, does so because a persistent session would bypass that limit. Login nodes may also be assigned at random, so you may not get back to the one where you started a session.
 :::
 
-**In a job of its own.** A small, long job, e.g. 2 cores for 12 hours, that runs only the head, which then submits the tasks as jobs of their own. This survives logging out, and is accounted like any other job. But it needs `sbatch` to work from a compute node, which is allowed on many clusters but not all, so check that first, with `sbatch` or `squeue` in an interactive job. Its time limit has to be longer than the whole workflow, and it holds its cores while it waits. Here is such a driver job, for an nf-core pipeline:
+**In a job of its own.** A small, long job, e.g. 2 cores for 12 hours, that runs only the head, which then submits the tasks as jobs of their own. This survives logging out, and is accounted like any other job. But it needs `sbatch` to work from a compute node, which depends on how your centre has deployed Slurm, so check that first, with `sbatch` or `squeue` in an interactive job. Its time limit has to be longer than the whole workflow, and it holds its cores while it waits. Here is such a driver job, for an nf-core pipeline:
 
 ``` bash
 #!/bin/bash
@@ -165,7 +165,7 @@ Snakemake keeps a lock of its own instead, as files under `.snakemake/locks`, so
 
 ### Software for every step
 
-Lastly, the steps of a real pipeline need software, often a different tool for each. Snakemake can give each rule a conda environment of its own, from a file next to the rule, created when it first runs, and Nextflow pipelines from nf-core run each process in a container. Both are good for reproducibility, and both bring back the questions of [the part on software environments](../package-managers/10-intro.md): create the environments on the kind of node they will run on, and on a filesystem every node sees. On an Arm cluster such as Isambard 3, containers built for x86-64 do not run at all, and nf-core pipelines have an `arm64` profile for that, used above as `-profile test,arm64`, which builds an Arm container for each process on demand, through a service called [Wave](https://docs.seqera.io/wave), when the compute nodes can reach the internet.
+Lastly, the steps of a real pipeline need software, often a different tool for each. Snakemake can give each rule a conda environment of its own, from a file next to the rule, created when it first runs, and Nextflow pipelines from nf-core run each process in a container. Both are good for reproducibility, and both bring back the questions of [the part on software environments](../package-managers/10-intro.md): create the environments on the kind of node they will run on, and on a filesystem every node sees. On an Arm cluster, containers built for x86-64 do not run at all, and nf-core pipelines have an `arm64` profile for that, used above as `-profile test,arm64`, which builds an Arm container for each process on demand, through a service called [Wave](https://docs.seqera.io/wave), when the compute nodes can reach the internet.
 
 ## Limitations
 
