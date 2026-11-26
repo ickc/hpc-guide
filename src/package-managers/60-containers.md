@@ -74,7 +74,7 @@ A few options you will probably need sooner or later:
 
 ## Limitations
 
-A container brings its own userland, but not its own kernel or hardware. It still runs on the host's kernel and drivers, which is why `--nv` exists. The same goes for the interconnect: an MPI program in a container has to use an MPI library compatible with the host's, so that it can use the fast network between nodes, and that is a subject of its own, in [the MPI part](../mpi/10-intro.md).
+A container brings its own userland, but not its own kernel or hardware. It still runs on the host's kernel and drivers, which is why `--nv` exists. And an image is built for one CPU architecture: most images published on Docker Hub, and the prebuilt images many pipelines use, are `x86_64` only, and will not run on an Arm (`aarch64`) node. On an Arm cluster, check that an image has an `arm64` version before you plan around it, or build your own from a definition file as above. The same goes for the interconnect: an MPI program in a container has to use an MPI library compatible with the host's, so that it can use the fast network between nodes, and that is a subject of its own, in [the MPI part](../mpi/10-intro.md).
 
 If what you need is compiled software built for the machine, with the vendor's compilers and libraries, a container is usually the wrong tool, and Spack, the next page, is the right one.
 
