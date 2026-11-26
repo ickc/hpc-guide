@@ -11,4 +11,5 @@ The text of the guide is licensed under [CC BY-SA 4.0](LICENSES/CC-BY-SA-4.0.txt
 `bin/`, the CI workflow and the configuration) is licensed under [BSD-3-Clause](LICENSE). Copyright 2026 Kolen
 Cheung. The licensing follows the [REUSE](https://reuse.software) specification: see `REUSE.toml`.
 
-See [DEVELOPER.md](DEVELOPER.md) for how to build, preview, and deploy it.
+See [DESIGN.md](DESIGN.md) for why it is the way it is, [AGENTS.md](AGENTS.md) for the rules of writing it, and
+[DEVELOPER.md](DEVELOPER.md) for how to build, preview, and deploy it.

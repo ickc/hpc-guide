@@ -68,7 +68,7 @@ There are also full package managers for a whole system that can be installed in
 
 But as an end user, trust is more difficult to establish, because there are many different layers between you and the software. It is not a single package manager in a sense, so who are you trusting, even?
 
-For example, if you run `mise use -g ubi:isambard-sc/clifton` (clifton is the client one HPC centre uses to issue the SSH certificate you log in with), you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases from `isambard-sc`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall, especially with a binary as sensitive as this one, which holds the key to your account:
+For example, if you run `mise use -g ubi:sigstore/cosign` ([cosign](https://github.com/sigstore/cosign) is a tool to sign and verify software, i.e. to tell you what else to trust), you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases from `sigstore`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall, especially with a binary as sensitive as this one, whose whole job is to decide what else you trust:
 
 ``` bash
 #!/usr/bin/env bash
@@ -81,35 +81,35 @@ BINDIR="${__OPT_ROOT}/bin"
 # shellcheck disable=SC2312
 read -r __OSTYPE __ARCH <<< "$(uname -sm)"
 
-clifton_install() {
+cosign_install() {
     case "${__OSTYPE}-${__ARCH}" in
-        Darwin-arm64) filename="clifton-macos-aarch64" ;;
-        Darwin-x86_64) filename="clifton-macos-x86_64" ;;
-        Linux-x86_64) filename="clifton-linux-musl-x86_64" ;;
-        Linux-aarch64) filename="clifton-linux-musl-aarch64" ;;
+        Darwin-arm64) filename="cosign-darwin-arm64" ;;
+        Darwin-x86_64) filename="cosign-darwin-amd64" ;;
+        Linux-x86_64) filename="cosign-linux-amd64" ;;
+        Linux-aarch64) filename="cosign-linux-arm64" ;;
         *) exit 1 ;;
     esac
-    url="https://github.com/isambard-sc/clifton/releases/latest/download/${filename}"
+    url="https://github.com/sigstore/cosign/releases/latest/download/${filename}"
 
     mkdir -p "${BINDIR}"
     if command -v curl > /dev/null; then
-        curl -fL "${url}" -o "${BINDIR}/clifton"
+        curl -fL "${url}" -o "${BINDIR}/cosign"
     elif command -v wget > /dev/null; then
-        wget "${url}" -O "${BINDIR}/clifton"
+        wget "${url}" -O "${BINDIR}/cosign"
     fi
-    chmod +x "${BINDIR}/clifton"
+    chmod +x "${BINDIR}/cosign"
 }
 
-clifton_uninstall() {
-    rm -f "${BINDIR}/clifton"
+cosign_uninstall() {
+    rm -f "${BINDIR}/cosign"
 }
 
 case "${1:-}" in
     install)
-        clifton_install
+        cosign_install
         ;;
     uninstall)
-        clifton_uninstall
+        cosign_uninstall
         ;;
     *)
         echo "Usage: __OPT_ROOT=... ${0} [install|uninstall]"
