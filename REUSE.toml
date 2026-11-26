@@ -14,7 +14,7 @@ SPDX-License-Identifier = "BSD-3-Clause"
 
 # Prose: the guide's pages and the documents about it.
 [[annotations]]
-path = ["src/**/*.md", "README.md", "DEVELOPER.md"]
+path = ["src/**/*.md", "README.md", "DEVELOPER.md", "DESIGN.md", "AGENTS.md", "CLAUDE.md"]
 precedence = "closest"
 SPDX-FileCopyrightText = "2026 Kolen Cheung"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
