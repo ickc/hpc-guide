@@ -66,7 +66,7 @@ srun apptainer exec numpy.sif python3 -c 'import numpy; print(numpy.__version__)
 
 A few options you will probably need sooner or later:
 
-- `--bind /scratch` (or wherever your data is) mounts a directory that is not mounted by default. Your home directory, the current directory and `/tmp` already are.
+- `--bind "$SCRATCH"` (or wherever your data is)[^2] mounts a directory that is not mounted by default. Your home directory, the current directory and `/tmp` already are.
 - `--nv` makes the NVIDIA GPUs and driver of the host available inside the container, and `--rocm` the AMD ones.
 - `--cleanenv` stops the container inheriting your environment variables, so that, for example, a `PYTHONPATH` set outside does not leak in.
 
@@ -79,3 +79,5 @@ A container brings its own userland, but not its own kernel or hardware. It stil
 If what you need is compiled software built for the machine, with the vendor's compilers and libraries, a container is usually the wrong tool, and Spack, the next page, is the right one.
 
 [^1]: Apptainer is the Linux Foundation's continuation of Singularity, and SingularityCE is a separate fork by Sylabs, with the same commands. Some clusters offer rootless Podman instead, or as well.
+
+[^2]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.

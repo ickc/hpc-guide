@@ -65,7 +65,7 @@ Then the job unpacks it into a directory of its own, on the node:
 ``` {.bash include="../examples/ship-env/job.sh"}
 ```
 
-`$TMPDIR` is the job's own temporary directory, on clusters that set one, and otherwise this falls back to `/tmp`. The job ID in the path keeps two jobs on the same node apart. `trap ... EXIT` deletes the unpacked copy when the job ends, whether it succeeded or not, so it does not fill up the node's disk. `bin/activate` is a small activation script conda-pack adds to the tarball, and `conda-unpack` rewrites the prefixes, which only needs to happen once per unpacking.
+`$TMPDIR` is the job's own temporary directory, on clusters that set one, and otherwise this falls back to `/tmp`.[^2] The job ID in the path keeps two jobs on the same node apart. `trap ... EXIT` deletes the unpacked copy when the job ends, whether it succeeded or not, so it does not fill up the node's disk. `bin/activate` is a small activation script conda-pack adds to the tarball, and `conda-unpack` rewrites the prefixes, which only needs to happen once per unpacking.
 
 Before relying on `/tmp`, check what it is with `df -h /tmp` on a compute node. If it says `tmpfs`, it is in memory rather than on a disk, and the unpacked environment counts against the memory of your job.
 
@@ -75,7 +75,7 @@ A job on more than one node has to unpack the environment on each of them, once 
 srun --ntasks-per-node=1 bash -c 'mkdir -p "$LOCAL/env" && tar -xzf "$TARBALL" -C "$LOCAL/env" && source "$LOCAL/env/bin/activate" && conda-unpack'
 ```
 
-with `LOCAL` and `TARBALL` exported, as in the job above.[^2]
+with `LOCAL` and `TARBALL` exported, as in the job above.[^3]
 
 ## Is it worth it?
 
@@ -87,4 +87,6 @@ That is the end of this part. The next part is about MPI, and how to compose an 
 
 [^1]: Not on a login node, where everyone shares the same `/tmp`, and which may not be the same kind of machine.
 
-[^2]: If you use pixi, [pixi-pack](https://github.com/Quantco/pixi-pack) does the same for a pixi environment.
+[^2]: Some centres give each job node-local storage under a name of their own instead, such as `$LOCALDIR`, often only for the length of the job, and on a job of several nodes, each node has its own. Look for that kind of storage in your centre's documentation; [the part on storage](../storage/index.md) is about the kinds there are.
+
+[^3]: If you use pixi, [pixi-pack](https://github.com/Quantco/pixi-pack) does the same for a pixi environment.
