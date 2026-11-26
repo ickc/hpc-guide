@@ -1,0 +1,11 @@
+[workspace]
+name = "pixi-job"
+channels = ["conda-forge"]
+platforms = ["linux-64", "linux-aarch64"]
+
+[dependencies]
+python = "3.13.*"
+numpy = "*"
+
+[tasks]
+pi = { cmd = "python pi.py", description = "Estimate pi from random points in the unit square" }
