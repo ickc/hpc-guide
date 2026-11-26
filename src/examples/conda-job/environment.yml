@@ -1,0 +1,6 @@
+name: numpy-demo
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy
