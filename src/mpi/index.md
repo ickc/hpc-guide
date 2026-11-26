@@ -1,5 +1,6 @@
 ---
 title: "MPI"
+description: "Running an MPI program across nodes on the vendor's MPI, with conda or Spack, and checking that it really spans them."
 listing:
   contents: "*.md"
   type: table

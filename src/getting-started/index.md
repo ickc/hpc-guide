@@ -1,5 +1,6 @@
 ---
 title: "Getting started"
+description: "What a cluster is, your first batch job, finding out what a job used, and a checklist for when one fails."
 listing:
   contents: "*.md"
   type: table

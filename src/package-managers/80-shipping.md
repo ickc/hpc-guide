@@ -83,7 +83,7 @@ Unpacking takes time. The environment in this example unpacks in a second or two
 
 Where it pays off is when the start-up reads are the problem, not the unpacking: many processes in one job, each starting Python, all reading from the node-local copy instead of the shared filesystem. So rather than thousands of short jobs, each unpacking its own environment, run fewer, longer jobs that each unpack once and then run many tasks, which is the subject of [the part on parallelism](../parallel/10-intro.md). A [container](60-containers.md) is the other way to get there, since an image is already a single file.
 
-That is the end of this part. The next part is about MPI, and how to compose an environment from conda or Spack with the MPI library the vendor provides, which is where most of the remaining trouble with environments on an HPC is.
+That is the end of this part. [The next part](../mpi/10-intro.md) is about MPI, and how to compose an environment from conda or Spack with the MPI library the vendor provides, which is where most of the remaining trouble with environments on an HPC is.
 
 [^1]: Not on a login node, where everyone shares the same `/tmp`, and which may not be the same kind of machine.
 

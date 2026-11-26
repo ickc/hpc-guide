@@ -14,7 +14,7 @@ project:
 website:
   title: "HPC Guide"
   site-url: "https://hpc.kolen.dev"
-  description: "A guide to be effective on utilizing HPC resources"
+  description: "A practical guide, by example, to getting your analysis done on an HPC cluster"
   search:
     location: sidebar
     type: textbox

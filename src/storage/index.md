@@ -1,5 +1,6 @@
 ---
 title: "Storage"
+description: "The kinds of storage a cluster has and which to use for what, Lustre, and moving data on and off the cluster."
 listing:
   contents: "*.md"
   type: table
