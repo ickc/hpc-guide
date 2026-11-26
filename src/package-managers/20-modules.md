@@ -30,9 +30,9 @@ module show gcc
 It prints something like
 
 ``` text
-prepend_path("PATH","/opt/gcc/13.2/bin")
-prepend_path("LD_LIBRARY_PATH","/opt/gcc/13.2/lib64")
-prepend_path("MANPATH","/opt/gcc/13.2/share/man")
+prepend_path("PATH","/path/to/gcc/13.2/bin")
+prepend_path("LD_LIBRARY_PATH","/path/to/gcc/13.2/lib64")
+prepend_path("MANPATH","/path/to/gcc/13.2/share/man")
 setenv("CC","gcc")
 ```
 

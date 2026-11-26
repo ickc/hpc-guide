@@ -12,14 +12,14 @@ spack:
       buildable: false
       externals:
       - spec: cray-mpich@8.1.30
-        prefix: /opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3
+        prefix: /path/to/cray-mpich # $MPICH_DIR, with the module loaded
     cray-pmi:
       buildable: false
       externals:
       - spec: cray-pmi@6.1.15
-        prefix: /opt/cray/pe/pmi/6.1.15
+        prefix: /path/to/cray-pmi # pkg-config --variable=prefix cray-pmi
     libfabric:
       buildable: false
       externals:
       - spec: libfabric@1.22.0 fabrics=cxi
-        prefix: /opt/cray/libfabric/1.22.0
+        prefix: /path/to/libfabric # pkg-config --variable=prefix libfabric
