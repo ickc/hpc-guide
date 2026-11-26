@@ -45,7 +45,7 @@ and a job that runs it, asking for 1 core and 2 GB of memory:
 
 ### Peak memory of one command: `/usr/bin/time -v`
 
-The script runs Python through `/usr/bin/time -v`, which runs a command, and once it ends, prints what it used. The output file has it after the script's own output. When I ran the same command on a workstation, these were the lines that matter here:
+The script runs Python through `/usr/bin/time -v`, which runs a command, and once it ends, prints what it used. The output file has it after the script's own output. On a workstation, the same command printed these lines, among others:
 
 ``` text
     User time (seconds): 59.90
@@ -64,7 +64,7 @@ Write it as `/usr/bin/time`, the full path, or `command time`. A plain `time -v`
 
 ## `seff`, where your cluster has it
 
-Many clusters also have `seff`, a script that comes with Slurm but is not always installed. `seff <job ID>` reads the same record as `sacct`, and turns it into two percentages: `CPU Efficiency`, which is `TotalCPU` over `CPUTime`, and `Memory Efficiency`, which is the peak memory over the memory asked for. That is the quickest way to see whether a job used what it asked for. Since it reads the same samples as `sacct`, the same caveat about short peaks applies.
+Many clusters also have `seff`, a script that comes with Slurm but is not always installed. `seff <job ID>` reads the same record as `sacct`, and turns it into two percentages: `CPU Efficiency`, which is `TotalCPU` over `CPUTime`, and `Memory Efficiency`, which is the peak memory over the memory asked for. That is the quickest way to see whether a job used what it asked for. Since it reads the same samples as `sacct`, it can miss a short peak of memory in the same way.
 
 ## Asking for the right resources
 
