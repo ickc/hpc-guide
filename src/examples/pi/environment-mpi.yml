@@ -1,0 +1,11 @@
+name: pi-mpi
+channels:
+  - conda-forge/label/mpi-external
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy
+  - map_parallel
+  # mpi4py, built against an MPICH that the vendor's MPI stands in for at run time
+  - mpi4py
+  - mpich * external_*

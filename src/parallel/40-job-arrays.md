@@ -49,7 +49,7 @@ pi = 3.141543 from 4294967296 samples
 
 If a task fails, the dependency can never be satisfied, and the reduce job stays in the queue, waiting for something that won't happen, until you cancel it (unless your cluster is set to cancel such jobs by itself). To find which tasks failed, `sacct -j <job ID> -X --format=JobID,State,ExitCode` lists every task with its state; once you've fixed the problem, rerun only those, e.g. `sbatch --array=5,17 job.sh`, since an option on the command line overrides the one in the script, then submit the reduce again.
 
-That is as far as dependencies go on this page. A pipeline with more steps than one reduce is the subject of the page on workflows (`80-workflows`), later in this part.
+That is as far as dependencies go on this page. A pipeline with more steps than one reduce is the subject of the [page on workflows](80-workflows.md), later in this part.
 
 ## The limit: overwhelming the scheduler
 
@@ -85,7 +85,7 @@ The sizes here are small, to keep the example quick: 2 nodes for 64 tasks of a s
 A node of Isambard 3 has [144 cores](https://docs.isambard.ac.uk/user-documentation/information/how-isambard-works/), in two Grace CPUs of 72 each. So an array of 10 whole nodes runs 1,440 tasks at a time, as 10 jobs, where a plain array would need 1,440 array tasks running at once to do the same.
 :::
 
-This is where the tasks are no longer Python functions that one script hands out, but whole commands. When they are Python functions, and you want them spread over many nodes from one script, without an array, the next page, on `mpi4py.futures` (`50-mpi4py-futures`), does that, with MPI underneath.
+This is where the tasks are no longer Python functions that one script hands out, but whole commands. When they are Python functions, and you want them spread over many nodes from one script, without an array, the [next page](50-mpi4py-futures.md), on `mpi4py.futures`, does that, with MPI underneath.
 
 [^1]: Indices need not start at 1, or be consecutive: `--array=0-90:10` is 0, 10, 20, ..., 90, and `--array=5,17` is just those two, which is useful for rerunning tasks that failed, below.
 

@@ -135,4 +135,4 @@ Threads cannot go beyond the process they belong to, and so beyond its node. The
 
 [^2]: The timings on this page were measured on 8 cores of an x86 workstation. On the nodes of your cluster the times will be different, but not the ratios between them.
 
-[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the page on hybrid MPI, later in this part.
+[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the [page on hybrid MPI](70-hybrid-mpi.md), later in this part.
