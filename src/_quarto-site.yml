@@ -40,6 +40,10 @@ website:
     contents:
       - href: index.md
         text: Overview
+      - section: "Getting started"
+        href: getting-started/index.md
+        contents:
+          - auto: "getting-started/*.md"
       - section: "Software environments"
         href: package-managers/index.md
         contents:
