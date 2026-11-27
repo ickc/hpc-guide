@@ -5,7 +5,7 @@ output-file: shipping
 aliases: [../package-managers/shipping.html]
 ---
 
-Every page so far has assumed that your environment lives on the shared filesystem, and that every job reads it from there. That is usually fine. But a conda environment is tens of thousands of small files, and starting Python in it reads hundreds of them. If you run thousands of short jobs at once, that is thousands of processes asking the shared filesystem for the same small files, which is slow for you and for everyone else on it (the [page on Lustre](../storage/20-lustre.md) explains why small files are the expensive kind). And some clusters have no shared filesystem on the compute nodes at all.
+Every page so far has assumed that your environment lives on the shared filesystem, and that every job reads it from there, which is usually fine. But a conda environment is tens of thousands of small files, and starting Python in it reads hundreds of them. If you run thousands of short jobs at once, that is thousands of processes asking the shared filesystem for the same small files, which is slow for you and for everyone else on it (the [page on Lustre](../storage/20-lustre.md) explains why small files are the expensive kind). And some clusters have no shared filesystem on the compute nodes at all.
 
 The fix is to pack the environment into a single file, which the shared filesystem is good at serving, and unpack it at the start of each job onto storage local to the node, which is fast for small files.
 
@@ -20,7 +20,7 @@ This comes back to the PREFIX from [the introduction](10-intro.md). For software
 
 The first two match if you build the environment on the cluster, on the same kind of node the jobs run on. The fourth is what conda is good at: a conda environment brings its own libraries rather than using the system's, so the prefix is self-contained. Archive it, unpack it on another node, and it will not complain about a missing library it was using from outside.
 
-That leaves the prefix. Unless you are sure the software you installed is designed to be portable, you should assume it is not, and that it only works at the path it was installed at. There are two ways to deal with that.
+That leaves the prefix, which is written into the files that are installed, so assume that an environment only works at the path it was installed at. There are two ways to deal with that.
 
 ## The same prefix everywhere
 
@@ -40,9 +40,9 @@ tar -xzf ~/envs/myenv.tar.gz -C /tmp
 source /tmp/myenv/bin/activate
 ```
 
-`bin/activate` is the activation script of miniforge's base environment, which is why I installed miniforge itself at that path rather than an environment inside one: it can be activated with nothing but the files in the tarball.
+`bin/activate` is the activation script of miniforge's base environment, which is why miniforge itself is installed at that path, rather than an environment inside it: it can be activated with nothing but the files in the tarball.
 
-This works as long as no two jobs on the same node unpack to the same `/tmp/myenv` at the same time. Many clusters give each job a private `/tmp`, in which case it is fine, but if yours shares `/tmp` between the jobs on a node, two jobs will overwrite each other's environment. For that, you need a prefix you can choose per job.
+This works as long as no two jobs on the same node unpack to the same `/tmp/myenv` at the same time. Many clusters give each job a private `/tmp`, but if yours shares `/tmp` between the jobs on a node, two jobs will overwrite each other's environment, and you need a prefix you can choose per job.
 
 ## Any prefix, with conda-pack
 
@@ -76,15 +76,15 @@ A job on more than one node has to unpack the environment on each of them, once 
 srun --ntasks-per-node=1 bash -c 'mkdir -p "$LOCAL/env" && tar -xzf "$TARBALL" -C "$LOCAL/env" && source "$LOCAL/env/bin/activate" && conda-unpack'
 ```
 
-with `LOCAL` and `TARBALL` exported, as in the job above.[^3]
+with `LOCAL` and `TARBALL` set as in the job above, and exported, so that the `bash` of each task sees them.[^3]
 
 ## Is it worth it?
 
-Unpacking takes time. The environment in this example unpacks in a second or two, but a large one with compilers and MPI can take a minute: on one cluster I have used, a big analysis environment took around 50 seconds. So for a job that runs for hours, it does not matter either way, and for jobs a minute long, the unpacking can take longer than the work.
+Unpacking takes time. The environment in this example unpacks in a second or two, but a large one with compilers and MPI can take a minute: on one cluster I have used, a big analysis environment took around 50 seconds. For a job that runs for hours, that does not matter, and for jobs a minute long, the unpacking can take longer than the work.
 
-Where it pays off is when the start-up reads are the problem, not the unpacking: many processes in one job, each starting Python, all reading from the node-local copy instead of the shared filesystem. So rather than thousands of short jobs, each unpacking its own environment, run fewer, longer jobs that each unpack once and then run many tasks, which is the subject of [the part on parallelism](../parallel/10-intro.md). A [container](package-managers/50-containers.md) is the other way to get there, since an image is already a single file.
+Where it pays off is when the start-up reads are the problem: many processes in one job, each starting Python, all reading from the node-local copy instead of the shared filesystem. So rather than thousands of short jobs, each unpacking its own environment, run fewer, longer jobs that each unpack once and then run many tasks. A [container](package-managers/50-containers.md) is the other way to get there, since an image is already a single file.
 
-That is the end of this part. Once your environment, and its MPI, works on every node, the question is how to use them, and there is more than one answer: many independent tasks, threads within a node, or ranks that communicate. [The next part](../parallel/10-intro.md) is about parallelism, and how to choose.
+That is the end of this part. Once your environment, and its MPI, works on every node, [the next part](../parallel/10-intro.md) is about using them in parallel, and which kind of parallel yours is.
 
 [^1]: Not on a login node, where everyone shares the same `/tmp`, and which may not be the same kind of machine.
 
