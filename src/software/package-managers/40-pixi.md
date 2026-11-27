@@ -15,7 +15,14 @@ Install pixi into your architecture-dependent prefix,
 curl -fsSL https://pixi.sh/install.sh | PIXI_HOME="${__OPT_ROOT}/pixi" PIXI_NO_PATH_UPDATE=1 bash
 ```
 
-and add `export PATH="${__OPT_ROOT}/pixi/bin:${PATH}"` to your `~/.bashrc`. `PIXI_HOME` is where pixi installs itself, and `PIXI_NO_PATH_UPDATE` stops the installer from editing your `~/.bashrc` itself.[^1]
+and add these two lines to your `~/.bashrc`:
+
+``` bash
+export PIXI_HOME="${__OPT_ROOT}/pixi"
+export PATH="${PIXI_HOME}/bin:${PATH}"
+```
+
+`PIXI_HOME` is where pixi installs itself, and where it keeps its global data, so it has to be set whenever pixi runs, not only for the installer. `PIXI_NO_PATH_UPDATE` stops the installer from editing your `~/.bashrc` itself.[^1]
 
 Then, in your project's directory,
 

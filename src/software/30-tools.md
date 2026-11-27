@@ -9,7 +9,7 @@ The pages so far were about environments for a project. This one is about the ot
 
 ## A conda environment of tools
 
-I have experimented with many ways of installing command-line tools in my home directory on Linux, from compiling them from source to Gentoo Prefix, and this is the best I have found. It uses the fact that conda is a cross-platform, language-agnostic package manager. A conda package does not have to be Python software, and conda-forge has most of the tools you are likely to want. Many of them are, in effect, a download that gets unpacked, but conda does it more conveniently, and more securely, than downloading and unpacking archives by hand.
+A [conda](package-managers/30-conda.md) package does not have to be Python software, and conda-forge has most of the tools you are likely to want. Many of them are, in effect, a download that gets unpacked, but conda does it more conveniently, and more securely, than downloading and unpacking archives by hand.
 
 Make an environment file, say `system.yml`, with the tools you want:
 
@@ -47,7 +47,7 @@ Then don't activate it. Add its `bin` to the end of your `PATH`, in your `~/.bas
 export PATH="${PATH}:${__OPT_ROOT}/system/bin"
 ```
 
-At the end, so that the system's own version of a tool, where there is one, comes first, and the environment only fills in what is missing. If you would rather have the newer version everywhere, put it at the front instead. Either way, it is always there, in every shell and every job, without activating anything, and it does not get in the way of the project environments you activate on top. To add a tool, add it to `system.yml` and run `mamba env update -f system.yml -p "${__OPT_ROOT}/system" --prune`, and on a new machine, the same file gets you the same tools.
+At the end, so that the system's own version of a tool, where there is one, comes first, and the environment only fills in what is missing, or at the front, if you would rather have the newer version everywhere. Either way, it is there in every shell and every job, without activating anything, and it does not get in the way of the project environments you activate on top. To add a tool, add it to `system.yml` and run `mamba env update -f system.yml -p "${__OPT_ROOT}/system" --prune`, and on a new machine, the same file gets you the same tools.
 
 ## pixi global
 
@@ -61,13 +61,11 @@ The tools go in `$PIXI_HOME/bin`, which is already on your `PATH`, and since `PI
 
 ## Package managers that build from source
 
-There are also full package managers for a whole system that can be installed in your home directory and build everything from source there: Homebrew (which, as [the introduction](10-intro.md) explained, can't use its prebuilt packages because you can't write to `/home/linuxbrew`), pkgsrc, and Gentoo Prefix. All of these have various levels of success. Adapting them to an HPC means you are pushing them beyond the typical use cases they are designed for, and it requires some level of expertise to pull this off. Builds take hours, and a build that fails partway is yours to debug. It can often be time consuming to maintain. I'd only go this way if what you need is not on conda-forge.
+There are also full package managers for a whole system that can be installed in your home directory and build everything from source there: Homebrew (which, as [the introduction](10-intro.md) explained, can't use its prebuilt packages because you can't write to `/home/linuxbrew`), pkgsrc, and Gentoo Prefix. All of these have various levels of success. Adapting them to an HPC means you are pushing them beyond the typical use cases they are designed for. It requires some level of expertise to pull this off, and can often be time consuming to maintain, since builds take hours, and one that fails partway is yours to debug. I'd only go this way if what you need is not on conda-forge.
 
 ## mise, and who you are trusting
 
-[mise](https://mise.jdx.dev) has an interesting model. It is a manager of tool versions, and rather than packaging tools itself, it installs them through many *backends*: from its own registry, from [aqua](https://aquaproj.github.io)'s, from PyPI or npm or cargo, or straight from a project's GitHub Releases. It can pin the versions of tools per directory, with a `mise.toml`, and for many tools it is mostly providing a nicer UX over a download.
-
-But as an end user, trust is more difficult to establish, because there are many different layers between you and the software. It is not a single package manager in a sense, so who are you trusting, even?
+[mise](https://mise.jdx.dev) has an interesting model. It is a manager of tool versions, and rather than packaging tools itself, it installs them through many *backends*: from its own registry, from [aqua](https://aquaproj.github.io)'s, from PyPI or npm or cargo, or straight from a project's GitHub Releases. It can pin the versions of tools per directory, with a `mise.toml`, and for many tools it is mostly providing a nicer UX over a download. But as an end user, trust is more difficult to establish, because there are many different layers between you and the software. It is not a single package manager in a sense, so who are you trusting, even?
 
 For example, if you run `mise use -g ubi:jgm/pandoc`, you are trusting the maintainers of mise, of its `ubi` backend, which downloads from GitHub Releases, and of everything they depend on, sitting at different levels, where compromising any one of them compromises your system. If you know that ultimately you are trusting the GitHub Releases of `jgm/pandoc`, then running the following script directly eliminates the unnecessary layers of trust and increases security overall:
 
@@ -124,8 +122,8 @@ case "${1:-}" in
 esac
 ```
 
-It finds the version of the latest release from the address that GitHub redirects `releases/latest` to, works out the OS and architecture with the same `uname -sm` as [the introduction](10-intro.md), downloads the matching archive of that release, and copies the `pandoc` program out of it into `$__OPT_ROOT/bin`, which, with the `~/.bashrc` from the introduction, is the architecture-dependent one. Run it with `install` to install or update, and `uninstall` to remove it. The same pattern works for any tool that publishes its programs for each platform on its GitHub Releases, with the names of its files in place of pandoc's.
+It finds the latest release from the address that GitHub redirects `releases/latest` to, works out the OS and architecture with the same `uname -sm` as [the introduction](10-intro.md#where-to-put-your-environments), downloads the matching archive, and copies the `pandoc` program out of it into `$__OPT_ROOT/bin`, the architecture-dependent one. Run it with `install` to install or update, and `uninstall` to remove it. The same pattern works for any tool that publishes its programs for each platform on its GitHub Releases, with the names of its files in place of pandoc's.
 
-A conda-forge package adds layers too, the package's maintainers and conda-forge's. But as [the page on conda](package-managers/30-conda.md) explained, those maintainers build the package openly in CI, from a recipe anyone can read, so they are layers of defence. A layer that only passes a download along is one more party to trust, with nobody checking anything in between.
+A conda-forge package adds layers too, the package's maintainers and conda-forge's, but they build the package openly in CI, from a recipe anyone can read, so they are [layers of defence](package-managers/30-conda.md#conda-forge-not-anacondas-channels). A layer that only passes a download along is one more party to trust, with nobody checking anything in between.
 
 The [next section](mpi/10-intro.md) is about MPI, and how to compose an environment, from conda or Spack, with the MPI library the vendor provides, which is where most of the remaining trouble with environments on an HPC is.
