@@ -9,7 +9,7 @@ aliases: [../own-relay.html]
 
 ![](hpc-relay.svg){width="80%" fig-alt="JupyterLab or RStudio listens on 127.0.0.1 of the compute node. The compute node connects out to a relay, and the laptop connects to the same relay."}
 
-The app listens on the compute node's loopback, as on the previous page, so again nothing listens on the cluster network. What differs between this page and the next two is who runs the relay: you, Microsoft, or Cloudflare. And since all of your traffic goes through the relay, that is also who you are trusting with it.
+The app listens on the compute node's loopback, as on the previous page, so again nothing listens on the cluster network. All of your traffic goes through the relay, so whoever runs it is who you are trusting with it. On this page, that is you.
 
 Whether a compute node may connect out at all depends on how your centre has set up its network: some clusters let it reach anywhere, some only the web, and some nothing outside the cluster. Their documentation may say; otherwise, try it from [a shell on a compute node](../20-shell.md), e.g. `curl -sI https://github.com` for the web, or `ssh me@my-server true` for SSH to a server of yours.
 
@@ -66,12 +66,12 @@ Everything that crosses a network is inside SSH: from the compute node to the se
 But the two SSH sessions meet on the server, and there, on its loopback, the traffic is plain HTTP again. So whoever has root on the server can read it. That is you, and whoever hosts it for you, e.g. your cloud provider. And every other user of the server can connect to the port, like other users' jobs on a compute node, which is why the token stays on. So use a server that nobody else logs in to.
 
 ::: callout-note
-The obvious relay is the cluster's own login node, which every compute node can reach. On many clusters that does not work: the compute nodes may not be allowed to SSH to the login nodes, or the login nodes may not accept keys that you added yourself. And where it works, the port it opens is on the login node's loopback, where every other user logged in to that login node can connect to it. That is [SSH over srun](30-srun-ssh.md) with more steps and less privacy.
+The obvious relay is the cluster's own login node, which every compute node can reach. On many clusters that does not work: the compute nodes may not be allowed to SSH to the login nodes, or the login nodes may not accept keys that you added yourself. And where it works, the port it opens is on the login node's loopback, where every other user logged in to that login node can connect to it.
 :::
 
 ## Limitations
 
-You need the server, always on, and reachable from the compute nodes, which is why this is not the one I recommend to everyone. If your cluster only lets the compute nodes out to the web, the server's `sshd` has to listen on port 443 too.[^2] And a port on the server can only be held by one job at a time, so two jobs at once need two `RELAY_PORT`s, and two `permitlisten`s for the key.
+You need the server, always on, and reachable from the compute nodes. If your cluster only lets the compute nodes out to the web, the server's `sshd` has to listen on port 443 too.[^2] And a port on the server can only be held by one job at a time, so two jobs at once need two `RELAY_PORT`s, and two `permitlisten`s for the key.
 
 The [next page](50-dev-tunnel.md) is the same idea with somebody else's relay, for when you don't have a server.
 

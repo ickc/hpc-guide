@@ -41,14 +41,25 @@ All this may sound theoretical. But these days, in the agentic era, with LLM age
 
 ## Which one to use
 
-The rest of this section goes through the ways to do this securely, each on a page of its own, with scripts you can run. Side by side:
+The rest of this section goes through the ways to do this securely, each on a page of its own, with scripts you can run. They differ in how the connection reaches the compute node, who could read your traffic, who else can connect to the app, and what you need to set up:
 
-- [SSH over srun](30-srun-ssh.md) is the one I recommend. It needs nothing but Slurm and an `sshd`, nothing listens on the cluster network, nobody else is in the path, and it works the same for JupyterLab, RStudio or anything else with a web interface.
-- [HTTPS with a self-signed certificate](20-https.md) is the smallest change from the usual recipe, if your app is JupyterLab, and you don't mind checking a fingerprint and a fixed port.
-- [Microsoft Dev Tunnels](50-dev-tunnel.md), if you'd rather have only a browser on your laptop, and your work may go through Microsoft.
-- [A relay you run](40-own-relay.md), if you have a server of your own and want everything under your control.
-- [A Cloudflare quick tunnel](60-cloudflare-tunnel.md), only for a quick look.
-- Never the usual recipe above, with plain HTTP on the cluster network.
+|  | Reaches the node through | Can read your traffic | Can connect to the app | You need |
+|------------------------|------------------------|------------------------|------------------------|------------------------|
+| [HTTPS](20-https.md) | the login node, with `ssh -L` | nobody, once you have checked the fingerprint | anyone on the cluster | an app that serves HTTPS itself, a certificate, a fixed port |
+| [SSH over srun](30-srun-ssh.md) | the login node, then `srun` | nobody | other jobs on the same node | Slurm, and an `sshd` you can run |
+| [Your own relay](40-own-relay.md) | your server, which the job connects out to | whoever has root on your server | other users of your server | a server, always on, that the compute nodes can reach |
+| [Dev Tunnels](50-dev-tunnel.md) | Microsoft's relay | Microsoft | only your account | a GitHub or Microsoft account, and compute nodes that reach the internet |
+| [Cloudflare](60-cloudflare-tunnel.md) | Cloudflare's relay, at a public URL | Cloudflare | anyone with the URL | compute nodes that reach the internet |
+
+Wherever someone else can connect to the app, its token, or RStudio's password, is the only thing in the way, which is why every page keeps it on.
+
+[SSH over srun](30-srun-ssh.md) is the one I recommend. It needs nothing but Slurm and an `sshd`, nothing listens on the cluster network, nobody else is in the path, and it works the same for JupyterLab, RStudio or anything else with a web interface, with no certificate to make and no browser warning. If your project's data must not leave the cluster, use it, or HTTPS, since every relay takes your traffic outside the cluster.
+
+[HTTPS with a self-signed certificate](20-https.md) is the smallest change from the usual recipe, if your app is JupyterLab, and you don't mind checking a fingerprint and a fixed port. For RStudio, it gets complicated.
+
+[Microsoft Dev Tunnels](50-dev-tunnel.md) suits you if you'd rather have only a browser on your laptop, with no server of your own, and your work may go through Microsoft: if your centre already recommends VS Code's tunnels, it trusts the same relay. [A relay you run](40-own-relay.md) is for when you have a server of your own and want everything under your control, and a [Cloudflare quick tunnel](60-cloudflare-tunnel.md) is the least effort of all, with a public URL, so only for a quick look.
+
+And never the usual recipe above, with plain HTTP on the cluster network.
 
 The [next page](20-https.md) starts with the easiest to understand.
 

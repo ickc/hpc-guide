@@ -42,13 +42,13 @@ The connections from the job to Microsoft and from your browser to Microsoft are
 
 You are also trusting your GitHub or Microsoft account. Whoever gets into it can open your tunnels, and whoever gets the sign-in kept in your home directory on the cluster can make tunnels as you.
 
-So it comes down to whether your work may go through a third party. If your centre already recommends `code tunnel` for VS Code, it trusts the same relay. If your project's data must not leave the cluster, use [SSH over srun](30-srun-ssh.md), which involves nobody else.
+So it comes down to whether your work may go through a third party. If your centre already recommends `code tunnel` for VS Code, it trusts the same relay.
 
 ## Limitations
 
-It needs the compute nodes to reach Microsoft's servers, which depends on your cluster, as on [the previous page](40-own-relay.md). It needs a GitHub or Microsoft account. And there is a sign-in page and a warning page between you and your app, at least the first time. On the other hand, nothing on the cluster listens to anyone, you need no server, and on your laptop you need nothing but a browser.
+It needs the compute nodes to reach Microsoft's servers, which depends on your cluster, as on [the previous page](40-own-relay.md). It needs a GitHub or Microsoft account. And there is a sign-in page and a warning page between you and your app, at least the first time.
 
-The [next page](60-cloudflare-tunnel.md) is a relay with even less to set up, and that is its problem.
+The [next page](60-cloudflare-tunnel.md) is a relay with less to set up, and no sign-in at all.
 
 [^1]: If your login nodes and compute nodes have different kinds of CPU, run it again on a compute node, from [a shell there](../20-shell.md), with `DEVTUNNEL` set to a path of its own.
 
