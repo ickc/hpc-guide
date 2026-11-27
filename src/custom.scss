@@ -5,3 +5,13 @@
 /*-- scss:defaults --*/
 
 /*-- scss:rules --*/
+
+// Quarto sets `.table a { word-break: break-word }`, which lets a table cell
+// shrink to a single letter, so a linked name in a narrow column breaks
+// mid-word ("Containe/rs"). `overflow-wrap: break-word` still breaks a word
+// too long for its cell, such as a URL, but leaves the column wide enough for
+// the words that fit.
+.table a {
+  word-break: normal;
+  overflow-wrap: break-word;
+}

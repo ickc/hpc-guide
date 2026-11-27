@@ -14,9 +14,7 @@ If your tasks are calls of a Python function, Python's standard library can run 
 ``` {.bash include="../../examples/pi-futures/job.sh"}
 ```
 
-Two details matter on a cluster.
-
-The number of workers is `len(os.sched_getaffinity(0))`, the number of CPUs this process may run on, which in a job is the CPUs the job was given. `os.cpu_count()`, the obvious choice, is the number of CPUs of the whole node. On a node shared with other jobs, a pool of that size is oversubscription.[^1]
+The number of workers is `len(os.sched_getaffinity(0))`, the number of CPUs this process may run on, which in a job is the CPUs the job was given. `os.cpu_count()` is the number of CPUs of the whole node, and on a node shared with other jobs, a pool of that size is oversubscription.[^1]
 
 The pool is started under `if __name__ == "__main__":`. Depending on the platform and the version of Python, worker processes may start by importing your script afresh, and without that line, each of them would start a pool of its own.[^2]
 
@@ -36,11 +34,11 @@ def task(seed):
         return seed, None, repr(e)
 ```
 
-Then every result says which seed it was, and whether it failed, and the script can list the failed ones, to rerun only those, as GNU parallel's job log does on [its page](20-gnu-parallel.md).
+Then every result says which seed it was, and whether it failed, and the script can list the failed ones, to rerun only those.
 
 [map_parallel](https://ickc.github.io/python-map_parallel/), a package I wrote, is a complete example of this pattern: a drop-in replacement for `map`, on a pool of processes, of threads, or of MPI ranks, with the care above taken for each of them, so that an exception in any task is raised in your script.
 
-This gives the same π as the baseline, about 8 times faster, and like GNU parallel it stops at the edge of the node. The [next page](40-job-arrays.md) is about going beyond it, with the scheduler running the tasks for you.
+This gives the same π as the baseline, about 8 times faster, and it stops at the edge of the node. The [next page](40-job-arrays.md) is about going beyond it, with the scheduler running the tasks for you.
 
 [^1]: Since Python 3.13, `os.process_cpu_count()` is the same as `len(os.sched_getaffinity(0))`, and it is what `ProcessPoolExecutor` uses when you give it no `max_workers`. Before 3.13, the default was `os.cpu_count()`.
 

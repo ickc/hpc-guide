@@ -5,7 +5,7 @@ output-file: job-arrays
 aliases: [../job-arrays.html]
 ---
 
-[On one node](10-intro.md), one job runs all the tasks. When there are more than one node can get through in the time of one job, the simplest way out is to let the scheduler run them for you, each task as a job of its own, on whichever nodes are free.
+[GNU parallel](20-gnu-parallel.md) and [the pool](30-python-pool.md) run every task inside one job, on one node. When there are more tasks than one node can get through in the time of one job, the scheduler can run them for you, each task as a job of its own, on whichever nodes are free.
 
 ## One submission for many jobs
 
@@ -17,14 +17,14 @@ for seed in $(seq 1 64); do
 done
 ```
 
-That works, and gives you 64 jobs, each with its own job ID, to keep track of and cancel one by one. A *job array* is the same in one submission: one job script, submitted once, which Slurm runs as many *array tasks*, each with its own index.
+That works, and gives you 64 jobs, each with its own job ID, to keep track of and cancel one by one. A *job array* is the same in one submission: one batch script, submitted once, which Slurm runs as many *array tasks*, each with its own index.
 
 ``` {.bash include="../../examples/pi-array/job.sh"}
 ```
 
 `--array=1-64%16` makes 64 array tasks, with indices 1 to 64, and runs at most 16 of them at a time. The `%16` is the *throttle*: without it, Slurm runs as many as there are free resources for, which is fine for 64, but with thousands, a throttle stops your array from taking over the cluster, or your share of it, and leaves room for your other jobs.[^1]
 
-Each array task runs the whole script, with the resources the script asks for, here 1 CPU, and with its own index in `SLURM_ARRAY_TASK_ID`. That is all that tells the tasks apart, so it is the index that picks the task's work: here it is the seed, and in your case it might pick the line of a task list, with `sed -n "${SLURM_ARRAY_TASK_ID}p" tasks.txt`.
+Each array task runs the whole script, with the resources the script asks for, here 1 CPU, and with its own index in `SLURM_ARRAY_TASK_ID`. That index is all that tells the tasks apart, so it picks the task's work: here it is the seed, and in your case it might pick the line of a task list, with `sed -n "${SLURM_ARRAY_TASK_ID}p" tasks.txt`.
 
 Each task writes its result to `results/<index>.txt`. Its output goes to `pi-array-%A_%a.out`, where `%A` is the job ID of the array, and `%a` the index of the task, so each task gets its own file. Without `%a` in the name, the tasks would write to the same file, and overwrite each other's output.
 
@@ -50,25 +50,25 @@ pi = 3.141543 from 4294967296 samples
 
 If a task fails, the dependency can never be satisfied, and the reduce job stays in the queue, waiting for something that won't happen, until you cancel it (unless your cluster is set to cancel such jobs by itself). To find which tasks failed, `sacct -j <job ID> -X --format=JobID,State,ExitCode` lists every task with its state; once you've fixed the problem, rerun only those, e.g. `sbatch --array=5,17 job.sh`, since an option on the command line overrides the one in the script, then submit the reduce again.
 
-That is as far as dependencies go on this page. A pipeline with more steps than one reduce is the subject of the [page on workflows](../40-workflows.md), later in this part.
+A pipeline with more steps than one reduce is the subject of the [page on workflows](../40-workflows.md), later in this part.
 
 ## The limit: overwhelming the scheduler
 
-The convenience comes with a cost. Each array task is a job, with everything that comes with one: the scheduler has to find room for it, start it, track it while it runs, and account for it after it ends. An array is cheaper for the scheduler than as many separate jobs, but 10,000 array tasks are still 10,000 jobs to schedule, and the scheduler is shared by everyone on the cluster. When the scheduler is overwhelmed, it is slow for all of them, `squeue` and `sbatch` included.
+Each array task is a job, with everything that comes with one: the scheduler has to find room for it, start it, track it while it runs, and account for it after it ends. An array is cheaper for the scheduler than as many separate jobs, but 10,000 array tasks are still 10,000 jobs to schedule, and the scheduler is shared by everyone on the cluster. When it is overwhelmed, it is slow for all of them, `squeue` and `sbatch` included.
 
 Each task also pays for itself. It waits in the queue, then starts from nothing: a new shell, activating the environment, starting Python and importing NumPy, all reading from the shared filesystem, the [cost of activation](../../software/package-managers/30-conda.md) multiplied by the number of tasks. For a task that takes an hour, none of that matters. For one that takes 10 seconds, it can be more than the task itself.
 
-Clusters protect themselves with limits. `MaxArraySize` in Slurm's configuration caps the indices of an array (by default, 1001, so indices up to 1000), and many clusters also limit how many jobs one user can have in the queue, which a large array can run into. `scontrol show config | grep -i MaxArraySize` shows the first.
+Clusters protect themselves with limits. `MaxArraySize` in Slurm's configuration caps the indices of an array (by default, 1001, so indices up to 1000), which `scontrol show config | grep -i MaxArraySize` shows.
 
 ::: {.callout-note title="Other limits you may run into"}
-A limit on how many jobs one user can have queued shows up in `squeue` as a pending reason such as `QOSMaxSubmitJobPerUserLimit`. And on a cluster that charges a project's time as credits, Slurm may reserve credits for every queued task by its requested resources and `--time`, so a large array with a long `--time` can block new submissions until some of its tasks complete.
+Many clusters also limit how many jobs one user can have in the queue, which a large array can run into, and which shows up in `squeue` as a pending reason such as `QOSMaxSubmitJobPerUserLimit`. And on a cluster that charges a project's time as credits, Slurm may reserve credits for every queued task by its requested resources and `--time`, so a large array with a long `--time` can block new submissions until some of its tasks complete.
 :::
 
 So an array is for tasks that are each worth a job: few enough, and long enough. When you have many short tasks, group them, so that each array task runs many of them.
 
 ## An array of whole nodes, each running GNU parallel
 
-Nothing prevents you from mixing the two. An array where each task has a whole node to itself, and runs its share of the tasks with [GNU parallel](20-gnu-parallel.md) inside it, reduces the amount of spam to the scheduler to one job per node, while still going beyond one node:
+Nothing prevents you from mixing them. An array where each task has a whole node to itself, and runs its share of the tasks with [GNU parallel](20-gnu-parallel.md) inside it, reduces the amount of spam to the scheduler to one job per node, while still going beyond one node:
 
 ``` {.bash include="../../examples/pi-array-parallel/job.sh"}
 ```
@@ -86,7 +86,7 @@ The sizes here are small, to keep the example quick: 2 nodes for 64 tasks of a s
 On nodes of 144 cores, such as those with two 72-core NVIDIA Grace CPUs, an array of 10 whole nodes runs 1,440 tasks at a time, as 10 jobs, where a plain array would need 1,440 array tasks running at once to do the same.
 :::
 
-This is where the tasks are no longer Python functions that one script hands out, but whole commands. When they are Python functions, and you want them spread over many nodes from one script, without an array, the [next page](50-mpi4py-futures.md), on `mpi4py.futures`, does that, with MPI underneath.
+The [next page](50-mpi4py-futures.md) goes beyond one node from one Python script instead, with a pool of workers on MPI ranks.
 
 [^1]: Indices need not start at 1, or be consecutive: `--array=0-90:10` is 0, 10, 20, ..., 90, and `--array=5,17` is just those two, which is useful for rerunning tasks that failed, below.
 
