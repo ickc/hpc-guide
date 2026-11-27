@@ -38,6 +38,6 @@ This works, in the sense that it finishes. But it starts all 64 at once, on 8 co
 
 ## Which to reach for first
 
-If the tasks fit on one node in the time of one job, start there: GNU parallel when they are commands, and a pool when they are Python functions. Beyond one node, for tasks that are commands, a job array, or GNU parallel inside one, is simpler. For Python functions, I'd say `mpi4py.futures` or a job array is the safer default for most people, and Dragon the one to try when a pool is limited by one node and getting MPI right is the obstacle: if your code is already a `multiprocessing` pool, trying it on 2 nodes costs two lines.
+If the tasks fit on one node in the time of one job, start there: GNU parallel when they are commands, and a pool when they are Python functions. Beyond one node, for tasks that are commands, a job array, or GNU parallel inside one, is simpler. For Python functions, I'd recommend `mpi4py.futures` or a job array as the safer default for most people, and Dragon the one to try when a pool is limited by one node and getting MPI right is the obstacle: if your code is already a `multiprocessing` pool, trying it on 2 nodes costs two lines.
 
 Every page of this section runs the same 64 tasks of Monte Carlo π, and gets the same answer. The [next page](20-gnu-parallel.md) starts on one node, with GNU parallel.
