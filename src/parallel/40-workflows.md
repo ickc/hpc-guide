@@ -5,7 +5,7 @@ output-file: workflows
 aliases: [../running-jobs/workflow.html]
 ---
 
-The previous pages were about running one computation on many cores, or many nodes. This page is about computations made of steps, where some steps need the output of others: the fourth kind of parallel from [the introduction](10-intro.md), tasks with dependencies.
+The previous pages ran one computation on many cores, or many nodes. This page is about computations made of steps, where some steps need the output of others: the fourth kind of parallel from [the introduction](10-intro.md), tasks with dependencies.
 
 ## The chain you may already have
 
@@ -17,7 +17,7 @@ call="$(sbatch --parsable --dependency=afterok:"$align" call.sh)"
 sbatch --dependency=afterok:"$call" merge.sh
 ```
 
-This works, and for two or three steps, it is fine. But as the pipeline grows, it bites in a few ways. The dependencies are between jobs, while what you care about is files: `call.sh` needs the alignments, and Slurm only knows that some job finished. When a step fails, everything after it waits forever in the queue, and to recover, you have to work out which outputs are complete, edit the chain to skip the steps that are done, and resubmit. When you change one input, you have to work out which steps it affects.
+This works, and for two or three steps, it is fine. But as the pipeline grows, it bites in a few ways. The dependencies are between jobs, while what you care about is files: `call.sh` needs the alignments, and Slurm only knows that some job finished. When a step fails, everything after it waits forever in the queue, and to recover, you have to work out which outputs are complete, and edit the chain to skip the steps that are done. When you change one input, you have to work out which steps it affects.
 
 Workflow managers are useful for reproducible workflow, especially when you have complicated pipelines with complicated data dependencies. Better use one than to roll your own.
 
@@ -41,7 +41,7 @@ The π of this part is a workflow of two steps: 64 count tasks, then the reduce,
 ``` {.python include="../examples/pi-workflow/Snakefile"}
 ```
 
-`rule count` says how to make `results/{seed}.txt` for any `seed`, which is a *wildcard*, and `{wildcards.seed}` puts its value into the command. `rule reduce` needs `expand("results/{seed}.txt", seed=SEEDS)`, the list of 64 files, so for it to run, Snakemake has to make each of them, with `count`. `rule all` comes first, so it is what Snakemake makes by default: `pi.txt`. The `group` line matters only through Slurm, below.
+`rule count` says how to make `results/{seed}.txt` for any `seed`, which is a *wildcard*, and `{wildcards.seed}` puts its value into the command. `rule reduce` needs `expand("results/{seed}.txt", seed=SEEDS)`, the list of 64 files, so Snakemake makes each of them with `count` first. `rule all` comes first, so it is what Snakemake makes by default: `pi.txt`. The `group` line matters only through Slurm, below.
 
 The same, as a Makefile:
 
@@ -96,7 +96,7 @@ In Nextflow, the same choice is its *executor*: with `process.executor = 'slurm'
 
 ### Where the head process runs
 
-Whichever executor you use, the workflow manager itself is a process, the *head*, that runs for the whole of the workflow: it submits the tasks, watches them, and submits the next ones as their inputs appear. If it dies, nothing new is submitted, although the jobs it has already submitted carry on.[^1] There are two places to run it.
+The workflow manager itself is a process, the *head*, that runs for the whole of the workflow, submitting the tasks as their inputs appear and watching them. If it dies, nothing new is submitted, although the jobs it has already submitted carry on.[^1] There are two places to run it.
 
 **On a login node.** This is the simplest, and it is what the Snakemake Slurm plugin expects: run inside a job, it warns that this "is not recommended". The head mostly waits, so it takes little CPU, but it has to keep running for as long as the workflow does, hours or days, and it ends when your `ssh` connection does, unless it runs in a terminal multiplexer such as `tmux` or `screen`.
 
@@ -104,7 +104,7 @@ Whichever executor you use, the workflow manager itself is a process, the *head*
 Some clusters forbid `tmux`, `screen` or similar sessions left running on a login node after you disconnect, and may stop them without warning. A cluster that logs you in with short-lived SSH certificates, valid for 12 hours say, does so because a persistent session would bypass that limit. Login nodes may also be assigned at random, so you may not get back to the one where you started a session.
 :::
 
-**In a job of its own.** A small, long job, e.g. 2 cores for 12 hours, that runs only the head, which then submits the tasks as jobs of their own. This survives logging out, but it needs `sbatch` to work from a compute node, which depends on how your centre has deployed Slurm, so check that first, with `sbatch` or `squeue` in an interactive job. Its time limit has to be longer than the whole workflow, and it holds its cores while it waits. Here is such a driver job, for an nf-core pipeline:
+**In a job of its own.** A small, long job, e.g. 2 cores for 12 hours, that runs only the head. This survives logging out, but it needs `sbatch` to work from a compute node, which depends on how your centre has deployed Slurm, so check that first, with `sbatch` or `squeue` in an interactive job. Its time limit has to be longer than the whole workflow, and it holds its cores while it waits. Here is such a driver job, for an nf-core pipeline:
 
 ``` bash
 #!/bin/bash
@@ -145,7 +145,7 @@ The last two matter as much as the first two, since every check is a call to `sq
 
 ### The working directory and file locking
 
-A workflow manager keeps its state in files: for Nextflow, the `.nextflow` directory where you run it, and the *work directory*, `work/` by default, where every task runs in a directory of its own; for Snakemake, the `.snakemake` directory. They have to be on a filesystem that every node can see, since a task on a compute node writes its outputs there and the head reads them, which rules out node-local disk. And they see the latency of that filesystem: a task's output may only show up on the head's node some seconds after the task has finished, which is what Snakemake's `latency-wait` (60 seconds in the profile above) and Nextflow's `exitReadTimeout` are for.
+A workflow manager keeps its state in files: for Nextflow, the `.nextflow` directory where you run it, and the *work directory*, `work/` by default, where every task runs in a directory of its own; for Snakemake, the `.snakemake` directory. They have to be on a filesystem that every node can see, since a task on a compute node writes its outputs there and the head reads them, which rules out node-local disk. A task's output may also show up on the head's node only some seconds after the task has finished, which is what Snakemake's `latency-wait` (60 seconds in the profile above) and Nextflow's `exitReadTimeout` are for.
 
 Nextflow also relies on file locking: it locks its cache of completed tasks, which is what `-resume` reads, and on a filesystem without working locks, that fails, or worse, appears to work. Lustre, the filesystem of many clusters, supports locks, but whether they work across nodes is set by an option when it is mounted, `flock`, `localflock` or `noflock`, and `findmnt -t lustre` shows which. So put the working directory on a shared filesystem with `flock`, typically `$SCRATCH` or `$PROJECTDIR`,[^2] which also have the room for the many intermediate files.
 
@@ -153,11 +153,11 @@ Snakemake keeps a lock of its own instead, as files under `.snakemake/locks`, so
 
 ### Software for every step
 
-The steps of a real pipeline often need a different tool each. Snakemake can give each rule a conda environment of its own, from a file next to the rule, created when it first runs, and Nextflow pipelines from nf-core run each process in a container. Both bring back the questions of [the part on software environments](../software/10-intro.md): create the environments on the kind of node they will run on, and on a filesystem every node sees. On an Arm cluster, containers built for x86-64 do not run at all, and nf-core pipelines have an `arm64` profile for that, used above as `-profile test,arm64`, which builds an Arm container for each process on demand, through a service called [Wave](https://docs.seqera.io/wave), when the compute nodes can reach the internet.
+The steps of a real pipeline often need a different tool each. Snakemake can give each rule a conda environment of its own, from a file next to the rule, created when it first runs, and Nextflow pipelines from nf-core run each process in a container. Both bring back the questions of [the part on software environments](../software/10-intro.md): create the environments on the kind of node they will run on, and on a filesystem every node sees. On an Arm cluster, containers built for x86-64 do not run at all, and nf-core's `arm64` profile, used above, builds an Arm container for each process on demand, through a service called [Wave](https://docs.seqera.io/wave), when the compute nodes can reach the internet.
 
 ## Limitations
 
-A workflow manager is one more tool to learn, with its own language and its own ways of failing, and for two steps, a chain of `sbatch` with `--dependency` is simpler. It also adds its own overhead to every task, on top of Slurm's, so a workflow of many tiny tasks is still better grouped, as above, or run inside one allocation. And none of them makes a single task faster: within each step, the earlier pages of this part still apply.
+A workflow manager is one more tool to learn, with its own language and its own ways of failing, and for two steps, a chain of `sbatch` with `--dependency` is simpler. It adds its own overhead to every task, on top of Slurm's, so a workflow of many tiny tasks is still better grouped, as above, or run inside one allocation. And it makes no single task faster: within each step, the earlier pages of this part still apply.
 
 That is the end of this part. Every way of running in parallel here reads and writes files, often many of them, on filesystems shared by everyone, and the next part, [Storage](../storage/10-where.md), is about those: where to put your data, how much room you have, and how not to overwhelm a shared filesystem with many small files.
 
