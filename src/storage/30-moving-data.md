@@ -24,7 +24,7 @@ rsync -a --partial --info=progress2 data/ my-cluster:/path/to/scratch/data/
 
 `-a` is *archive* mode: it copies directories recursively, and keeps the files' timestamps, permissions and symbolic links as they are, which is also how `rsync` tells, on the next run, which files have not changed. `--partial` keeps a file that was only partly copied when the transfer was interrupted, rather than deleting it, so that the next run continues that file too, instead of starting it again, which matters most for one big file. `--info=progress2` prints one line of progress for the whole transfer, rather than one per file.[^1]
 
-The trailing slash on `data/` matters. With it, `rsync` copies the *contents* of `data` into the destination, `/path/to/scratch/data/`. Without it, `rsync data my-cluster:/path/to/scratch/data/` copies the directory itself into the destination, and you end up with `data/data`. So I always write both with a trailing slash, the source and the destination, and the two directories then mirror each other. If you are unsure what a command will do, add `-n` (`--dry-run`) and `-v`, which lists what it would copy without copying anything.
+The trailing slash on `data/` matters. With it, `rsync` copies the *contents* of `data` into the destination, `/path/to/scratch/data/`. Without it, `rsync data my-cluster:/path/to/scratch/data/` copies the directory itself into the destination, and you end up with `data/data`. So write both with a trailing slash, the source and the destination, and the two directories then mirror each other. If you are unsure what a command will do, add `-n` (`--dry-run`) and `-v`, which lists what it would copy without copying anything.
 
 To copy the results back, swap the two:
 

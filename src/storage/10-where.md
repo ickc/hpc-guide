@@ -16,27 +16,27 @@ The names below are environment variables some centres set, but none of them is 
 
 Your home directory is mounted on every node, login and compute, and it is where your configuration files, your scripts, and your source code go. It is small, often tens of gigabytes, and its latency is high: each file operation takes a while, which you won't notice when you edit a script, but you will when a job opens thousands of files there.
 
-Home is the one most likely to be backed up, or to keep snapshots you can restore from, on the clusters that back up anything at all. But on many clusters, nothing is backed up, home included.[^1] It is not purged.
+Home is the one most likely to be backed up, or to keep snapshots you can restore from, on the clusters that back up anything at all. But on many clusters, nothing is backed up, home included. It is not purged.
 
 For a job on several nodes, home is shared, so every node sees the same files, which makes it fine for the job script and the small configuration files it reads at the start. It is not the place for the data.
 
 ### Scratch, `$SCRATCH`
 
-Scratch is the large, fast filesystem, meant for the data your jobs read and write while you work on it.[^2] Its quota is usually measured in terabytes rather than gigabytes. It is fast for big files, read and written in large chunks, but like every shared filesystem, it is slow for many small files, for reasons [the page on Lustre](20-lustre.md#why-many-small-files-are-the-expensive-kind) goes into.
+Scratch is the large, fast filesystem, meant for the data your jobs read and write while you work on it.[^1] Its quota is usually measured in terabytes rather than gigabytes. It is fast for big files, read and written in large chunks, but like every shared filesystem, it is slow for many small files, for reasons [the page on Lustre](20-lustre.md#why-many-small-files-are-the-expensive-kind) goes into.
 
-The catch is that it is subject to a *purge* policy: files that nobody has used for a while are deleted automatically, without asking you. On one cluster I have used, that is 60 days since a file was last accessed. So scratch is for work in progress, never for the only copy of anything. When a result is worth keeping, copy it to your project directory, or off the cluster altogether, which is [the page on moving data](30-moving-data.md). And don't `touch` your files to keep them from being purged: the policy is there so that the filesystem has room for everyone, and some centres forbid exactly that.
+The catch is that it is subject to a *purge* policy: files that nobody has used for a while, e.g. for 60 days, are deleted automatically, without asking you. So scratch is for work in progress, never for the only copy of anything. When a result is worth keeping, copy it to your project directory, or off the cluster altogether, which is [the page on moving data](30-moving-data.md). And don't `touch` your files to keep them from being purged: the policy is there so that the filesystem has room for everyone, and some centres forbid exactly that.
 
-It is not backed up either, which goes without saying for something that deletes files on its own. For a job on several nodes, scratch is shared like home, so every node sees the same files, and it is where a multi-node job normally reads its inputs from and writes its outputs to.
+It is not backed up either. For a job on several nodes, scratch is shared like home, so every node sees the same files, and it is where a multi-node job normally reads its inputs from and writes its outputs to.
 
 ### Project, `$PROJECTDIR`
 
-A project directory is shared by the members of a project, with a quota of its own, separate from each member's.[^3] It is for what you all need for the length of the project: shared datasets, the environments everyone uses, and the results worth keeping. It is usually not purged, but it is often deleted some time after the project ends, so it is still not an archive.
+A project directory is shared by the members of a project, with a quota of its own, separate from each member's.[^2] It is for what you all need for the length of the project: shared datasets, the environments everyone uses, and the results worth keeping. It is usually not purged, but it is often deleted some time after the project ends, so it is still not an archive.
 
 Its speed is that of the filesystem it is on, which may well be the same one as scratch. Whether it is backed up is, again, up to your centre. Since it is shared by the project, also check who can read and write what you put there, with `ls -l`, before you rely on it, e.g. that the files you made can be read by the rest of your group.
 
 ### Node-local, `$LOCALDIR`
 
-Some clusters give each compute node storage of its own, usually a local SSD, or a directory in memory.[^4] This is the fastest storage you have for many small files, since nobody else is using it, and there is no network between your job and the disk.
+Some clusters give each compute node storage of its own, usually a local SSD, or a directory in memory.[^3] This is the fastest storage you have for many small files, since nobody else is using it, and there is no network between your job and the disk.
 
 But it is only available on that node, and often only for the duration of the job: the directory is made when the job starts, and deleted when it ends. So it has no quota you can check in advance, only its size, which is in your centre's documentation, or in `df -h` inside a job. It is not backed up, and anything you leave on it is gone after the job.
 
@@ -70,9 +70,9 @@ Then, to see which filesystem a directory is on, use `findmnt -T`:
 findmnt -T "$SCRATCH"
 ```
 
-which prints the mount point that directory is under, where it comes from, and the filesystem type, e.g. `lustre` for Lustre, `gpfs` for IBM Storage Scale, `beegfs`, `nfs`, or `xfs` and `tmpfs` for a local disk and memory. This can be surprising. On one cluster I have used, home, scratch and project were all directories on one and the same Lustre filesystem, told apart only by their quotas and their purge policies, so `findmnt -T` gave the same mount for all three.
+which prints the mount point that directory is under, where it comes from, and the filesystem type, e.g. `lustre` for Lustre, `gpfs` for IBM Storage Scale, `beegfs`, `nfs`, or `xfs` and `tmpfs` for a local disk and memory. Home, scratch and project may well turn out to be directories on one and the same filesystem, told apart only by their quotas and purge policies.
 
-Which brings up `df -h`. It shows the size and the free space of the filesystem a directory is on, but on a shared filesystem, that is everyone's free space, not yours. So it is the wrong tool for how much room you have left, which is your quota, and has to be checked with the filesystem's own tool. On that same cluster, `df -h` happened to show the quota of each directory rather than the size of the filesystem, since its quotas were set per directory, but nothing in the output tells you which of the two you are looking at. And it says nothing about the other limit, on the number of files, which is the one many small files run into first. For Lustre, the tool is `lfs quota`, on [the next page](20-lustre.md#checking-your-quota). Other filesystems have their own, e.g. `mmlsquota` for IBM Storage Scale, and many centres provide a command of their own that summarises every quota you have, named in their documentation.
+`df -h` is the wrong tool for how much room you have left. On a shared filesystem, it shows everyone's free space, not yours, or on some clusters the quota of the directory, with nothing in the output to say which. And it says nothing about the other limit, on the number of files, which is the one many small files run into first. How much room you have is your quota, checked with the filesystem's own tool. For Lustre, that is `lfs quota`, on [the next page](20-lustre.md#checking-your-quota). Other filesystems have their own, e.g. `mmlsquota` for IBM Storage Scale, and many centres provide a command of their own that summarises every quota you have, named in their documentation.
 
 For node-local storage, `df -h` is the right tool, inside a job, since the node's disk is yours for the length of the job (or shared only with the other jobs on that node):
 
@@ -101,7 +101,7 @@ The last step is the one that needs care. If the work fails half way, or runs ou
 
 `$INPUT` and `$RESULTS` default to the directory you submitted from, but you'd point them at scratch, e.g. `INPUT=$SCRATCH/inputs.tar RESULTS=$SCRATCH/results sbatch job.sh`, since `sbatch` passes your environment on to the job. `$LOCAL` is node-local storage: `$LOCALDIR` if your centre sets it, otherwise `$TMPDIR`, which some clusters set to a directory for each job, and otherwise `/tmp`. The job ID in the name keeps two jobs on the same node apart.
 
-`stage_out` is the fourth step, and `trap stage_out EXIT` runs it whenever the script exits, whether the work succeeded or not: with `set -e`, a failing command makes the script exit, which runs it too. That leaves the job being stopped from the outside, by its time limit or by `scancel`, where Slurm sends the job `SIGTERM`, and kills it outright a little later (30 seconds, by default).[^5] So the second `trap` catches `SIGTERM`, stops the work, and exits, which runs `stage_out` in time if packing the results is quick. To leave more room, `--signal=B:USR1@60` asks Slurm to send the script `SIGUSR1` about 60 seconds before the time limit, which the same `trap` catches.[^6] That is also why the work runs in the background, with `&` and then `wait`: bash runs a `trap` only once the command in the foreground finishes, while `wait` returns as soon as a signal arrives.
+`stage_out` is the fourth step, and `trap stage_out EXIT` runs it whenever the script exits, whether the work succeeded or not: with `set -e`, a failing command makes the script exit, which runs it too. That leaves the job being stopped from the outside, by its time limit or by `scancel`, where Slurm sends the job `SIGTERM`, and kills it outright a little later (30 seconds, by default).[^4] So the second `trap` catches `SIGTERM`, stops the work, and exits, which runs `stage_out` in time if packing the results is quick. To leave more room, `--signal=B:USR1@60` asks Slurm to send the script `SIGUSR1` about 60 seconds before the time limit, which the same `trap` catches.[^5] That is also why the work runs in the background, with `&` and then `wait`: bash runs a `trap` only once the command in the foreground finishes, while `wait` returns as soon as a signal arrives.
 
 The results come back as one tarball per job, `$RESULTS/<job ID>.tar`, which you unpack where you need them, e.g. with `tar -xf`. The job prints how many files it staged in and out, so you can see in its output that the staging worked, e.g. that a job whose work failed half way still staged out the 500 results it had.
 
@@ -117,26 +117,22 @@ where `$LOCAL` has to exist on every node already, e.g. made with `srun --ntask
 
 That is more to get right, and with a `trap` on each node rather than one. So before you write your own, check what your centre already provides, since some centres have integrated node-local storage into Slurm:
 
-- a private `/tmp` for each job, from a Slurm plugin that gives every job its own `/tmp` and `/dev/shm`, removed when the job ends, so that two jobs on a node never see each other's files;[^7]
+- a private `/tmp` for each job, from a Slurm plugin that gives every job its own `/tmp` and `/dev/shm`, removed when the job ends, so that two jobs on a node never see each other's files;[^6]
 - a [burst buffer](https://slurm.schedmd.com/burst_buffer.html), fast storage you ask for in the job script (with `#DW` lines on a Cray system with DataWarp, or `--bb` options), which Slurm stages in before the job starts and stages out after it ends, so the job itself never waits for it;
 - a filesystem made for the length of the job out of the local disks of all its nodes, which every node of the job can see. BeeOND, from the makers of BeeGFS, is one, and it is the centre that has to set it up, from the scripts Slurm runs before and after each job.
 
 Your centre's documentation says which of these it has, if any, and how to ask for them.
 
-## What's next
-
 Node-local storage is the fast option, but it is not always there, and staging takes care. For everything else, your data lives on a shared filesystem, and on many clusters that is Lustre, the subject of [the next page](20-lustre.md): how to check your quota on it, why many small files are the expensive kind, and how to spread a big file over many disks.
 
-[^1]: One cluster I have used says so up front: none of its storage is backed up, and you should keep a copy of anything you cannot afford to lose somewhere else. Check yours before you assume otherwise.
+[^1]: `$SCRATCH` is what many clusters call it, but not every cluster sets it, and some call it something else, e.g. `$SCRATCHDIR`. Look for a large, fast filesystem with a purge policy in your centre's documentation.
 
-[^2]: `$SCRATCH` is what many clusters call it, but not every cluster sets it, and some call it something else, e.g. `$SCRATCHDIR`. Look for a large, fast filesystem with a purge policy in your centre's documentation.
+[^2]: `$PROJECTDIR` is a name some centres use, others use another, and some have no variable for it at all, only a path. Look for storage shared by a project, with its own quota, in your centre's documentation.
 
-[^3]: `$PROJECTDIR` is a name some centres use, others use another, and some have no variable for it at all, only a path. Look for storage shared by a project, with its own quota, in your centre's documentation.
+[^3]: `$LOCALDIR` is a name some centres use, and others don't, or call it something else, e.g. `$TMPDIR`, or have only `/tmp`. Look for node-local storage in your centre's documentation.
 
-[^4]: `$LOCALDIR` is a name some centres use, and others don't, or call it something else, e.g. `$TMPDIR`, or have only `/tmp`. Look for node-local storage in your centre's documentation.
+[^4]: That grace period is `KillWait` in Slurm's configuration, which `scontrol show config | grep KillWait` shows.
 
-[^5]: That grace period is `KillWait` in Slurm's configuration, which `scontrol show config | grep KillWait` shows.
+[^5]: The `B:` sends the signal to the batch script only, rather than to every process of the job. Slurm checks the time limits only every so often, so the signal can come up to a minute earlier than asked for. Give it more than 60 seconds if your results take longer to pack.
 
-[^6]: The `B:` sends the signal to the batch script only, rather than to every process of the job. Slurm checks the time limits only every so often, so the signal can come up to a minute earlier than asked for. Give it more than 60 seconds if your results take longer to pack.
-
-[^7]: The plugin is `job_container/tmpfs`, called `namespace/tmpfs` in recent versions of Slurm, and its [configuration](https://slurm.schedmd.com/job_container.conf.html) is in `job_container.conf`. `scontrol show config | grep -i -E 'JobContainer|Namespace'` shows whether your cluster uses it.
+[^6]: The plugin is `job_container/tmpfs`, called `namespace/tmpfs` in recent versions of Slurm, and its [configuration](https://slurm.schedmd.com/job_container.conf.html) is in `job_container.conf`. `scontrol show config | grep -i -E 'JobContainer|Namespace'` shows whether your cluster uses it.

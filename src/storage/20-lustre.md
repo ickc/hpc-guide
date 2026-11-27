@@ -42,7 +42,7 @@ A Lustre filesystem is not one big disk, but many servers, which your node talks
 
 The *metadata* servers keep the namespace: the names of files and directories, their owners, permissions and timestamps, and where each file's data is. Each stores this on one or more *metadata targets* (MDTs). The *object storage* servers keep the data itself, on many *object storage targets* (OSTs), each of which is in effect one large disk, or rather an array of disks. A file's data is stored as one or more objects, on one or more OSTs. So opening a file is two steps: your node first asks a metadata server where the file's data is, then reads or writes the data from the OSTs directly.
 
-`lfs mdts <dir>` and `lfs osts <dir>` list the targets of the filesystem a directory is on. On one Lustre filesystem I have used, there were 2 MDTs and 6 OSTs, which serve every user of the cluster.
+`lfs mdts <dir>` and `lfs osts <dir>` list the targets of the filesystem a directory is on.
 
 ## Why many small files are the expensive kind
 
@@ -67,7 +67,7 @@ lfs getstripe big.h5     # the layout of a file
 lfs getstripe -d data/   # the default layout of new files in a directory
 ```
 
-`lmm_stripe_count` is the stripe count, `lmm_stripe_size` the stripe size in bytes, and `obdidx` lists the OSTs the file is on. On one Lustre filesystem I have used, the default was a stripe count of 1 and a stripe size of 1 MiB.
+`lmm_stripe_count` is the stripe count, `lmm_stripe_size` the stripe size in bytes, and `obdidx` lists the OSTs the file is on.
 
 To change it, set a default on a directory with `lfs setstripe`:
 
@@ -86,13 +86,13 @@ which copies all of its data, so it takes as long as copying the file does. `lfs
 
 ### Pools
 
-Some Lustre filesystems group their OSTs into *pools*, e.g. one of flash and one of spinning disks, and `lfs pool_list <dir>` lists them, if there are any. On one Lustre filesystem I have used, there were two pools, `flash` with 2 smaller OSTs and `disk` with 4 much larger ones, and new files went to `flash` by default. `-p` chooses the pool:
+Some Lustre filesystems group their OSTs into *pools*, e.g. `flash`, a few small OSTs of flash storage, and `disk`, larger ones of spinning disks, and `lfs pool_list <dir>` lists them, if there are any. `-p` chooses the pool:
 
 ``` bash
 lfs setstripe -p disk -c 4 -S 8M data
 ```
 
-and the stripe count is then over the OSTs of that pool, so `-c -1` means every OST in the pool. Ask for more stripes than the pool has OSTs, and a file gets as many as there are, without an error.[^3] Which pool is meant for what is up to your centre, so check its documentation before you move your data off the default.
+and the stripe count is then over the OSTs of that pool, so `-c -1` means every OST in the pool. Ask for more stripes than the pool has OSTs, and a file gets as many as there are, without an error. Which pool is meant for what is up to your centre, so check its documentation before you move your data off the default.
 
 ### When to bother, and when not to
 
@@ -100,12 +100,8 @@ Striping helps a file that is big, gigabytes rather than megabytes, and read or 
 
 It does not help, and makes things worse, for small files: each stripe is one more object on one more OST, so a small file with many stripes is that many more servers to contact to open it, for no gain. Nor does it help much for many big files that are each read by one process: with a stripe count of 1, different files already land on different OSTs, so the load is spread anyway. So for most users, the default layout is fine, and I'd only stripe a directory that holds a few very large files read in parallel. If in doubt, measure: time reading or writing one such file with and without the stripes, before you set it for everything.
 
-## What's next
-
 Lustre is fast for big files, as long as you keep the small ones off it. The data still has to get onto the cluster in the first place, and the results off it, which is [the next page](30-moving-data.md).
 
 [^1]: If the project ID it prints is 0, the directory has no project quota of its own, and your quota is probably per user or per group instead, which `lfs quota -h -u "$USER" "$d"` and `lfs quota -h -g "$(id -gn)" "$d"` show.
 
 [^2]: As on the previous page, these names depend on the system: substitute whatever your centre calls each of them.
-
-[^3]: `-C` instead of `-c` puts several stripes of a file on the same OST, which Lustre calls *overstriping*. You are unlikely to need it.
