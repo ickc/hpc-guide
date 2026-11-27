@@ -1,6 +1,6 @@
 ---
 title: "Modules"
-description: "The software the sysadmins installed for you: how to find it, load it in a job, and what it is good for."
+description: "The software the sysadmins installed for you: how to find it, what loading a module does, loading it in a batch job, and mixing modules with your own environments."
 output-file: modules
 aliases: [../../package-managers/modules.html]
 ---
@@ -57,22 +57,14 @@ gcc --version
 
 `module purge` starts from a clean slate, and naming the version means the job still gets the same compiler after the sysadmins change the default. Some clusters have modules loaded by default that you should keep (for example, the one that sets up the scheduler or the interconnect), in which case `module reset` returns to the defaults instead of unloading everything. Your cluster's documentation will say which.[^2]
 
-## What modules are good for
+## Modules and your own environments
 
-What you find with `module avail` varies a lot from one cluster to another. Some have hundreds of modules of research software, others very few. In either case, I think the modules worth using are the ones tied to the machine: compilers, the MPI library, and libraries the vendor has tuned for the hardware, such as BLAS and FFT, or CUDA on a GPU system. These are hard to get right yourself, and the sysadmins have done it for you.
+If you use a module's Python, you cannot add packages to it, and a `pip install --user` on top of it goes into `~/.local/lib/python3.X`, which every other Python of the same version picks up too, the ones in your conda environments included.
 
-::: callout-note
-## For example, on a Cray system
+Be careful about mixing modules with the environments on the following pages. A module prepends to `PATH`, so whichever of the two you set up last wins: load a Python module after activating a conda environment, and `python` is the module's, without the packages you installed. So load modules first, and activate the environment after. A module also prepends to `LD_LIBRARY_PATH`, and anything that looks there for a library can pick up the module's version instead of the one it was built against, which shows up as an error like `` version `GLIBCXX_3.4.30' not found ``. If you need a module and a conda environment in the same job, load as few modules as you can, and if something breaks, `module purge` is the first thing to try. Where you do need both, for MPI, [the section on MPI](../mpi/30-conda.md) shows how to do it properly.
 
-On a Cray EX system, the modules are mostly the Cray programming environment: `PrgEnv-gnu` loads the GNU compilers wrapped by Cray's compiler drivers, with Cray MPICH, and `gcc-native` loads the plain GNU compilers. On the one I have used most, there is almost no research software to load beyond that, so nearly everything else comes from conda.
-:::
-
-For the rest, such as Python and its packages, a module is usually not what you want. It has the version the sysadmins chose, at the time they chose it, and you cannot add packages to it. You end up with a module's Python plus a `pip install --user` on top, in `~/.local/lib/python3.X`, which every other Python of the same version picks up too, the ones in your conda environments included.
-
-Be careful about mixing modules with the environments on the following pages. A module prepends to `PATH`, so whichever of the two you set up last wins: load a Python module after activating a conda environment, and `python` is the module's, without the packages you installed. So load modules first, and activate the environment after. A module also prepends to `LD_LIBRARY_PATH`, and anything that looks there for a library can pick up the module's version instead of the one it was built against, which shows up as an error like `` version `GLIBCXX_3.4.30' not found ``. If you need a module and a conda environment in the same job, load as few modules as you can, and if something breaks, `module purge` is the first thing to try. Where you do need both, for MPI, [the MPI part](../mpi/30-conda.md) shows how to do it properly.
-
-The next page is about conda, which is where most of your software will come from.
+The [next page](30-conda.md) is about conda, which installs software into a prefix of your own.
 
 [^1]: `module --version` tells you which one your cluster has.
 
-[^2]: If a job script fails with `module: command not found`, the shell running it did not read the system's startup files, which is where `module` is defined. Starting the script with `#!/bin/bash -l`, a login shell, usually fixes it.
+[^2]: If a batch script fails with `module: command not found`, the shell running it did not read the system's startup files, which is where `module` is defined. Starting the script with `#!/bin/bash -l`, a login shell, usually fixes it.

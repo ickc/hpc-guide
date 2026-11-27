@@ -33,7 +33,7 @@ So before you trust an MPI environment with a real run, check that the ranks for
 
 Every rank takes part in an `allreduce`, which adds up a 1 from each of them, so the sum is the number of ranks that actually communicated. Then rank 0 collects the name of the node each rank is on, prints a report, and says whether one world spans every rank.
 
-Run it with a job script set up exactly the way your real MPI job is, the same modules and the same environment, on at least 2 nodes, since a world on one node tells you nothing about the network between them:
+Run it with a batch script set up exactly the way your real MPI job is, the same modules and the same environment, on at least 2 nodes, since a world on one node tells you nothing about the network between them:
 
 ``` {.bash include="../../examples/mpi-hello/job.sh"}
 ```
