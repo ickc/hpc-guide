@@ -20,7 +20,7 @@ These run on the cluster itself, in the terminal you logged in with:
 - [Vim](https://www.vim.org)
 - [Helix](https://helix-editor.com)
 
-If you don't know where to start, nano is a good option, often available by default on many HPC systems (though not on all of them). If the one you want is not there, you can install it yourself, as [the part on software environments](../software/index.md) shows.
+If you don't know where to start, nano is a good option, often available by default on many HPC systems (though not on all of them). If the one you want is not there, you can install it yourself, as [the page on tools for yourself](../software/30-tools.md) shows.
 
 ## GUI based text editors with a remote mechanism
 

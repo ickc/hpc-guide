@@ -56,7 +56,7 @@ The examples run in one conda environment, with NumPy, and GNU parallel for a la
 ``` {.yaml include="../examples/pi/environment.yml"}
 ```
 
-Create it on the cluster, as in [the page on conda](../software/package-managers/30-conda.md), with `conda env create -f environment.yml`. The baseline is the whole problem on one core, the 64 tasks one after another:
+Create it on the cluster, as in [the page on conda](../software/package-managers/30-conda.md), with `mamba env create -f environment.yml`. The baseline is the whole problem on one core, the 64 tasks one after another:
 
 ``` {.bash include="../examples/pi/job.sh"}
 ```
