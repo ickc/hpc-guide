@@ -51,7 +51,7 @@ A DOI is a name, which resolves to wherever Zenodo says the record is. Zenodo's 
 
 ## Limitations
 
-What the jobs ran on is in their records, and nowhere else in the archive, which is why a rerun on another machine is checked against the tolerance you declared, rather than bit for bit. And an image or a packed environment runs on its own platform only, so for another, it is the recipe and the lockfile that make the environment again.
+The machine the jobs ran on cannot be archived, only its record, so a rerun on another machine is checked against the tolerance you declared, rather than bit for bit. And an image or a packed environment runs on its own platform only, so for another, it is the recipe and the lockfile that make the environment again.
 
 ## The checklist
 
