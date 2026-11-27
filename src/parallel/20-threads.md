@@ -9,12 +9,12 @@ aliases: [../running-jobs/oversubscription.html]
 
 ## Threads, and where they come from
 
-A *thread* is a stream of work inside a process. All the threads of a process share its memory, so they can work on the same data without sending it to each other, and the operating system runs each thread on whichever core is free. A process with 8 threads can keep 8 cores busy, but only the cores of one node, since that is where its memory is.
+A *thread* is a stream of work inside a process. All the threads of a process share its memory, so they can work on the same data without sending it to each other, and the operating system runs each thread on whichever core is free. A process with 8 threads can keep 8 cores busy, but only on one node, since that is where its memory is.
 
 You often get threads without asking for them:
 
 - **BLAS**, the library that does linear algebra, e.g. matrix products, for NumPy, SciPy, R, and most compiled programs. Its common implementations, OpenBLAS and Intel MKL, use threads by default, so `a @ b` in NumPy may use every core it can see.
-- **OpenMP**, in compiled code (C, C++, Fortran), where a loop marked with `#pragma omp parallel for` is split between threads. Many libraries are built with it.
+- **OpenMP**, in compiled code (C, C++, Fortran), where a loop marked with `#pragma omp parallel for` is split between threads, and in many libraries built with it.
 - **Numba**, in Python, where a function compiled with `@njit(parallel=True)` runs its `prange` loops on threads.
 - **JAX**, on the CPU, which is the odd one out: it [doesn't parallelize operations across CPU cores](https://github.com/jax-ml/jax/issues/5022#issuecomment-1222336766) unless you use explicit parallelism constructs, but some of its operations, such as BLAS or LAPACK, have their own internal parallelism.
 - **Python's own threads**, with `threading` or `concurrent.futures.ThreadPoolExecutor`. With the usual build of Python, only one thread runs Python code at a time, because of its global interpreter lock (the GIL), but NumPy, like many libraries written in C, releases the GIL while it computes, so threads that spend their time in NumPy do run at once.[^1]
@@ -33,7 +33,7 @@ On your own computer, a program can use every core. On a cluster, it can use the
 ``` {.bash include="../examples/pi-threads/job.sh"}
 ```
 
-`--ntasks=1 --cpus-per-task=8` is one task, i.e. one process, with 8 CPUs for its threads. Slurm puts them all on one node, since a task cannot be split between nodes, and sets `SLURM_CPUS_PER_TASK` to 8 in the job (only when you give `--cpus-per-task`), so the script never has to repeat the number. On most clusters, Slurm also confines the job to its CPUs, so that the process cannot run on any other core of the node even if it tries. Then `num-threads.sh`, below, tells every threaded library to use 8 threads, and `pi_threads.py` starts 8 of its own.
+`--ntasks=1 --cpus-per-task=8` is one task, i.e. one process, with 8 CPUs for its threads. Slurm puts them all on one node, since a task cannot be split between nodes, and sets `SLURM_CPUS_PER_TASK` to 8 in the job (only when you give `--cpus-per-task`), so the script never has to repeat the number. On most clusters, Slurm also confines the job to its CPUs, so that the process cannot run on any other core of the node. Then `num-threads.sh`, below, tells every threaded library to use 8 threads, and `pi_threads.py` starts 8 of its own.
 
 The output is
 
@@ -42,7 +42,7 @@ The output is
 pi = 3.141543 from 4294967296 samples
 ```
 
-which is the same estimate as the baseline on one core, about 8 times faster.[^2] 794% is the 8 cores, all busy.
+which is the same estimate as the baseline on one core, about 8 times faster, with the 8 cores all busy.[^2]
 
 ::: callout-tip
 Set the number of threads to the number of *physical* cores available to the process, i.e. disregard the number of logical cores unless you know what you're doing.
@@ -54,7 +54,9 @@ Some CPUs present each physical core as two *logical* cores, which is called sim
 
 On an HPC, you quite often need to think about restricting the number of threads, because when it isn't done carefully, it leads to *oversubscription*: more threads than cores. The threads then take turns on the cores, and every switch from one to another costs time.
 
-It happens when something uses fewer cores than the node has, and a library doesn't know. For example, with hybrid MPI (so-called MPI+X), where each rank's threads, the X, should only use the rank's share of the node, say half of it with 2 MPI ranks per node. Or when you share a node with other users' jobs, which happens whenever you don't ask for the whole node, with `--exclusive`, on a cluster that allows sharing. Or when you run many processes at once, as on the next pages: 8 tasks at a time on 8 CPUs, each of which, through NumPy, starts 8 threads, makes 64 threads on 8 cores.
+It happens when something uses fewer cores than the node has, and a library doesn't know. For example, with hybrid MPI (so-called MPI+X), where each rank's threads, the X, should only use the rank's share of the node, say half of it with 2 MPI ranks per node. Or when you share a node with other users' jobs, which happens whenever you don't ask for the whole node, with `--exclusive`, on a cluster that allows sharing. Or when you run many processes at once, as in the next section: 8 tasks at a time on 8 CPUs, each of which, through NumPy, starts 8 threads, makes 64 threads on 8 cores.
+
+It also happens when `srun` starts tasks without `--cpus-per-task`, e.g. `srun --ntasks=N` in a job that asked for a whole node, with `OMP_NUM_THREADS` set so that ranks times threads is the number of cores. Each task then gets 1 CPU, and with `--cpu-bind=cores` it is pinned to that one core, so all of its threads share it, and the more threads per rank, the slower the job gets. The fix is to tell `srun` how many CPUs each task needs, `srun --ntasks=N --cpus-per-task=M`.
 
 This example does exactly that, the same matrix products in 8 copies at once, first with 1 thread each, then with 8 threads each, what a threaded library would use on 8 CPUs if nothing told it otherwise:
 
@@ -89,7 +91,7 @@ all copies: 0.977 s elapsed, 7.645 s CPU time
 all copies: 4.846 s elapsed, 38.633 s CPU time
 ```
 
-The same work took 5 times as long, and 5 times the CPU time. The threads of a matrix product work together, so they wait for each other, and with 64 threads on 8 cores, the thread being waited for is often not running. How much oversubscription costs depends on that: the 8 threads of `pi_threads.py` never wait for each other, and lose little to it, while those of BLAS and OpenMP lose a lot. Either way, it never gains anything, so it is worth preventing every time.
+The same work took 5 times as long, and 5 times the CPU time. The threads of a matrix product wait for each other, and with 64 threads on 8 cores, the thread being waited for is often not running. Threads that never wait for each other, as those of `pi_threads.py`, lose little to oversubscription, while those of BLAS and OpenMP lose a lot. Oversubscription never gains anything, so it is worth preventing every time.
 
 ## The environment variables
 
@@ -117,17 +119,13 @@ That is why every job in this part sources `num-threads.sh`, even those whose ta
 
 ## Seeing it
 
-Oversubscription doesn't make a job fail. It runs to the end, with the right result, only slower, so what you see is a time that doesn't add up.
-
-One way to get there is a job that asks for a whole node with `--exclusive`, then launches its processes with `srun --ntasks=N`, without `--cpus-per-task`, and sets `OMP_NUM_THREADS` so that ranks times threads is the number of cores. Without `--cpus-per-task`, each task gets 1 CPU, and with `--cpu-bind=cores` it is pinned to that one core, so all of its threads share it. The job uses only as many cores as it has ranks, and the more threads per rank, the slower it gets, which is the opposite of what the arithmetic says. The fix is to tell `srun` how many CPUs each task needs, `srun --ntasks=N --cpus-per-task=M`.
-
-To check a job while it runs, look at its CPU use. `pi_threads.py` and `matmul.py` print theirs, which you can do in your own program with `time.process_time()`; for any program, `sacct` shows the CPU time of a job, `TotalCPU`, next to its `Elapsed` time, and while it runs, you can watch it with `top` on its node:
+Oversubscription doesn't make a job fail. It runs to the end, with the right result, only slower, so what you see is a time that doesn't add up. To check a job while it runs, look at its CPU use. `pi_threads.py` and `matmul.py` print theirs, which you can do in your own program with `time.process_time()`; for any program, `sacct` shows the CPU time of a job, `TotalCPU`, next to its `Elapsed` time, and while it runs, you can watch it with `top` on its node:
 
 ``` bash
 srun --jobid=<job ID> --overlap --pty top
 ```
 
-`--overlap` lets this run alongside the job, on the same CPUs, rather than waiting for them to be free. In `top`, 100% in the `%CPU` column is one core, so a process with 8 threads on its own 8 cores shows about 800%. A process with many threads at about 100%, as the copies above were, is sharing its cores. On a node your job has to itself, so is a *load average*, at the top of `top`, well above the number of CPUs.
+`--overlap` lets this run alongside the job, on the same CPUs, rather than waiting for them to be free. In `top`, 100% in the `%CPU` column is one core, so a process with 8 threads on its own 8 cores shows about 800%. A process with many threads at about 100%, as the copies above were, is sharing its cores, and so, on a node your job has to itself, is a *load average*, at the top of `top`, well above the number of CPUs.
 
 Threads cannot go beyond the process they belong to, and so beyond its node. The [next section](tasks/10-intro.md) is about many processes instead, many independent tasks at once.
 
@@ -135,4 +133,4 @@ Threads cannot go beyond the process they belong to, and so beyond its node. The
 
 [^2]: The timings on this page were measured on 8 cores of an x86 workstation. On the nodes of your cluster the times will be different, but not the ratios between them.
 
-[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the [page on hybrid MPI](30-hybrid-mpi.md), later in this part.
+[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, which is the subject of the [page on hybrid MPI](30-hybrid-mpi.md), later in this part.
