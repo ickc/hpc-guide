@@ -27,18 +27,16 @@ reads the URL and the token from the login node, and opens them in your browser.
 
 ## What it means for security
 
-The difference that matters is that this URL is **public**. Nobody has to sign in: anyone who has the URL reaches your app, from anywhere on the internet. The only thing protecting it is the app's own token, so this is only acceptable for an app that has one, with a strong one. JupyterLab's own is strong enough, and the launcher makes one for the demo app. Never turn the token off for this, as some recipes do.
+This URL is **public**. Nobody has to sign in: anyone who has the URL reaches your app, from anywhere on the internet. The only thing protecting it is the app's own token, so this is only acceptable for an app that has one, with a strong one. JupyterLab's own is strong enough, and the launcher makes one for the demo app. Never turn the token off for this, as some recipes do.
 
-And as with Microsoft's relay, Cloudflare ends the HTTPS and passes the HTTP on, so Cloudflare can read everything that goes through it.[^1]
+And Cloudflare ends the HTTPS and passes the HTTP on, so Cloudflare can read everything that goes through it.[^1]
 
 ## Limitations
 
-Cloudflare says quick tunnels are for testing and development, with no promise that they keep working.[^2] Like the previous two pages, it needs the compute nodes to reach the internet, here Cloudflare and, the first time, GitHub.
-
-So I include it only because it is the least effort of anything in this part. For a quick look, with a strong token, it does the job. For regular use, prefer one of the others.
+Cloudflare says quick tunnels are for testing and development, with no promise that they keep working.[^2] It needs the compute nodes to reach the internet, here Cloudflare and, the first time, GitHub. For a quick look, with a strong token, it does the job.
 
 That is the end of this part, and of this guide.
 
-[^1]: Cloudflare can put a sign-in in front of a tunnel too, with a *named* tunnel and Cloudflare Access. But that needs an account and a domain of your own, and is more setup than any other page of this part.
+[^1]: Cloudflare can put a sign-in in front of a tunnel too, with a *named* tunnel and Cloudflare Access. But that needs an account and a domain of your own.
 
 [^2]: It also limits each quick tunnel to 200 requests at a time, and does not support Server-Sent Events, a way for a web page to receive updates from the server.

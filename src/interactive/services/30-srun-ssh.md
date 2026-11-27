@@ -5,7 +5,7 @@ description: "The fix specific to Slurm: JupyterLab or RStudio listens only on t
 aliases: [../srun-ssh.html]
 ---
 
-On the [previous page](20-https.md), I said I'd talk about a solution specific to Slurm, that is easy to deploy with minimal setup, and works the same whether it is JupyterLab or RStudio. This is it, and it is the one I recommend: run an SSH server on the compute node for the length of your job, and reach it through Slurm rather than through the network.
+The [previous page](20-https.md) ended on a solution specific to Slurm, that is easy to deploy with minimal setup, and works the same whether it is JupyterLab or RStudio: run an SSH server on the compute node for the length of your job, and reach it through Slurm rather than through the network.
 
 ## The idea
 
@@ -18,7 +18,7 @@ Then it is an ordinary SSH session, and SSH does what it always does: it checks 
 
 ![](./hpc-srun-ssh.svg){width="100%" fig-alt="A laptop connects to the login node with ssh. From the login node, srun starts sshd -i on the compute node, which forwards to JupyterLab or RStudio listening on 127.0.0.1 of the same node."}
 
-Compared with [the usual recipe](10-intro.md), nothing listens on the cluster network, so there is nothing for anyone else on the cluster to connect to, and nothing in plain HTTP travels between nodes. Compared with [HTTPS](20-https.md), there is no certificate to make, no fingerprint to check and no browser warning, since SSH checks the server's key itself. And the app does not have to speak HTTPS, so RStudio is no harder than JupyterLab.
+So nothing listens on the cluster network, and nothing in plain HTTP travels between nodes. SSH checks the server's key itself, so there is no certificate to make and no browser warning. And the app does not have to speak HTTPS, so RStudio is no harder than JupyterLab.
 
 ## The scripts
 
