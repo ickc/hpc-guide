@@ -2,10 +2,13 @@
 title: "Working interactively"
 description: "Editing files on the cluster, a shell on a compute node, and JupyterLab or RStudio on one, securely."
 listing:
-  contents: "*.md"
+  contents:
+    - 10-editors.md
+    - 20-shell.md
+    - services/index.md
   type: table
   fields: [title, description]
-  sort: filename
+  sort: false
   sort-ui: false
   filter-ui: false
 aliases: [../text-editors/index.html]
