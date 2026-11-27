@@ -17,9 +17,16 @@ guide is the way it is, and every rule here follows from it. [DEVELOPER.md](DEVE
   they may already know; why it bites; the fix, as commands or files, with each option explained after the
   block; its limitations; a closing sentence pointing to the next page.
 - **Audience.** Assume little. Define each term once, where it first appears. Example first, then why.
-- **Voice.** First person. Hedged opinions ("I think", "I'd recommend"), flat verdicts ("is simply not true"),
-  explicit connectives (so, but, which is why), concrete numbers. Detail that interrupts goes in a footnote.
-  Oxford -ize spelling with British vocabulary.
+- **Voice.** First person for a recommendation ("I'd recommend"), and sparingly. Flat verdicts ("is simply not
+  true"), explicit connectives (so, but, which is why), concrete numbers. Detail that interrupts goes in a
+  footnote. Oxford -ize spelling with British vocabulary.
+- **Succinct.** Keep what the reader needs to do the thing, why each option is there, and the real limitations.
+  Cut internal monologue (the writer classifying or weighing aloud: "I think it is closest to…", "which is less
+  obvious than it sounds"), the verification trail (the source file and version a claim was read from, "according
+  to its documentation" on every claim, a benchmark recounted), digressions into features this reader does not
+  need, and closing sentences that restate the paragraph.
+- **One tool, one page.** On a page about one of several alternatives, do not compare it with the others: that is
+  the job of its section's intro page.
 - **Never write** a balanced antithesis ("Nothing about X; it only does Y"), a short punchy sentence after a long
   one, "It's not X, it's Y", "not just X but Y", the rule of three, an em-dash reversal for rhythm, "Here's the
   thing", "In short", or an inspirational closing line. Prefer commas, colons, parentheses and footnotes to em
