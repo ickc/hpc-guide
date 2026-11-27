@@ -7,7 +7,7 @@ guide is the way it is, and every rule here follows from it. [DEVELOPER.md](DEVE
 
 - Read the page before and the page after the one you are writing, and the pages they link to. The guide is read
   in order, so a page has to pick up where the last one left off.
-- For the voice, and for how the guide teaches, read `src/interactive/30-services.md` and `40-https.md`, which
+- For the voice, and for how the guide teaches, read `src/interactive/services/10-intro.md` and `20-https.md`, which
   are the template the rest follows.
 - Grep for what the guide already covers, and link to it rather than repeat it.
 
@@ -47,7 +47,7 @@ guide is the way it is, and every rule here follows from it. [DEVELOPER.md](DEVE
   surface: an executor raises a task's exception only when its result is retrieved, and a rank that fails leaves
   the others waiting unless the program runs under `python -m mpi4py` or `srun --kill-on-bad-exit=1`.
 - The author's own packages are mentioned, not depended on. `map_parallel` is mentioned once, in
-  `src/parallel/30-one-node.md`.
+  `src/parallel/tasks/30-python-pool.md`.
 - Never link to the author's blog.
 
 ## Accuracy
@@ -85,6 +85,9 @@ guide is the way it is, and every rule here follows from it. [DEVELOPER.md](DEVE
   site's own settings are in `src/_quarto-site.yml`, its styles in `src/custom.scss`.
 - A part is a folder with an `index.md` (a `description`, a short intro, the listing) and `NN-name.md` pages. A
   new part goes into the sidebar in `src/_quarto-site.yml`, the home page listing, and `src/404.md`.
+- Where a part has several ways of doing the same thing, they form a subsection, a subfolder laid out like a
+  part, whose `10-intro.md` compares them and says which to reach for. The page of each one is about that one
+  only: no comparison with the others, and no mention of them beyond a link where they combine.
 - Link to source files, not to `.html`. A page that moves gets `aliases:` with its old path.
 - Run `pixi run format` before every commit, since CI checks it, and `pixi run build` to see the result.
 

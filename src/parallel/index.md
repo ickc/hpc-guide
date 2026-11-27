@@ -2,10 +2,15 @@
 title: "Parallelism"
 description: "Making a computation use many cores and nodes, by the kind of parallel it is: threads, many independent tasks, ranks that communicate, and workflows."
 listing:
-  contents: "*.md"
+  contents:
+    - 10-intro.md
+    - 20-threads.md
+    - tasks/index.md
+    - 30-hybrid-mpi.md
+    - 40-workflows.md
   type: table
   fields: [title, description]
-  sort: filename
+  sort: false
   sort-ui: false
   filter-ui: false
 aliases: [../running-jobs/index.html]

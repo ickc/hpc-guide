@@ -129,10 +129,10 @@ srun --jobid=<job ID> --overlap --pty top
 
 `--overlap` lets this run alongside the job, on the same CPUs, rather than waiting for them to be free. In `top`, 100% in the `%CPU` column is one core, so a process with 8 threads on its own 8 cores shows about 800%. A process with many threads at about 100%, as the copies above were, is sharing its cores. On a node your job has to itself, so is a *load average*, at the top of `top`, well above the number of CPUs.
 
-Threads cannot go beyond the process they belong to, and so beyond its node. The [next page](30-one-node.md) is about many processes instead, many independent tasks at once, on one node.
+Threads cannot go beyond the process they belong to, and so beyond its node. The [next section](tasks/10-intro.md) is about many processes instead, many independent tasks at once.
 
 [^1]: On a *free-threaded* build of Python, which has no GIL, threads run Python code at once too: see [Python's HOWTO on free threading](https://docs.python.org/3/howto/free-threading-python.html).
 
 [^2]: The timings on this page were measured on 8 cores of an x86 workstation. On the nodes of your cluster the times will be different, but not the ratios between them.
 
-[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the [page on hybrid MPI](70-hybrid-mpi.md), later in this part.
+[^3]: Pinning matters most when one node runs several multithreaded processes, as with MPI+X, where each rank's threads should be pinned within its own share of the cores. That is the subject of the [page on hybrid MPI](30-hybrid-mpi.md), later in this part.

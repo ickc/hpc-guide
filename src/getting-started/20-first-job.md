@@ -37,7 +37,7 @@ sbatch job.sh
 
 An option given to `sbatch` on the command line overrides the same directive in the script, so `sbatch --time=00:05:00 job.sh` runs it with a 5-minute limit without editing it.
 
-The job starts in the directory you submitted it from, and by default, with the environment variables of the shell you submitted it from. That is convenient, but it also means a job can depend on something you happened to do in that shell before submitting it, such as loading a module. Put everything the job needs in the script itself, so that it runs the same way tomorrow, which comes back in [the part on software environments](../package-managers/20-modules.md#modules-in-a-job).
+The job starts in the directory you submitted it from, and by default, with the environment variables of the shell you submitted it from. That is convenient, but it also means a job can depend on something you happened to do in that shell before submitting it, such as loading a module. Put everything the job needs in the script itself, so that it runs the same way tomorrow, which comes back in [the part on software environments](../software/package-managers/20-modules.md#modules-in-a-job).
 
 ## Watching it: `squeue`
 

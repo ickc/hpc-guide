@@ -45,14 +45,14 @@ This is handy for watching a running job from the inside: `top` to see whether i
 `sleep infinity` never ends by itself, so the job lasts until its time limit, or until you `scancel` it. In practice, this is your real job script, and you get into it to see how it is doing.
 
 ::: callout-tip
-Run these from inside `tmux` or `screen` on the login node. Then the shell on the compute node survives your laptop going to sleep or your Wi-Fi dropping, since it is the login node that holds the connection to it.[^2] Some clusters do not allow such a session to keep running after you disconnect, as [the page on workflows](../parallel/80-workflows.md#where-the-head-process-runs) explains, so check yours before you rely on it.
+Run these from inside `tmux` or `screen` on the login node. Then the shell on the compute node survives your laptop going to sleep or your Wi-Fi dropping, since it is the login node that holds the connection to it.[^2] Some clusters do not allow such a session to keep running after you disconnect, as [the page on workflows](../parallel/40-workflows.md#where-the-head-process-runs) explains, so check yours before you rely on it.
 :::
 
 ## Limitations
 
 An interactive allocation is used whether you type in it or not. The cores and the time are yours, and are charged to your project, from the moment the shell starts until you exit it, even while you are reading the output or at lunch. So exit when you are done, rather than leave it to the time limit.
 
-And a shell gets *you* onto the compute node, but not your browser. JupyterLab, RStudio and the like listen on a port and expect a browser to connect to it, and your laptop cannot reach a port on a compute node. That is what the [next page](30-services.md) is about, and what the rest of this part solves. The `srun` you have seen here turns out to be part of the answer too.
+And a shell gets *you* onto the compute node, but not your browser. JupyterLab, RStudio and the like listen on a port and expect a browser to connect to it, and your laptop cannot reach a port on a compute node. That is what the [next page](services/10-intro.md) is about, and what the rest of this part solves. The `srun` you have seen here turns out to be part of the answer too.
 
 [^1]: That is the cluster's choice, the `use_interactive_step` option of `LaunchParameters` in its Slurm configuration. With it, `salloc` starts the shell on the allocated node; without it, `salloc` starts the shell where you ran it.
 

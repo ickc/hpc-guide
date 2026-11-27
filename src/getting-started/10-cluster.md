@@ -16,7 +16,7 @@ The *compute nodes* are where the work runs, and there are many more of them, fr
 
 Type `hostname` to see which node you are on. On a login node, it is usually a name with `login` in it; inside a job, it is the name of a compute node. You'll use this a lot in this guide, as the quickest check of where something actually runs.
 
-The two kinds of node are not always the same kind of machine either. On some clusters the login nodes have a different CPU from the compute nodes, or no GPU where the compute nodes have several, or even a different architecture, e.g. `x86_64` login nodes in front of Arm compute nodes. So something that works on the login node is not guaranteed to work on a compute node, which comes back in [the part on software environments](../package-managers/10-intro.md#where-to-put-your-environments).
+The two kinds of node are not always the same kind of machine either. On some clusters the login nodes have a different CPU from the compute nodes, or no GPU where the compute nodes have several, or even a different architecture, e.g. `x86_64` login nodes in front of Arm compute nodes. So something that works on the login node is not guaranteed to work on a compute node, which comes back in [the part on software environments](../software/10-intro.md#where-to-put-your-environments).
 
 ## The scheduler, and why you queue
 
@@ -51,8 +51,7 @@ Nothing necessarily stops you. On one cluster I have used, a login shell could k
 
 The rest of this part is the minimum to get work done: [the next page](20-first-job.md) is your first job, the one after it is about finding out what a job actually used so that you can ask for the right resources, and the last one is a checklist for when a job fails. After that, each part is about one thing, and you can read the ones you need:
 
-- [Software environments](../package-managers/10-intro.md): getting the software your analysis needs onto the cluster, without `sudo`.
-- [MPI](../mpi/10-intro.md): running one program across many nodes, on the MPI that knows the cluster's network.
+- [Software environments](../software/10-intro.md): getting the software your analysis needs onto the cluster, without `sudo`, including an MPI that knows the cluster's network.
 - [Parallelism](../parallel/10-intro.md): making a computation that takes too long on one core use many, from threads to job arrays to workflows.
 - [Storage](../storage/index.md): the filesystems, their quotas, and how to move data in and out.
 - [Working interactively](../interactive/index.md): editing files on the cluster from your laptop, a shell on a compute node, and JupyterLab or RStudio on one, securely.

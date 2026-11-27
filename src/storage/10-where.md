@@ -113,7 +113,7 @@ On several nodes, each node needs its own copy of the inputs, and has its own re
 sbcast "$INPUT" "$LOCAL/inputs.tar"
 ```
 
-where `$LOCAL` has to exist on every node already, e.g. made with `srun --ntasks-per-node=1 mkdir -p "$LOCAL"` first. Then unpack it with one task per node, the same way, and stage out the same way at the end, with the node's name in each tarball's name (`$(hostname).tar`) so that the nodes do not overwrite each other's. The [page on shipping an environment](../package-managers/80-shipping.md) does the same with a packed environment rather than data. If all you need on each node is the program itself, `srun --bcast` copies it to every node before running it there.
+where `$LOCAL` has to exist on every node already, e.g. made with `srun --ntasks-per-node=1 mkdir -p "$LOCAL"` first. Then unpack it with one task per node, the same way, and stage out the same way at the end, with the node's name in each tarball's name (`$(hostname).tar`) so that the nodes do not overwrite each other's. The [page on shipping an environment](../software/50-shipping.md) does the same with a packed environment rather than data. If all you need on each node is the program itself, `srun --bcast` copies it to every node before running it there.
 
 That is more to get right, and with a `trap` on each node rather than one. So before you write your own, check what your centre already provides, since some centres have integrated node-local storage into Slurm:
 

@@ -5,8 +5,7 @@ listing:
   id: parts
   contents:
     - getting-started/index.md
-    - package-managers/index.md
-    - mpi/index.md
+    - software/index.md
     - parallel/index.md
     - storage/index.md
     - interactive/index.md

@@ -44,18 +44,33 @@ website:
         href: getting-started/index.md
         contents:
           - auto: "getting-started/*.md"
+      # A part with subsections lists its pages and subsections in order,
+      # since an auto glob cannot place a folder between two pages.
       - section: "Software environments"
-        href: package-managers/index.md
+        href: software/index.md
         contents:
-          - auto: "package-managers/*.md"
-      - section: "MPI"
-        href: mpi/index.md
-        contents:
-          - auto: "mpi/*.md"
+          - software/10-intro.md
+          - section: "Package managers"
+            href: software/package-managers/index.md
+            contents:
+              - auto: "software/package-managers/*.md"
+          - software/30-tools.md
+          - section: "MPI"
+            href: software/mpi/index.md
+            contents:
+              - auto: "software/mpi/*.md"
+          - software/50-shipping.md
       - section: "Parallelism"
         href: parallel/index.md
         contents:
-          - auto: "parallel/*.md"
+          - parallel/10-intro.md
+          - parallel/20-threads.md
+          - section: "Many independent tasks"
+            href: parallel/tasks/index.md
+            contents:
+              - auto: "parallel/tasks/*.md"
+          - parallel/30-hybrid-mpi.md
+          - parallel/40-workflows.md
       - section: "Storage"
         href: storage/index.md
         contents:
@@ -63,7 +78,12 @@ website:
       - section: "Working interactively"
         href: interactive/index.md
         contents:
-          - auto: "interactive/*.md"
+          - interactive/10-editors.md
+          - interactive/20-shell.md
+          - section: "Services on a compute node"
+            href: interactive/services/index.md
+            contents:
+              - auto: "interactive/services/*.md"
   page-footer:
     left: "© {{< copyright-year 2026 >}} Kolen Cheung. Text under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), code under [BSD-3-Clause](https://github.com/ickc/hpc-guide/blob/main/LICENSE)."
 

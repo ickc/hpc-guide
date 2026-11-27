@@ -202,8 +202,14 @@ else needs editing: the sidebar picks it up through an `auto` glob in
 own glob. Leave gaps in the numbering (10, 20, 30) so pages can be inserted
 without renumbering.
 
-`src/_quarto-site.yml` only names the sections and their order. It never lists
-individual pages.
+A section can also hold a subsection: a subfolder laid out the same way, with
+its own `index.md` and `NN-name.md` pages, listed in the part's sidebar entry
+and in the `contents` of the part's `index.md` listing. In such a part,
+`src/_quarto-site.yml` lists the part's own pages and subsections in order,
+since an `auto` glob cannot place a folder between two pages; inside the
+subsection, an `auto` glob still picks up new pages. Elsewhere,
+`src/_quarto-site.yml` only names the sections and their order, and never
+lists individual pages.
 
 ### The not-found page
 

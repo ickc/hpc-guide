@@ -5,7 +5,7 @@ output-file: intro
 aliases: [../running-jobs/embarassingly-parallel.html]
 ---
 
-The previous part ended with an MPI that spans the nodes. But MPI is only one answer to a more common question, which is probably the one that brought you to an HPC in the first place: you have a computation that takes too long on one core, and you want it to use many. This part is about how, and the first step is to work out what kind of parallel your computation is, because each kind has its own tools, and the wrong one either doesn't speed anything up or makes a mess of the scheduler.
+The previous part ended with an environment, and an MPI, that work on every node. But MPI is only one answer to a more common question, which is probably the one that brought you to an HPC in the first place: you have a computation that takes too long on one core, and you want it to use many. This part is about how, and the first step is to work out what kind of parallel your computation is, because each kind has its own tools, and the wrong one either doesn't speed anything up or makes a mess of the scheduler.
 
 ## The kinds of parallel
 
@@ -15,7 +15,7 @@ It helps to sort the problems into four classes, by asking what the pieces of yo
 
 **One process using many cores.** Your program is one process, and it can use more than one core by itself, through *threads*: several streams of work inside the same process, sharing its memory. You may not have written any of them. NumPy's linear algebra, a compiled program with OpenMP, or a function compiled with Numba all start threads on their own. Threads share memory, so they cannot go beyond one node.
 
-**Ranks that communicate.** The pieces need to exchange data while they run, e.g. a simulation on a grid split between processes, where each one needs the values at the edges of its neighbours' part every step. That is MPI, the subject of [the previous part](../mpi/10-intro.md), and it is the one kind that spans many nodes as one program.
+**Ranks that communicate.** The pieces need to exchange data while they run, e.g. a simulation on a grid split between processes, where each one needs the values at the edges of its neighbours' part every step. That is MPI, the subject of [the previous part](../software/mpi/10-intro.md), and it is the one kind that spans many nodes as one program.
 
 **Tasks with dependencies.** A pipeline: some tasks need the output of others, e.g. align every sample, then call variants on each, then merge them all. Each step may well be embarrassingly parallel on its own, but there is an order between them, and once there are more than a couple of steps, you want a *workflow manager* to keep track of what to run when.
 
@@ -35,19 +35,17 @@ So, crossing the two:
 
 |  | One node | Many nodes |
 |----------------------------------------|----------------------------------------|----------------------------------------|
-| Many independent tasks | GNU parallel, or a pool of processes in Python ([one node](30-one-node.md)) | a Slurm job array ([job arrays](40-job-arrays.md)), [`mpi4py.futures`](50-mpi4py-futures.md), or [DragonHPC](60-dragon.md) |
+| Many independent tasks | [GNU parallel](tasks/20-gnu-parallel.md), or [a pool of processes in Python](tasks/30-python-pool.md) | a Slurm [job array](tasks/40-job-arrays.md), [`mpi4py.futures`](tasks/50-mpi4py-futures.md), or [DragonHPC](tasks/60-dragon.md) |
 | One process, many cores | threads ([threads](20-threads.md)) | not possible: threads share memory |
-| Ranks that communicate | MPI | MPI, with threads in each rank ([hybrid MPI](70-hybrid-mpi.md)) |
-| Tasks with dependencies | a [workflow manager](80-workflows.md) | a [workflow manager](80-workflows.md) |
+| Ranks that communicate | MPI | MPI, with threads in each rank ([hybrid MPI](30-hybrid-mpi.md)) |
+| Tasks with dependencies | a [workflow manager](40-workflows.md) | a [workflow manager](40-workflows.md) |
 
 Or, as a guide to the pages of this part:
 
 - If your program already uses threads, or could, start with [threads](20-threads.md), which is also where oversubscription is explained: running more threads than cores, which every other page has to avoid.
-- If you have many independent tasks that fit on one node, use [GNU parallel or a pool of processes](30-one-node.md).
-- If you have more of them than one node can run in the time you have, use a [job array](40-job-arrays.md), possibly with GNU parallel inside each of its tasks.
-- If your tasks are Python functions and you want to spread them over many nodes from one script, the page on [`mpi4py.futures`](50-mpi4py-futures.md) does that with MPI underneath, and the one on [DragonHPC](60-dragon.md) with a runtime of its own.
-- If your program is MPI, with threads in each rank, the page on [hybrid MPI](70-hybrid-mpi.md) is about placing the ranks and threads on the cores.
-- If your tasks depend on each other, the page on [workflows](80-workflows.md) goes from `sbatch --dependency` to workflow managers such as Snakemake and Nextflow.
+- If you have many independent tasks, the section on [many tasks](tasks/10-intro.md) starts with which way to run them, on one node or on many.
+- If your program is MPI, with threads in each rank, the page on [hybrid MPI](30-hybrid-mpi.md) is about placing the ranks and threads on the cores.
+- If your tasks depend on each other, the page on [workflows](40-workflows.md) goes from `sbatch --dependency` to workflow managers such as Snakemake and Nextflow.
 
 The [listing of this part](index.md) has all of them.
 
@@ -67,7 +65,7 @@ The examples run in one conda environment, with NumPy, and GNU parallel for a la
 ``` {.yaml include="../examples/pi/environment.yml"}
 ```
 
-Create it on the cluster, as in [the page on conda](../package-managers/30-conda.md), with `conda env create -f environment.yml`. The baseline is the whole problem on one core, the 64 tasks one after another:
+Create it on the cluster, as in [the page on conda](../software/package-managers/30-conda.md), with `conda env create -f environment.yml`. The baseline is the whole problem on one core, the 64 tasks one after another:
 
 ``` {.bash include="../examples/pi/job.sh"}
 ```
