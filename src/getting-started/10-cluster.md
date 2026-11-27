@@ -45,7 +45,7 @@ Since the login nodes are shared by everyone, anything heavy you run there slows
 - Something that keeps running after you leave, such as a JupyterLab server, or an AI coding agent. Some clusters forbid running an agent on a login node outright.[^4]
 - Asking the scheduler about your jobs in a tight loop, e.g. `watch -n 1 squeue --me`. The scheduler is shared too, and every query is work for it. Every 15 seconds or so is plenty.
 
-Nothing necessarily stops you. On one cluster I have used, a login shell could keep all 144 cores of the login node busy, with no per-user limit that I could find. So it is up to you. Other clusters do limit each user on a login node, e.g. to a few cores, in which case a heavy program there is not only antisocial but slow. Editing, looking at output, moving files, installing software into an environment, and submitting jobs are what login nodes are for, so do those there without worrying.
+Nothing necessarily stops you: on one cluster I have used, a login shell could keep all 144 cores of the login node busy. Other clusters limit each user on a login node, e.g. to a few cores, and then a heavy program there is slow as well. Editing, looking at output, moving files, installing software into an environment, and submitting jobs are what login nodes are for, so do those there without worrying.
 
 ## How this guide is organised
 

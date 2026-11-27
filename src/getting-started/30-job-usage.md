@@ -68,7 +68,7 @@ Many clusters also have `seff`, a script that comes with Slurm but is not always
 
 ## Asking for the right resources
 
-With those numbers, the next job can ask for about what it needs. Each resource has its own trade-off.
+With those numbers, the next job can ask for about what it needs. Each resource has its own tradeoff.
 
 **Time.** Ask for the `Elapsed` of a representative run, plus a margin for a slower node or a bigger input, e.g. half as much again. Too tight, and the job is killed just before it finishes, which wastes the whole run. But don't ask for the longest time the partition allows "to be safe", as a shorter job starts sooner: the scheduler fills the gaps before bigger jobs with smaller, shorter ones that fit in them, which is called *backfill*, and a job that asks for a week never fits in a gap. `sinfo -o "%P %l"` shows the longest time each partition allows. If your work needs more than that, it has to be split into jobs that each fit, e.g. by saving its state at the end of each job and continuing from it in the next, or, if it is many independent pieces, as a [job array](../parallel/tasks/40-job-arrays.md).
 
