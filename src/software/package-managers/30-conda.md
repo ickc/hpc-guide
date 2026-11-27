@@ -125,6 +125,6 @@ mamba env export > environment.lock.yml
 mamba env export --from-history > environment.yml
 ```
 
-Then `mamba env create -f environment.lock.yml` reproduces exactly the same environment on a machine of the same platform. Only of the same platform, though: an export from Linux `x86_64` can include packages, such as MKL, that do not exist for `aarch64`. `conda create -n env2 --clone env1` makes a copy of an environment under a new name.
+Then `mamba env create -f environment.lock.yml` makes the same environment again on a machine of the same platform, as long as the channel still has every one of those builds, since it solves again from their names. Only of the same platform, though: an export from Linux `x86_64` can include packages, such as MKL, that do not exist for `aarch64`. `conda list --explicit --md5` lists every package by its URL and hash instead, and needs no solve, which is why [Freezing an environment](../../reproducibility/30-environment.md#from-names-to-hashes), in the part on reproducibility, recommends it. `conda create -n env2 --clone env1` makes a copy of an environment under a new name.
 
 The [next page](40-pixi.md) is about pixi, which uses the same conda-forge packages.

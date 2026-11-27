@@ -41,7 +41,7 @@ From: condaforge/miniforge3:latest
 apptainer build numpy.sif numpy.def
 ```
 
-`%post` runs once, at build time, as root inside the container, which is where you can `apt-get install` too. Whether you can build on the cluster depends on whether it allows unprivileged builds (Apptainer uses user namespaces, or `--fakeroot`, for this). If it does not, build the image on your own Linux machine, or in CI, and copy the `.sif` over: it is just a file.
+`%post` runs once, at build time, as root inside the container, which is where you can `apt-get install` too. Whether you can build on the cluster depends on whether it allows unprivileged builds (Apptainer uses user namespaces, or `--fakeroot`, for this). If it does not, build the image on your own Linux machine, or in CI, and copy the `.sif` over: it is just a file. Built again next month, the same definition file gives a different image, since `:latest` and the solve both move on. For a result you mean to reproduce, start `From:` a digest and keep the `.sif`, as in [Freezing an environment](../../reproducibility/30-environment.md#a-container-is-not-frozen-either).
 
 In a job, the container is one more word in front of your command:
 
