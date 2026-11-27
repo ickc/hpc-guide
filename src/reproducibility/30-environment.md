@@ -63,9 +63,9 @@ and start a definition file `From:` a digest rather than `:latest`. Keep the `.s
 
 ## Limitations
 
-A lockfile pins what would be downloaded, not that it can still be downloaded: a channel can drop a package, and a registry an image, which is what archiving, at the end of this part, is about. It says nothing about what the cluster provides, the modules, the MPI, the GPU driver, the kernel and the CPU, which you cannot lock, only record. And one recipe solved for two platforms gives two environments, with different packages in them, such as MKL, which conda-forge has for `x86_64` and not for `aarch64`, and so possibly different numbers from the same code.
+A lockfile pins what would be downloaded, not that it can still be downloaded: a channel can drop a package, and a registry an image, which is what [archiving](60-archiving.md), at the end of this part, is about. It says nothing about what the cluster provides, the modules, the MPI, the GPU driver, the kernel and the CPU, which you cannot lock, only record. And one recipe solved for two platforms gives two environments, with different packages in them, such as MKL, which conda-forge has for `x86_64` and not for `aarch64`, and so possibly different numbers from the same code.
 
-The next page is about that part of the environment, the one that belongs to the centre, and how to record it in every job.
+[The next page](40-machine.md) is about that part of the environment, the one that belongs to the centre, and how to record it in every job.
 
 [^1]: `$SCRATCH` is what many clusters call their scratch space, large and fast but purged of files not used for a while. Not every cluster sets it, and some use another name, so look for that kind of storage in your centre's documentation; [the part on storage](../storage/10-where.md) is about the kinds there are.
 

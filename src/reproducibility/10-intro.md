@@ -20,9 +20,9 @@ Benureau and Rougier, in [a paper on what it takes to turn code into a scientifi
 
 |  | Held fixed | Varies | Counts as the same | In this part |
 |------------------------|------------------------|------------------------|------------------------|------------------------|
-| Re-runnable | the code, and a description of an environment it runs in | the system and libraries around it, as time passes | it runs again | [the environment](30-environment.md), the archive |
+| Re-runnable | the code, and a description of an environment it runs in | the system and libraries around it, as time passes | it runs again | [the environment](30-environment.md), [the archive](60-archiving.md) |
 | Repeatable | the code, its inputs and its seeds, on the same machine | nothing but the run | the same output, run after run | [seeds and the order of a sum](20-determinism.md) |
-| Reproducible | the code, the data, the parameters and the exact environment | who runs it, and on which computer | the same result | the environment, the machine, workflows, the archive |
+| Reproducible | the code, the data, the parameters and the exact environment | who runs it, and on which computer | the same result | the environment, [the machine](40-machine.md), workflows, the archive |
 | Reusable | --- | what the code is used for, and the code itself | others can run it, understand it and change it | beyond this part |
 | Replicable | the method, as the paper describes it | the code, written anew | the same result | beyond this part |
 
@@ -40,7 +40,7 @@ A *stateful aspect* is anything the result depends on that nobody wrote down as 
 
 ## This part
 
-Each page of this part captures one kind of input. [The next page](20-determinism.md) is about the ones inside your own code: seeds, and the order in which a parallel program adds up its results, which decides whether its output is the same to the last bit. [Freezing an environment](30-environment.md) is about the software it runs on, from an `environment.yml` that says `numpy` to a lockfile that names every package by its hash. The page after it is about the machine, the part of the environment that belongs to the centre, its modules, MPI, GPU driver, kernel and CPU, which you cannot lock, and so record in every job. Then a section on workflows, pipelines of many steps, each with its inputs and an environment of its own. The last page is about archiving a result, so that its inputs can still be found when someone asks for them, and ends with a checklist for your own project.
+Each page of this part captures one kind of input. [The next page](20-determinism.md) is about the ones inside your own code: seeds, and the order in which a parallel program adds up its results, which decides whether its output is the same to the last bit. [Freezing an environment](30-environment.md) is about the software it runs on, from an `environment.yml` that says `numpy` to a lockfile that names every package by its hash. [The page after it](40-machine.md) is about the machine, the part of the environment that belongs to the centre, its modules, MPI, GPU driver, kernel and CPU, which you cannot lock, and so record in every job. Then a section on workflows, pipelines of many steps, each with its inputs and an environment of its own. [The last page](60-archiving.md) is about archiving a result, so that its inputs can still be found when someone asks for them, and ends with a checklist for your own project.
 
 The parts before this one already did some of this. [Software environments](../software/10-intro.md) built environments from files, and every page of [Parallelism](../parallel/10-intro.md) printed the same estimate of π, to the last digit, whatever ran it, for reasons the next page goes into.
 

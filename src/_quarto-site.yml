@@ -90,6 +90,8 @@ website:
           - reproducibility/10-intro.md
           - reproducibility/20-determinism.md
           - reproducibility/30-environment.md
+          - reproducibility/40-machine.md
+          - reproducibility/60-archiving.md
   page-footer:
     left: "© {{< copyright-year 2026 >}} Kolen Cheung. Text under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), code under [BSD-3-Clause](https://github.com/ickc/hpc-guide/blob/main/LICENSE)."
 
