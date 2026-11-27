@@ -11,7 +11,7 @@ So far, this part has mostly treated a package as something that either works or
 
 MPI, the Message Passing Interface, is how a program runs as many processes, on one node or on many, that work on one problem together by sending each other messages. Each process is a *rank*, numbered from 0, and all the ranks of a run together form the *world*, `MPI_COMM_WORLD`. When rank 0 adds up a number from every other rank, that is a message from each of them to rank 0, and if the ranks are on different nodes, the message goes over the network between the nodes.
 
-MPI is a standard, and what you install is an *implementation* of it, a library (`libmpi.so`) that your program is linked against, and there are two main families: [MPICH](https://www.mpich.org) and [Open MPI](https://www.open-mpi.org). Many others are derived from MPICH, including the MPI that a vendor such as HPE Cray ships with its machines. mpi4py, in turn, is a Python wrapper around whichever `libmpi.so` it was built against.
+MPI is a standard, and what you install is an *implementation* of it, a library (`libmpi.so`) that your program is linked against. There are two main families, [MPICH](https://www.mpich.org) and [Open MPI](https://www.open-mpi.org), and many others are derived from MPICH, including the MPI that a vendor such as HPE Cray ships with its machines. mpi4py, in turn, is a Python wrapper around whichever `libmpi.so` it was built against.
 
 ## Why the vendor's MPI
 
@@ -31,7 +31,7 @@ srun python mpi_hello.py
 
 `srun` starts one process for each task in the job's allocation (8, for `--nodes=2 --ntasks-per-node=4`), on the right nodes, and gives each of them what it needs to find the others through PMI. The vendor's MPI picks that up, and the processes form one world. `srun --mpi=list` shows which kinds of PMI your Slurm offers.
 
-You will see instructions that use `mpirun` or `mpiexec` instead. Those come with an MPI, and each launches processes its own way. If your `mpirun` comes from conda, it can form a world across nodes, because it can ask Slurm which nodes the job has and start its processes on them. But it uses its own MPI, with its own networking libraries, so it does not use the fast network the way the vendor's MPI does. And an MPI from conda launched with `srun` gives every process a world of its own, which is the subject of [the next page](20-check.md).
+You will see instructions that use `mpirun` or `mpiexec` instead. Those come with an MPI, and each launches processes its own way. If your `mpirun` comes from conda, it can form a world across nodes, because it can ask Slurm which nodes the job has and start its processes on them. But it uses its own MPI, with its own networking libraries, so it does not use the fast network the way the vendor's MPI does. And an MPI from conda launched with `srun` gives every process a world of its own, which the next page comes back to.
 
 ## The MPICH ABI
 

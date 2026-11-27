@@ -59,7 +59,7 @@ gcc --version
 
 ## Modules and your own environments
 
-A module's Python has the version the sysadmins chose, at the time they chose it, and you cannot add packages to it. A `pip install --user` on top of it goes into `~/.local/lib/python3.X`, which every other Python of the same version picks up too, the ones in your conda environments included.
+If you use a module's Python, you cannot add packages to it, and a `pip install --user` on top of it goes into `~/.local/lib/python3.X`, which every other Python of the same version picks up too, the ones in your conda environments included.
 
 Be careful about mixing modules with the environments on the following pages. A module prepends to `PATH`, so whichever of the two you set up last wins: load a Python module after activating a conda environment, and `python` is the module's, without the packages you installed. So load modules first, and activate the environment after. A module also prepends to `LD_LIBRARY_PATH`, and anything that looks there for a library can pick up the module's version instead of the one it was built against, which shows up as an error like `` version `GLIBCXX_3.4.30' not found ``. If you need a module and a conda environment in the same job, load as few modules as you can, and if something breaks, `module purge` is the first thing to try. Where you do need both, for MPI, [the section on MPI](../mpi/30-conda.md) shows how to do it properly.
 
