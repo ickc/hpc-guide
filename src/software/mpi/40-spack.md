@@ -5,13 +5,13 @@ output-file: spack
 aliases: [../../package-managers/spack-mpi.html, ../../mpi/spack.html]
 ---
 
-[The previous page](30-conda.md) was about MPI in a conda environment. If your MPI program is compiled, and built from source with [Spack](../package-managers/60-spack.md), the problem is the same, but Spack gives you more say in how to solve it.
+[The previous page](30-conda.md) composed a conda environment with the vendor's MPI. This page does the same for an MPI program built from source with [Spack](../package-managers/60-spack.md).
 
 ## What Spack does by default
 
 Ask Spack for a package that needs MPI, and unless told otherwise, it builds an MPI too, from source, along with everything that MPI depends on, including the library it talks to the network through. On a Cray system that is libfabric, and the libfabric Spack builds has whatever providers, the drivers for each kind of network, its defaults give it, rather than being the one the vendor built for that network.[^1] The result can form a world across nodes, and still not use the fast network.
 
-So you tell Spack about the vendor's libraries, as *externals*: software that is already installed, which Spack uses rather than builds. You do this in the `packages:` section of a Spack environment's `spack.yaml`, or of a `packages.yaml` that applies to all of your environments.
+So you tell Spack about the vendor's libraries as [externals](../package-managers/60-spack.md), in the `packages:` section of the environment's `spack.yaml`, or of a `packages.yaml` that applies to all of your environments.
 
 ## At the very least, libfabric
 
@@ -26,9 +26,7 @@ packages:
       prefix: /path/to/libfabric
 ```
 
-`spec` says what the external is, a libfabric of that version with the `cxi` fabric, and `prefix` where it is installed, which you substitute: on a Cray system, `module show libfabric` shows it, and so does `pkg-config --variable=prefix libfabric` with the module loaded. `buildable: false` is the important line: without it, Spack is free to build a libfabric anyway, if it decides that another version fits the rest of the environment better. With it, any MPICH Spack builds is built against the vendor's libfabric, and talks to the network through it.
-
-This is still worse than not building an MPI at all, though.
+`spec` says what the external is, a libfabric of that version with the `cxi` fabric, and `prefix` where it is installed, which you substitute: on a Cray system, `module show libfabric` shows it, and so does `pkg-config --variable=prefix libfabric` with the module loaded. `buildable: false` is the important line: without it, Spack is free to build a libfabric anyway, if it decides that another version fits the rest of the environment better. With it, any MPICH Spack builds is built against the vendor's libfabric, and talks to the network through it. This is still worse than not building an MPI at all, though.
 
 ## Better, the vendor's MPI itself
 
@@ -37,7 +35,7 @@ Better is to add the vendor's MPI, and the vendor's PMI that it uses to talk to 
 ``` {.yaml include="../../examples/spack-mpi/spack.yaml"}
 ```
 
-`providers: mpi: [cray-mpich]` makes Cray MPICH the package that provides MPI to everything else, and the three externals are Cray MPICH, Cray's PMI, and libfabric. The versions and prefixes are your system's, and change when the vendor's software is upgraded, so take them from the modules: `module show cray-mpich` (or the module for your vendor's MPI) shows where it is installed, and the same for `cray-pmi` and `libfabric`. On a Cray system, `MPICH_DIR` is also set to Cray MPICH's prefix once a programming environment is loaded, and `pkg-config --variable=prefix cray-pmi` gives Cray PMI's. Replace each `/path/to/...` with those.
+`providers: mpi: [cray-mpich]` makes Cray MPICH the package that provides MPI to everything else, and the three externals are Cray MPICH, Cray's PMI, and libfabric. The versions and prefixes are your system's, and change when the vendor's software is upgraded, so take them from the modules, and replace each `/path/to/...` with them: `module show cray-mpich` (or the module for your vendor's MPI) shows where it is installed, and the same for `cray-pmi` and `libfabric`. On a Cray system, `MPICH_DIR` is also set to Cray MPICH's prefix once a programming environment is loaded, and `pkg-config --variable=prefix cray-pmi` gives Cray PMI's.
 
 ::: callout-note
 ## Your centre may have one already
@@ -54,7 +52,7 @@ Build it as in [the Spack page](../package-managers/60-spack.md), with `spack in
 
 ## Don't build Open MPI on an MPICH system
 
-Open MPI and MPICH are two different implementations of the MPI standard, with different ABIs. On a system whose vendor MPI is derived from MPICH, as Cray's is, building Open MPI with Spack means building a whole MPI stack of your own, with none of the vendor's tuning, and none of the vendor's support when it goes wrong. I don't recommend it, unless you have an advanced reason to, such as an application that only works with Open MPI.
+On a system whose vendor MPI is derived from MPICH, as Cray's is, the vendor's MPI cannot stand in for Open MPI, which has an ABI of its own, so building Open MPI with Spack means building a whole MPI stack of your own, with none of the vendor's tuning, and none of the vendor's support when it goes wrong. I don't recommend it, unless you have an advanced reason to, such as an application that only works with Open MPI.
 
 ## Which network does it use?
 
