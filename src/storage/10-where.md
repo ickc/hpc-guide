@@ -18,7 +18,7 @@ Your home directory is mounted on every node, login and compute, and it is where
 
 Home is the one most likely to be backed up, or to keep snapshots you can restore from, on the clusters that back up anything at all. But on many clusters, nothing is backed up, home included. It is not purged.
 
-For a job on several nodes, home is shared, so every node sees the same files, which makes it fine for the job script and the small configuration files it reads at the start. It is not the place for the data.
+For a job on several nodes, home is shared, so every node sees the same files, which makes it fine for the batch script and the small configuration files it reads at the start. It is not the place for the data.
 
 ### Scratch, `$SCRATCH`
 
@@ -118,7 +118,7 @@ where `$LOCAL` has to exist on every node already, e.g. made with `srun --ntask
 That is more to get right, and with a `trap` on each node rather than one. So before you write your own, check what your centre already provides, since some centres have integrated node-local storage into Slurm:
 
 - a private `/tmp` for each job, from a Slurm plugin that gives every job its own `/tmp` and `/dev/shm`, removed when the job ends, so that two jobs on a node never see each other's files;[^6]
-- a [burst buffer](https://slurm.schedmd.com/burst_buffer.html), fast storage you ask for in the job script (with `#DW` lines on a Cray system with DataWarp, or `--bb` options), which Slurm stages in before the job starts and stages out after it ends, so the job itself never waits for it;
+- a [burst buffer](https://slurm.schedmd.com/burst_buffer.html), fast storage you ask for in the batch script (with `#DW` lines on a Cray system with DataWarp, or `--bb` options), which Slurm stages in before the job starts and stages out after it ends, so the job itself never waits for it;
 - a filesystem made for the length of the job out of the local disks of all its nodes, which every node of the job can see. BeeOND, from the makers of BeeGFS, is one, and it is the centre that has to set it up, from the scripts Slurm runs before and after each job.
 
 Your centre's documentation says which of these it has, if any, and how to ask for them.

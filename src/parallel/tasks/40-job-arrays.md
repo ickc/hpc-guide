@@ -56,7 +56,7 @@ A pipeline with more steps than one reduce is the subject of the [page on workfl
 
 Each array task is a job, with everything that comes with one: the scheduler has to find room for it, start it, track it while it runs, and account for it after it ends. An array is cheaper for the scheduler than as many separate jobs, but 10,000 array tasks are still 10,000 jobs to schedule, and the scheduler is shared by everyone on the cluster. When it is overwhelmed, it is slow for all of them, `squeue` and `sbatch` included.
 
-Each task also pays for itself. It waits in the queue, then starts from nothing: a new shell, activating the environment, starting Python and importing NumPy, all reading from the shared filesystem, the [cost of activation](../../software/package-managers/30-conda.md) multiplied by the number of tasks. For a task that takes an hour, none of that matters. For one that takes 10 seconds, it can be more than the task itself.
+Each task also pays for itself. It waits in the queue, then starts from nothing: a new shell, activating the environment, starting Python and importing NumPy, all reading from the shared filesystem, the [cost of activation](../../software/package-managers/30-conda.md#activate-once-on-the-login-node) multiplied by the number of tasks. For a task that takes an hour, none of that matters. For one that takes 10 seconds, it can be more than the task itself.
 
 Clusters protect themselves with limits. `MaxArraySize` in Slurm's configuration caps the indices of an array (by default, 1001, so indices up to 1000), which `scontrol show config | grep -i MaxArraySize` shows.
 

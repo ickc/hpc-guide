@@ -60,7 +60,7 @@ The script runs Python through `/usr/bin/time -v`, which runs a command, and onc
 
 Why measure memory with this, when `sacct` has `MaxRSS`? Because `sacct` doesn't watch the memory all the time. It takes a sample every so often, every 30 seconds by default, so a peak shorter than that can fall between two samples, and a job killed for running out of memory may show a `MaxRSS` lower than what killed it.[^1] `/usr/bin/time -v` gets the peak from the kernel when the command ends, so it doesn't miss it. And it is per command, so in a script that runs several programs, one after another, you see which one needs the memory.
 
-Write it as `/usr/bin/time`, the full path, or `command time`. A plain `time -v` doesn't work in bash, since `time` alone is a keyword of bash, which knows no `-v`. And `/usr/bin/time` is a separate program, GNU time, which most Linux systems have, but not all: if `ls /usr/bin/time` says there is none, ask your sysadmins, or install it yourself, which [the part on software environments](../software/10-intro.md) shows how.[^2]
+Write it as `/usr/bin/time`, the full path, or `command time`. A plain `time -v` doesn't work in bash, since `time` alone is a keyword of bash, which knows no `-v`. And `/usr/bin/time` is a separate program, GNU time, which most Linux systems have, but not all: if `ls /usr/bin/time` says there is none, ask your sysadmins, or install it yourself, as [the page on tools for yourself](../software/30-tools.md) shows.[^2]
 
 ## `seff`, where your cluster has it
 

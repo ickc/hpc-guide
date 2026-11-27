@@ -20,7 +20,7 @@ This guide is for you if you have an allocation on an HPC cluster and an analysi
 
 It is written to be read as a book, from one page to the next, and each part builds on the ones before. If you are new to clusters, start at [Getting started](getting-started/10-cluster.md). If you know what you are after, each part can also be read on its own, and its first page says where it picks up.
 
-Most pages are built around examples: a job script, a program, a configuration file, explained line by line. Each one is a real file in [the guide's repository](https://github.com/ickc/hpc-guide/tree/main/src/examples), which you can download and run, and the page shows exactly what is in it. In the part on parallelism, every page solves the same problem, a Monte Carlo estimate of π, so that you can compare the ways of running it.
+Most pages are built around examples: a batch script, a program, a configuration file, explained line by line. Each one is a real file in [the guide's repository](https://github.com/ickc/hpc-guide/tree/main/src/examples), which you can download and run, and the page shows exactly what is in it. In the part on parallelism, every page solves the same problem, a Monte Carlo estimate of π, so that you can compare the ways of running it.
 
 ## The parts
 

@@ -90,7 +90,7 @@ gives you a shell there, which you can use for anything you would use `ssh` for,
 
 ## Limitations
 
-It needs an `sshd` on the compute node that you can run. Nearly every Linux system has one in `/usr/sbin`, since it is how you log in, but a compute node is not always a full system. If it has none, install OpenSSH yourself, e.g. from conda-forge, as [the part on software environments](../../software/index.md) shows, and set `SSHD` to it when you submit, as in `SSHD=/path/to/sshd sbatch launch.sh`.
+It needs an `sshd` on the compute node that you can run. Nearly every Linux system has one in `/usr/sbin`, since it is how you log in, but a compute node is not always a full system. If it has none, install OpenSSH yourself, e.g. from conda-forge, as [the page on tools for yourself](../../software/30-tools.md#a-conda-environment-of-tools) shows, and set `SSHD` to it when you submit, as in `SSHD=/path/to/sshd sbatch launch.sh`.
 
 `connect.sh` logs in to the login node five times: four to fetch the details and keys, and one to carry the session. With an SSH key, you won't notice. But if your cluster asks for a password or a second factor every time you log in, it will fail, since it cannot type them for you. SSH can share one login between connections, which fixes that: put this in your `~/.ssh/config` on your laptop,
 
