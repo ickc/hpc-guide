@@ -22,6 +22,12 @@ communicate, and workflows, and only then into the tools for each, on one node o
 picking up from the one before, and ends by pointing to the next, so that a reader who starts at the beginning
 never meets something unexplained.
 
+Where there are several ways of doing the same thing, such as the ways to run many independent tasks, or to reach
+a web app on a compute node, they form a section of their own, which starts with a page comparing them: what each
+is for, the tradeoffs, and which to reach for first. The page on each one is then about that one only. A reader
+on the page about DragonHPC has already chosen it, and wants to know how to run it, so how it compares with
+`mpi4py.futures` belongs on the page where they choose.
+
 It is selective. The material it grew from had far more in it than it uses, much of it specific to one system,
 or one scheduler. A tool or a detail goes in only if this reader needs it to get their work done, and the rest is
 a link to the tool's own documentation.
@@ -73,6 +79,12 @@ It is written in my voice, in the first person, as the blog is: hedged where it 
 flat where it is a fact ("this is a big no-no"), and with the detail that would interrupt the argument in
 footnotes. Not in the voice of a documentation site, and not in the aphoristic voice of a language model either:
 no balanced antitheses, no punchlines, no rules of three.
+
+A page is succinct, and on point: it says what the reader needs to get the thing done, and stops. The first
+person is for a recommendation, not for thinking aloud: no "I think it is closest to…", weighing one tool
+against another on a page that is about one of them. Nor does a page show how its claims were checked: the
+source file and version a fact was read from, or a benchmark recounted to prove a point, is of no use to the
+reader, who gets the fact, and a link where they would want to read on.
 
 ## No caveats about itself
 
