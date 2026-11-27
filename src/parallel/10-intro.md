@@ -77,4 +77,4 @@ The next page starts with the kind that needs no change to how you run your prog
 
 [^2]: Each task's random numbers come from `np.random.default_rng([seed, ROOT_SEED])`, a list of the task's own seed and one shared by all of them, which is how [NumPy's documentation](https://numpy.org/doc/stable/reference/random/parallel.html) recommends giving each worker an independent stream. Adding the task's number to a root seed, the obvious alternative, is the one it singles out as unsafe.
 
-[^3]: To the last digit, as long as NumPy is the same version: the tasks draw the same points whichever way they are run.
+[^3]: To the last digit, as long as it runs with the same build of NumPy: the tasks draw the same points whichever way they are run.

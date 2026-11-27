@@ -35,7 +35,7 @@ And Cloudflare ends the HTTPS and passes the HTTP on, so Cloudflare can read eve
 
 Cloudflare says quick tunnels are for testing and development, with no promise that they keep working.[^2] It needs the compute nodes to reach the internet, here Cloudflare and, the first time, GitHub. For a quick look, with a strong token, it does the job.
 
-That is the end of this part, and of this guide.
+That is the end of this part. Everything in the guide so far has been about getting an analysis to run on a cluster, and [the last part](../../reproducibility/10-intro.md) is about running it again, and getting the same result.
 
 [^1]: Cloudflare can put a sign-in in front of a tunnel too, with a *named* tunnel and Cloudflare Access. But that needs an account and a domain of your own.
 

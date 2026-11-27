@@ -9,6 +9,7 @@ listing:
     - parallel/index.md
     - storage/index.md
     - interactive/index.md
+    - reproducibility/index.md
   type: table
   fields: [title, description]
   sort: false
